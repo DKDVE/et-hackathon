@@ -11,9 +11,29 @@ from app.memory.ingestion.pdf_parser import PageText
 
 logger = logging.getLogger(__name__)
 
-_NUMBERED_HEADING = re.compile(r"^(\d+(?:\.\d+)*)\s+(.+)$")
+# Clause heading: a dotted number, optionally followed by a single trailing
+# separator ('.' or ')') — accepts "1 Purpose", "1. Purpose", "2) Procedure",
+# "3.1. Steps". The trailing separator is not captured into the section_ref.
+_NUMBERED_HEADING = re.compile(r"^(\d+(?:\.\d+)*)[.)]?\s+(.+)$")
 _SOP_HEADING = re.compile(r"^(SOP-\d+)\s*[—\-]\s*(.+)$", re.IGNORECASE)
 _SOP_STEP = re.compile(r"^(SOP-\d+)\s+Step\s+(\d+)\s*[:\-]?\s*(.+)$", re.IGNORECASE)
+
+
+def _is_heading_title(title: str) -> bool:
+    """Distinguish a genuine clause caption from a numbered *step* or a prose
+    line that merely happens to start with a number (e.g. "0.05 mm/100 mm ...").
+
+    ponytail: caption heuristic — a heading is short and unpunctuated; steps and
+    sentences end in terminal punctuation and run long. Ceiling: a heading longer
+    than 10 words, or a step with no terminal punctuation, is misclassified.
+    Upgrade path = explicit heading styles emitted by the renderer.
+    """
+    t = title.strip()
+    if not t:
+        return False
+    if t[-1] in ".;:!?":
+        return False
+    return len(t.split()) <= 10
 
 
 @dataclass(frozen=True)
@@ -48,8 +68,8 @@ class _Block:
 
 def _heading_ref(line: str) -> str | None:
     m = _NUMBERED_HEADING.match(line.strip())
-    if m:
-        return f"{m.group(1)} {m.group(2)}"
+    if m and _is_heading_title(m.group(2)):
+        return f"{m.group(1)} {m.group(2).strip()}"
     m = _SOP_HEADING.match(line.strip())
     if m:
         return f"{m.group(1)} — {m.group(2)}"
