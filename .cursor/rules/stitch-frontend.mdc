@@ -1,0 +1,18 @@
+---
+description: Use Stitch MCP for OCE frontend UI/UX design and integration
+globs: frontend/**/*
+alwaysApply: false
+---
+
+# Stitch MCP — Frontend UI/UX
+
+For **any** new screen, component scaffold, or visual refresh in `frontend/`:
+
+1. Read `frontend/stitch.config.json` for project and design-system IDs.
+2. Use **user-stitch** MCP (`list_projects`, `get_project`, `get_screen`) before improvising layouts.
+3. **New screens:** `generate_screen_from_text` with `designSystem: assets/5895438689689797248`, `deviceType: DESKTOP`, `projectId` from config. Do not retry on timeout — poll with `get_screen` every 30s.
+4. **Theme changes:** `update_design_system` on the OCE Industrial Dark system, then `apply_design_system` to affected screens.
+5. **Integration:** Translate Stitch HTML to React + ShadCN — map colors to CSS variables in `src/index.css` (`--primary` amber, slate surfaces). Use `lucide-react` icons, not Material Symbols. No ad-hoc hex in components.
+6. **Reference:** TDD §10 section order for DossierView; safety notes amber-on-dark, hypothesis dashed borders.
+
+Stitch is the design source of truth; ShadCN tokens are the implementation source of truth.
