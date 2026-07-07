@@ -1,0 +1,1735 @@
+# =============================================================================
+# MERIDIAN SPECIALTY CHEMICALS — RELATIONAL TRUTH (P10)
+# =============================================================================
+# This file is the single source of truth for the seeded plant. Every rendered
+# document (manual, SOPs, reports, registry CSVs) is a deterministic rendering
+# of the facts declared here. No fact may appear in a document that is absent
+# from this file.
+#
+# Ground truth vs. database:
+#   - `true_failure_mode` on work orders is GROUND TRUTH for the M3 normalization
+#     audit. It is NEVER written to Postgres. Only raw text reaches the DB; the
+#     system must *discover* the failure mode itself.
+#   - The ~500 work orders are a mix of hard-authored WOs (the planted pattern +
+#     history depth + red herrings) and deterministically generated noise. The
+#     generator (render_wo.py) expands the `work_order_generation` spec below
+#     using only phrasings/facts declared in this file, so P10 still holds: every
+#     phrase a technician "wrote" is authored here, in `phrase_bank`.
+#
+# Money is INR (₹), temperatures Celsius, pressures bar(g) / kg/cm² — an Indian
+# specialty-chemicals plant. Tag conventions: P-xxxx pumps, M-xxxx motors,
+# E-xxxx exchangers, A-xxxx agitators, C-xxxx compressors, CV-xxxx control
+# valves, TK-xxxx tanks. First digit of the numeric block = unit.
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# PLANTS & UNITS
+# -----------------------------------------------------------------------------
+plants:
+  - code: MV
+    name: Meridian Vashi
+    location: Vashi, Navi Mumbai, Maharashtra
+  - code: MT
+    name: Meridian Taloja
+    location: Taloja MIDC, Raigad, Maharashtra
+
+units:
+  # --- Vashi ---
+  - code: U100
+    plant: MV
+    name: Unit 100 — Solvent Recovery
+    areas: [Distillation, Solvent Transfer]
+  - code: U200
+    plant: MV
+    name: Unit 200 — Resins
+    areas: [Reactor Hall, Blending, Drumming]
+  # --- Taloja ---
+  - code: U300
+    plant: MT
+    name: Unit 300 — Specialty Esters
+    areas: [Esterification, Product Transfer, Filtration]
+  - code: U400
+    plant: MT
+    name: Unit 400 — Utilities & Tank Farm
+    areas: [Cooling Water, Tank Farm]
+
+# -----------------------------------------------------------------------------
+# ASSET CLASSES (~8). Hero class = CP200 (Rheinwerk MSC-CP200).
+# `key` is the internal handle used by generators; `code` is the human short.
+# -----------------------------------------------------------------------------
+asset_classes:
+  - key: CP200          # HERO CLASS
+    manufacturer: Rheinwerk Pumps GmbH
+    model: MSC-CP200
+    class_name: Centrifugal process pump (hot organics duty)
+    description: >-
+      Single-stage overhung centrifugal process pump, ISO 2858 / API 610 OH2
+      style, cartridge mechanical seal with API Plan 11 flush, rated for hot
+      organic transfer up to 220 C. The plant's hero pump family.
+  - key: CP100
+    manufacturer: Rheinwerk Pumps GmbH
+    model: MSC-CP100
+    class_name: Centrifugal process pump (general service)
+    description: >-
+      Close-coupled general-service centrifugal pump for cool/ambient aqueous
+      and light-solvent transfer, component mechanical seal, no external flush.
+  - key: MOT
+    manufacturer: Bharat Bijlee
+    model: BB-IE3-160
+    class_name: LV squirrel-cage induction motor
+    description: >-
+      Three-phase TEFC squirrel-cage induction motor, IE3, 415 V, driving pumps
+      and agitators across both plants.
+  - key: HEX
+    manufacturer: Alfa Laval India
+    model: AL-STX
+    class_name: Shell-and-tube heat exchanger
+    description: >-
+      Fixed-tubesheet shell-and-tube heat exchanger for process heating and
+      cooling duties, carbon-steel shell with SS316 tubes.
+  - key: AGI
+    manufacturer: Sulzer India
+    model: SZ-TE
+    class_name: Top-entry agitator
+    description: >-
+      Top-entry gear-driven agitator with mechanical seal, for reactor and
+      blend-vessel mixing duties.
+  - key: COMP
+    manufacturer: Atlas Copco India
+    model: GA-45
+    class_name: Rotary screw air compressor
+    description: >-
+      Oil-injected rotary screw compressor supplying plant and instrument air.
+  - key: CV
+    manufacturer: Emerson Fisher
+    model: EZ-globe
+    class_name: Globe control valve
+    description: >-
+      Pneumatic-actuated globe control valve with positioner, for flow and
+      temperature control loops.
+  - key: TK
+    manufacturer: Meridian Fabrication (in-house)
+    model: AST-CS
+    class_name: Atmospheric storage tank
+    description: >-
+      Vertical atmospheric carbon-steel storage tank, cone roof, for solvent
+      and product storage in the tank farm.
+
+# -----------------------------------------------------------------------------
+# ASSETS (~40). Registry-complete for ALL tiers (D-013).
+# hero: true marks the four CP200 sisters (Tier 1 depth).
+# wo_count: total work orders this asset carries (hard-authored + generated),
+#   summed across all assets == 500.
+# -----------------------------------------------------------------------------
+assets:
+  # ===== HERO CP200 SISTERS (mixed across units, same duty family) =====
+  - tag: P-3401
+    name: Ester feed pump A
+    class: CP200
+    plant: MT
+    unit: U300
+    area: Esterification
+    service_duty: Hot organics transfer — molten ester feed, 185 C
+    criticality: A
+    installed_on: 2019-05-14
+    hero: true
+    wo_count: 30
+  - tag: P-3402
+    name: Ester feed pump B
+    class: CP200
+    plant: MT
+    unit: U300
+    area: Product Transfer
+    service_duty: Hot organics transfer — ester product, 175 C
+    criticality: A
+    installed_on: 2019-05-14
+    hero: true
+    wo_count: 30
+  - tag: P-3105
+    name: Solvent bottoms pump
+    class: CP200
+    plant: MV
+    unit: U100
+    area: Distillation
+    service_duty: Hot organics transfer — column bottoms, 190 C
+    criticality: A
+    installed_on: 2020-02-20
+    hero: true
+    wo_count: 30
+  - tag: P-2210
+    name: Resin transfer pump
+    class: CP200
+    plant: MV
+    unit: U200
+    area: Blending
+    service_duty: Hot organics transfer — hot resin blend, 160 C
+    criticality: B
+    installed_on: 2020-08-03
+    hero: true
+    wo_count: 30
+
+  # ===== CP100 general-service pumps (6) =====
+  - tag: P-1101
+    name: Distillate transfer pump
+    class: CP100
+    plant: MV
+    unit: U100
+    area: Solvent Transfer
+    service_duty: Light solvent transfer, ambient
+    criticality: C
+    installed_on: 2018-11-10
+    wo_count: 11
+  - tag: P-1102
+    name: Reflux pump
+    class: CP100
+    plant: MV
+    unit: U100
+    area: Distillation
+    service_duty: Reflux return, 60 C
+    criticality: B
+    installed_on: 2018-11-10
+    wo_count: 14
+  - tag: P-2201
+    name: Reactor charge pump
+    class: CP100
+    plant: MV
+    unit: U200
+    area: Reactor Hall
+    service_duty: Monomer charge, ambient
+    criticality: B
+    installed_on: 2019-03-22
+    wo_count: 13
+  - tag: P-2202
+    name: Blend circulation pump
+    class: CP100
+    plant: MV
+    unit: U200
+    area: Blending
+    service_duty: Resin blend circulation, 55 C
+    criticality: C
+    installed_on: 2019-07-30
+    wo_count: 10
+  - tag: P-3301
+    name: Filtrate pump
+    class: CP100
+    plant: MT
+    unit: U300
+    area: Filtration
+    service_duty: Filtrate transfer, 70 C
+    criticality: C
+    installed_on: 2020-06-15
+    wo_count: 12
+  - tag: P-4101
+    name: Cooling water pump
+    class: CP100
+    plant: MT
+    unit: U400
+    area: Cooling Water
+    service_duty: Cooling water circulation, ambient
+    criticality: B
+    installed_on: 2017-09-01
+    wo_count: 15
+
+  # ===== Motors (8) =====
+  - tag: M-3401
+    name: Motor for P-3401
+    class: MOT
+    plant: MT
+    unit: U300
+    area: Esterification
+    service_duty: Drives ester feed pump A
+    criticality: A
+    installed_on: 2019-05-14
+    wo_count: 10
+  - tag: M-3402
+    name: Motor for P-3402
+    class: MOT
+    plant: MT
+    unit: U300
+    area: Product Transfer
+    service_duty: Drives ester feed pump B
+    criticality: A
+    installed_on: 2019-05-14
+    wo_count: 9
+  - tag: M-3105
+    name: Motor for P-3105
+    class: MOT
+    plant: MV
+    unit: U100
+    area: Distillation
+    service_duty: Drives solvent bottoms pump
+    criticality: A
+    installed_on: 2020-02-20
+    wo_count: 11
+  - tag: M-2210
+    name: Motor for P-2210
+    class: MOT
+    plant: MV
+    unit: U200
+    area: Blending
+    service_duty: Drives resin transfer pump
+    criticality: B
+    installed_on: 2020-08-03
+    wo_count: 8
+  - tag: M-1101
+    name: Motor for P-1101
+    class: MOT
+    plant: MV
+    unit: U100
+    area: Solvent Transfer
+    service_duty: Drives distillate transfer pump
+    criticality: C
+    installed_on: 2018-11-10
+    wo_count: 7
+  - tag: M-2201
+    name: Motor for reactor charge pump
+    class: MOT
+    plant: MV
+    unit: U200
+    area: Reactor Hall
+    service_duty: Drives reactor charge pump
+    criticality: B
+    installed_on: 2019-03-22
+    wo_count: 9
+  - tag: M-3301
+    name: Motor for filtrate pump
+    class: MOT
+    plant: MT
+    unit: U300
+    area: Filtration
+    service_duty: Drives filtrate pump
+    criticality: C
+    installed_on: 2020-06-15
+    wo_count: 8
+  - tag: M-4101
+    name: Motor for cooling water pump
+    class: MOT
+    plant: MT
+    unit: U400
+    area: Cooling Water
+    service_duty: Drives cooling water pump
+    criticality: B
+    installed_on: 2017-09-01
+    wo_count: 10
+
+  # ===== Heat exchangers (5) =====
+  - tag: E-1110
+    name: Column overhead condenser
+    class: HEX
+    plant: MV
+    unit: U100
+    area: Distillation
+    service_duty: Overhead vapour condensing
+    criticality: B
+    installed_on: 2018-10-05
+    wo_count: 13
+  - tag: E-2110
+    name: Reactor jacket cooler
+    class: HEX
+    plant: MV
+    unit: U200
+    area: Reactor Hall
+    service_duty: Reactor jacket cooling
+    criticality: B
+    installed_on: 2019-02-18
+    wo_count: 12
+  - tag: E-3110
+    name: Ester product cooler
+    class: HEX
+    plant: MT
+    unit: U300
+    area: Product Transfer
+    service_duty: Ester product cooling, 175→45 C
+    criticality: B
+    installed_on: 2020-01-12
+    wo_count: 14
+  - tag: E-3210
+    name: Feed preheater
+    class: HEX
+    plant: MT
+    unit: U300
+    area: Esterification
+    service_duty: Feed preheating
+    criticality: C
+    installed_on: 2020-01-12
+    wo_count: 11
+  - tag: E-4110
+    name: Cooling water plate cooler
+    class: HEX
+    plant: MT
+    unit: U400
+    area: Cooling Water
+    service_duty: Closed-loop cooling
+    criticality: C
+    installed_on: 2017-09-01
+    wo_count: 10
+
+  # ===== Agitators (4) =====
+  - tag: A-2110
+    name: Reactor R-201 agitator
+    class: AGI
+    plant: MV
+    unit: U200
+    area: Reactor Hall
+    service_duty: Resin reactor mixing
+    criticality: A
+    installed_on: 2019-02-18
+    wo_count: 14
+  - tag: A-2120
+    name: Reactor R-202 agitator
+    class: AGI
+    plant: MV
+    unit: U200
+    area: Reactor Hall
+    service_duty: Resin reactor mixing
+    criticality: A
+    installed_on: 2019-04-25
+    wo_count: 13
+  - tag: A-3110
+    name: Ester reactor agitator
+    class: AGI
+    plant: MT
+    unit: U300
+    area: Esterification
+    service_duty: Esterification reactor mixing
+    criticality: A
+    installed_on: 2020-01-30
+    wo_count: 12
+  - tag: A-3120
+    name: Blend vessel agitator
+    class: AGI
+    plant: MT
+    unit: U300
+    area: Product Transfer
+    service_duty: Product blend mixing
+    criticality: C
+    installed_on: 2020-03-11
+    wo_count: 9
+
+  # ===== Compressors (3) =====
+  - tag: C-4110
+    name: Plant air compressor 1
+    class: COMP
+    plant: MT
+    unit: U400
+    area: Cooling Water
+    service_duty: Plant air supply
+    criticality: B
+    installed_on: 2017-09-01
+    wo_count: 14
+  - tag: C-4120
+    name: Plant air compressor 2
+    class: COMP
+    plant: MT
+    unit: U400
+    area: Cooling Water
+    service_duty: Plant air supply (standby)
+    criticality: C
+    installed_on: 2017-09-01
+    wo_count: 11
+  - tag: C-4210
+    name: Instrument air compressor
+    class: COMP
+    plant: MT
+    unit: U400
+    area: Tank Farm
+    service_duty: Instrument air supply
+    criticality: B
+    installed_on: 2018-06-20
+    wo_count: 12
+
+  # ===== Control valves (5) =====
+  - tag: CV-1101
+    name: Column reflux control valve
+    class: CV
+    plant: MV
+    unit: U100
+    area: Distillation
+    service_duty: Reflux flow control
+    criticality: C
+    installed_on: 2018-11-10
+    wo_count: 9
+  - tag: CV-2101
+    name: Reactor temp control valve
+    class: CV
+    plant: MV
+    unit: U200
+    area: Reactor Hall
+    service_duty: Jacket coolant temperature control
+    criticality: B
+    installed_on: 2019-02-18
+    wo_count: 10
+  - tag: CV-3101
+    name: Ester feed flow valve
+    class: CV
+    plant: MT
+    unit: U300
+    area: Esterification
+    service_duty: Ester feed flow control
+    criticality: B
+    installed_on: 2020-01-12
+    wo_count: 11
+  - tag: CV-3201
+    name: Product cooler bypass valve
+    class: CV
+    plant: MT
+    unit: U300
+    area: Product Transfer
+    service_duty: Cooler bypass temperature control
+    criticality: C
+    installed_on: 2020-01-12
+    wo_count: 8
+  - tag: CV-4101
+    name: Cooling water flow valve
+    class: CV
+    plant: MT
+    unit: U400
+    area: Cooling Water
+    service_duty: Cooling water flow control
+    criticality: C
+    installed_on: 2017-09-01
+    wo_count: 8
+
+  # ===== Storage tanks (5) =====
+  - tag: TK-1201
+    name: Recovered solvent tank
+    class: TK
+    plant: MV
+    unit: U100
+    area: Solvent Transfer
+    service_duty: Recovered solvent storage
+    criticality: C
+    installed_on: 2018-08-01
+    wo_count: 9
+  - tag: TK-3201
+    name: Ester product day tank
+    class: TK
+    plant: MT
+    unit: U300
+    area: Product Transfer
+    service_duty: Ester product day storage
+    criticality: B
+    installed_on: 2020-01-05
+    wo_count: 10
+  - tag: TK-4201
+    name: Bulk solvent tank 1
+    class: TK
+    plant: MT
+    unit: U400
+    area: Tank Farm
+    service_duty: Bulk solvent storage
+    criticality: B
+    installed_on: 2017-08-15
+    wo_count: 9
+  - tag: TK-4202
+    name: Bulk solvent tank 2
+    class: TK
+    plant: MT
+    unit: U400
+    area: Tank Farm
+    service_duty: Bulk solvent storage
+    criticality: C
+    installed_on: 2017-08-15
+    wo_count: 7
+  - tag: TK-4203
+    name: Off-spec product tank
+    class: TK
+    plant: MT
+    unit: U400
+    area: Tank Farm
+    service_duty: Off-spec / recovery storage
+    criticality: C
+    installed_on: 2018-03-10
+    wo_count: 7
+
+# -----------------------------------------------------------------------------
+# FAILURE MODES (~25, ISO 14224-flavoured).
+# The `description` is the text M3 embeds for normalization — plain engineering
+# language, one dense sentence each. `code` is the normalized label.
+# `family` groups phenomenologically adjacent modes (D-017): the normalization
+# margin gate is a CROSS-family confusion guard only — within a family, near-ties
+# are expected (adjacent modes) and the best score wins. Family assignment is a
+# curation judgment, human-ratified (see M3.2 report).
+# -----------------------------------------------------------------------------
+failure_modes:
+  - code: mechanical_seal_leakage
+    family: sealing
+    name: Mechanical seal leakage
+    description: >-
+      Loss of process fluid past the mechanical seal faces or gland, seen as
+      weeping, dripping or product on the baseplate, from worn, scored or
+      improperly flushed seal faces. Often reported as seal weeping, dripping at
+      the gland or gland follower, product on the baseplate, scored or worn seal
+      faces, or a failed/replaced seal cartridge.
+  - code: seal_flush_line_blockage
+    family: sealing
+    name: Seal flush line blockage
+    description: >-
+      Restriction or fouling of the seal flush line, orifice or strainer that
+      starves the seal faces of cooling and lubrication flow and drives them to
+      run hot and fail. Often reported as flush line choked, low flush flow,
+      dirty strainer, blocked orifice, or running non-standard flush plan Y
+      instead of OEM Plan 11.
+  - code: gland_packing_leakage
+    family: sealing
+    name: Gland packing leakage
+    description: >-
+      Excessive leakage past compression gland packing due to worn rings or lost
+      adjustment on packed (non-mechanical-seal) equipment. Often reported as
+      gland packing dripping, weeping past the gland follower, or packing
+      retightened with leakage persisting.
+  - code: bearing_wear
+    family: tribology
+    name: Bearing wear
+    description: >-
+      Progressive degradation of rolling-element bearings producing rising
+      vibration, audible noise and elevated bearing housing temperature. Often
+      reported as bearing noisy DE/NDE side, elevated vibration, rumbling, or
+      bearing housing temperature rising.
+  - code: bearing_seizure
+    family: tribology
+    name: Bearing seizure
+    description: >-
+      Sudden loss of bearing function from loss of lubrication or contamination,
+      causing the shaft to bind, overheat or stop. Often reported as pump
+      stopped, shaft locked or won't turn, bearing seized, hot with burnt smell,
+      or no grease.
+  - code: shaft_misalignment
+    family: alignment
+    name: Shaft misalignment
+    description: >-
+      Angular or parallel misalignment between driver and driven shaft coupling
+      that raises vibration and loads bearings and seals beyond design. Often
+      reported as coupling wear, vibration at 2x running speed, soft foot, or
+      laser alignment out of tolerance.
+  - code: cavitation
+    family: hydraulic
+    name: Cavitation
+    description: >-
+      Vapour-bubble formation and collapse in the pump from insufficient NPSH,
+      producing crackling noise, unstable flow and impeller surface erosion.
+      Often reported as pump crackling, gravel-like noise, flow swinging,
+      suction low, or NPSH inadequate.
+  - code: impeller_damage
+    family: hydraulic
+    name: Impeller damage
+    description: >-
+      Mechanical damage to the impeller — cracked or broken vanes, wear-ring
+      contact or foreign-object strike — reducing head and flow. Often reported
+      as no head from pump, impeller vane broken or cracked, foreign object
+      inside, or casing opened to find damage.
+  - code: impeller_wear
+    family: hydraulic
+    name: Impeller wear
+    description: >-
+      Gradual erosion of impeller vanes and wear rings from abrasive or
+      high-velocity service, causing slow loss of developed head over time.
+      Often reported as head dropping slowly, impeller vanes eroded, wear rings
+      worn, clearances open, or performance down.
+  - code: coupling_failure
+    family: alignment
+    name: Coupling failure
+    description: >-
+      Failure of the flexible coupling element, spacer or bolts transmitting
+      torque between driver and pump, causing vibration or loss of drive. Often
+      reported as coupling element torn, rubber element broken, no drive, or
+      spacer replaced.
+  - code: motor_winding_overheating
+    family: electrical
+    name: Motor winding overheating
+    description: >-
+      Overheating of motor stator windings from overload, phase imbalance or
+      cooling loss, tripping on thermal protection and degrading insulation.
+      Often reported as motor tripped on overload, winding hot with smell, or
+      phase currents imbalanced.
+  - code: motor_bearing_failure
+    family: tribology
+    name: Motor bearing failure
+    description: >-
+      Degradation or failure of the motor's own drive- or non-drive-end
+      bearings, producing motor-side vibration and noise. Often reported as
+      motor NDE/DE bearing noisy, vibration on motor side, or motor bearings
+      replaced.
+  - code: electrical_insulation_fault
+    family: electrical
+    name: Electrical insulation fault
+    description: >-
+      Breakdown of winding or cable insulation seen as low insulation
+      resistance, earth fault or tripping of electrical protection. Often
+      reported as megger/IR low, earth fault, motor isolated, or insulation
+      resistance below threshold.
+  - code: lubrication_degradation
+    family: tribology
+    name: Lubrication degradation
+    description: >-
+      Loss of lubricant condition — contamination, water ingress, wrong grade or
+      low level — that accelerates bearing and gear wear. Often reported as oil
+      dark, water in oil, wrong grease grade, low lube level, or contaminated
+      grease.
+  - code: soft_foot
+    family: structural
+    name: Soft foot / foundation
+    description: >-
+      Uneven machine footing, loose hold-down bolts or degraded grout that
+      distorts the casing and induces vibration and misalignment. Often reported
+      as soft foot found, hold-down bolts loose, foundation cracked, or one foot
+      shimmed.
+  - code: high_vibration
+    family: structural
+    name: High vibration (undiagnosed)
+    description: >-
+      Elevated overall vibration recorded on rotating equipment where the root
+      cause is not yet isolated to a specific mechanical mode. Often reported as
+      overall vibration high with cause not yet isolated, vibration elevated and
+      trending, or monitoring continued.
+  - code: instrument_drift
+    family: valves_instrumentation
+    name: Instrument drift
+    description: >-
+      Gradual deviation of a transmitter or gauge from calibrated true value,
+      giving misleading process readings until recalibrated. Often reported as
+      gauge/transmitter reading off vs field, xmtr drift, or recalibrated to true
+      value.
+  - code: control_valve_seat_leakage
+    family: valves_instrumentation
+    name: Control valve seat leakage
+    description: >-
+      Passing of a shut control valve across the seat from erosion or debris,
+      preventing tight isolation and disturbing control. Often reported as CV
+      passing when shut, seat eroded, passing across seat, or lapped/replaced
+      trim.
+  - code: control_valve_stem_sticking
+    family: valves_instrumentation
+    name: Control valve stem sticking
+    description: >-
+      Sticky or hunting valve stem travel from packing friction, actuator or
+      positioner faults, degrading loop control. Often reported as valve
+      sticking, hunting, packing tight, or positioner hunting.
+  - code: suction_strainer_fouling
+    family: hydraulic
+    name: Suction strainer fouling
+    description: >-
+      Accumulation of debris on the pump suction strainer that starves suction,
+      lowers flow and can induce cavitation. Often reported as suction strainer
+      choked, flow low, high dP across strainer, or strainer cleaned.
+  - code: heat_exchanger_tube_fouling
+    family: heat_transfer
+    name: Heat exchanger tube fouling
+    description: >-
+      Deposition of scale, polymer or dirt on exchanger tubes that reduces heat
+      transfer and raises pressure drop and outlet temperature. Often reported as
+      HX dP high, outlet temp up, poor duty, tubes fouled, or chem clean
+      scheduled.
+  - code: heat_exchanger_tube_leak
+    family: heat_transfer
+    name: Heat exchanger tube leak
+    description: >-
+      Loss of tube integrity allowing cross-contamination between shell and tube
+      sides, detected by composition or pressure change. Often reported as cross
+      contamination, tube leak on exchanger, hydrotest failure, or tube plugged.
+  - code: gasket_joint_leakage
+    family: integrity
+    name: Gasket / joint leakage
+    description: >-
+      Leakage from a flanged or bonnet joint due to gasket failure, relaxation
+      or improper bolt-up. Often reported as flange weeping, bonnet joint leak,
+      gasket blown, or torqued after replacement.
+  - code: corrosion_erosion
+    family: integrity
+    name: Corrosion / erosion
+    description: >-
+      Metal loss of casing, piping or internals from chemical attack or
+      high-velocity abrasion, thinning walls over time. Often reported as wall
+      thin, UT readings low, metal thinning on casing, or corrosion on pump
+      casing.
+  - code: tank_shell_corrosion
+    family: integrity
+    name: Tank shell / roof corrosion
+    description: >-
+      Corrosion of storage-tank shell, roof or bottom plate from product,
+      condensation or atmospheric attack, threatening containment. Often reported
+      as tank shell corroded, roof rusty/pitting, external or internal shell
+      corrosion, or recoat planned.
+
+# -----------------------------------------------------------------------------
+# WORK-ORDER GENERATION SPEC (deterministic — render_wo.py expands this).
+# `routine_ratio` of each asset's WOs are routine/ambiguous → the correct
+# normalization outcome is `unclassified` (honest negatives for the audit).
+# Remaining WOs draw a true_failure_mode from the class profile weights.
+# -----------------------------------------------------------------------------
+work_order_generation:
+  first_wo_year: 2020            # generated WOs start no earlier than this
+  last_wo_date: 2026-06-30
+  routine_ratio: 0.12            # ~12% land in the unclassified bucket
+  # Per-class weighted failure-mode distribution for GENERATED (noise) WOs.
+  class_failure_profiles:
+    CP200:
+      mechanical_seal_leakage: 4
+      bearing_wear: 3
+      seal_flush_line_blockage: 2
+      cavitation: 2
+      shaft_misalignment: 2
+      coupling_failure: 1
+      lubrication_degradation: 2
+      impeller_wear: 1
+    CP100:
+      mechanical_seal_leakage: 2
+      bearing_wear: 3
+      cavitation: 2
+      shaft_misalignment: 2
+      suction_strainer_fouling: 2
+      gland_packing_leakage: 1
+      coupling_failure: 1
+    MOT:
+      motor_bearing_failure: 3
+      motor_winding_overheating: 3
+      electrical_insulation_fault: 2
+      lubrication_degradation: 2
+      high_vibration: 1
+    HEX:
+      heat_exchanger_tube_fouling: 4
+      heat_exchanger_tube_leak: 2
+      gasket_joint_leakage: 2
+      corrosion_erosion: 2
+    AGI:
+      mechanical_seal_leakage: 2
+      bearing_wear: 3
+      shaft_misalignment: 2
+      lubrication_degradation: 2
+      coupling_failure: 1
+    COMP:
+      bearing_wear: 2
+      lubrication_degradation: 3
+      high_vibration: 2
+      motor_winding_overheating: 1
+      gasket_joint_leakage: 1
+    CV:
+      control_valve_stem_sticking: 4
+      control_valve_seat_leakage: 3
+      instrument_drift: 2
+      gasket_joint_leakage: 1
+    TK:
+      tank_shell_corrosion: 3
+      gasket_joint_leakage: 2
+      instrument_drift: 2
+      corrosion_erosion: 1
+  # Plausible downtime range (hours) per failure mode for generated WOs.
+  downtime_ranges:
+    mechanical_seal_leakage: [8, 18]
+    seal_flush_line_blockage: [3, 8]
+    gland_packing_leakage: [2, 6]
+    bearing_wear: [4, 12]
+    bearing_seizure: [12, 36]
+    shaft_misalignment: [4, 10]
+    cavitation: [2, 8]
+    impeller_damage: [8, 24]
+    impeller_wear: [6, 16]
+    coupling_failure: [3, 10]
+    motor_winding_overheating: [6, 20]
+    motor_bearing_failure: [6, 18]
+    electrical_insulation_fault: [8, 24]
+    lubrication_degradation: [1, 5]
+    soft_foot: [3, 8]
+    high_vibration: [1, 4]
+    instrument_drift: [1, 3]
+    control_valve_seat_leakage: [2, 8]
+    control_valve_stem_sticking: [2, 6]
+    suction_strainer_fouling: [1, 4]
+    heat_exchanger_tube_fouling: [4, 12]
+    heat_exchanger_tube_leak: [10, 30]
+    gasket_joint_leakage: [2, 6]
+    corrosion_erosion: [6, 20]
+    tank_shell_corrosion: [8, 40]
+    unclassified: [0, 4]
+
+# -----------------------------------------------------------------------------
+# PHRASE BANK — technician voices (D-008: inconsistency is load-bearing).
+# Five authorial voices, deliberately inconsistent register / spelling:
+#   v1 Ravi   — terse, lowercase, abbreviations, temps in C
+#   v2 Sunil  — verbose, complete sentences, semi-formal
+#   v3 Imran  — abbreviation-heavy, apostrophes, telegraphic
+#   v4 Deepak — misspelled, run-on, little punctuation
+#   v5 Meena  — structured checklist style, semi-terse
+# render_wo.py picks phrasings deterministically and rotates voices so any 20
+# raw descriptions expose several distinct voices and genuinely messy entries.
+# Every phrase here is authored (P10) — the generator never invents wording.
+# -----------------------------------------------------------------------------
+phrase_bank:
+  mechanical_seal_leakage:
+    - {voice: v1, text: "mech seal weeping DE side, drops on baseplate, temp 71C"}
+    - {voice: v2, text: "Observed process fluid leakage at the mechanical seal during rounds; seal faces suspected worn, leak rate increasing."}
+    - {voice: v3, text: "seal leak'g at gland, prod'ct dripping outboard, flush temp high"}
+    - {voice: v4, text: "seal leaking again same pump product on floor faces look scored need cartridge"}
+  seal_flush_line_blockage:
+    - {voice: v1, text: "flush line choked, flow low, cleaned orifice"}
+    - {voice: v3, text: "chk'd flush plan, line partially blocked, strainer dirty"}
+    - {voice: v2, text: "Seal flush flow found restricted; flushing line and orifice cleaned, flush pressure restored to spec."}
+  gland_packing_leakage:
+    - {voice: v1, text: "gland packing dripping, tightened, still weeping slight"}
+    - {voice: v4, text: "packing leak on pump gland retightened gland follower ok for now"}
+    - {voice: v5, text: "Packing leak noted. Action: adjust gland. Status: monitor."}
+  bearing_wear:
+    - {voice: v1, text: "brg noisy DE side, temp 78C, vib high"}
+    - {voice: v2, text: "Drive-end bearing exhibiting elevated noise and vibration on routine survey; wear suspected, replacement planned."}
+    - {voice: v3, text: "brg NDE rumbling, vib 6.2 mm/s, plan replace"}
+    - {voice: v5, text: "Bearing check: noise Y, temp 76C, vib high. Recommend replace."}
+  bearing_seizure:
+    - {voice: v4, text: "pump stopped bearing seized shaft wont turn burnt smell"}
+    - {voice: v2, text: "Pump tripped; on inspection drive-end bearing found seized with evidence of lubricant starvation."}
+    - {voice: v1, text: "brg seized, shaft locked, hot, no grease"}
+  shaft_misalignment:
+    - {voice: v1, text: "high vib, coupling checked, alignment out"}
+    - {voice: v3, text: "align'mnt off ~0.4mm, laser done, corrected shims"}
+    - {voice: v2, text: "Vibration traced to shaft misalignment across the coupling; laser alignment carried out and readings brought within tolerance."}
+    - {voice: v4, text: "vibration high did alignment it was out fixed with shims runs smooth now"}
+  cavitation:
+    - {voice: v1, text: "pump crackling, flow swinging, suction low"}
+    - {voice: v3, text: "cavitation noise, NPSH low, throttled disch"}
+    - {voice: v2, text: "Pump showing cavitation symptoms — gravel-like noise and unstable flow; suction conditions investigated."}
+  impeller_damage:
+    - {voice: v4, text: "no head from pump opened it impeller vane broken foreign object inside"}
+    - {voice: v2, text: "Pump failing to develop head; casing opened and impeller found with a cracked vane, replaced."}
+    - {voice: v1, text: "low head, impeller cracked, swapped"}
+  impeller_wear:
+    - {voice: v1, text: "head dropping slow, impeller worn, wear rings gone"}
+    - {voice: v5, text: "Performance check: head low. Impeller vanes eroded. Action: replace impeller."}
+    - {voice: v3, text: "impeller worn, clearances open, perf down"}
+  coupling_failure:
+    - {voice: v1, text: "coupling element torn, no drive, replaced spacer"}
+    - {voice: v4, text: "coupling gone rubber element broken pump not turning fitted new one"}
+    - {voice: v2, text: "Flexible coupling element found failed causing loss of drive; element and bolts renewed."}
+  motor_winding_overheating:
+    - {voice: v1, text: "motor tripped on OL, winding hot, smell"}
+    - {voice: v2, text: "Motor tripped on thermal overload; winding temperature elevated, phase currents checked for imbalance."}
+    - {voice: v3, text: "mtr o/heat, tripped OL relay, wdg temp high"}
+  motor_bearing_failure:
+    - {voice: v1, text: "motor NDE brg noisy, vib on motor side"}
+    - {voice: v4, text: "motor making noise bearing on non drive end bad replaced both bearings"}
+    - {voice: v5, text: "Motor bearing check: DE ok, NDE noisy. Action: replace NDE bearing."}
+  electrical_insulation_fault:
+    - {voice: v3, text: "IR low <1Mohm, earth fault, motor isolated"}
+    - {voice: v2, text: "Insulation resistance found low with earth fault indication; motor isolated and sent for rewind assessment."}
+    - {voice: v1, text: "megger low, earth fault, motor out"}
+  lubrication_degradation:
+    - {voice: v1, text: "oil dark, water in oil, changed"}
+    - {voice: v5, text: "Lube check: level low, colour dark. Action: drain and refill correct grade."}
+    - {voice: v3, text: "grease contam'd, relubed brgs, oil grade wrong earlier"}
+  soft_foot:
+    - {voice: v2, text: "Persistent vibration traced to soft foot; hold-down bolts found loose and grout degraded under one foot."}
+    - {voice: v1, text: "soft foot found, one foot loose, shimmed"}
+    - {voice: v4, text: "base bolts loose foundation cracked vibration high tightened and shimmed"}
+  high_vibration:
+    - {voice: v1, text: "overall vib high 7 mm/s, cause tbd, monitoring"}
+    - {voice: v3, text: "vib elevated, no clear cause yet, trending"}
+    - {voice: v5, text: "Vibration survey: overall high. Root cause: not isolated. Action: monitor and trend."}
+  instrument_drift:
+    - {voice: v1, text: "gauge reading off vs field, recalibrated"}
+    - {voice: v2, text: "Transmitter reading deviating from field reference; instrument recalibrated to true value."}
+    - {voice: v3, text: "xmtr drift ~3%, recal done, tag ok now"}
+  control_valve_seat_leakage:
+    - {voice: v1, text: "cv passing when shut, seat eroded"}
+    - {voice: v4, text: "control valve not closing tight passing across seat debris found lapped seat"}
+    - {voice: v5, text: "Valve check: passing closed. Cause: seat erosion. Action: lap/replace trim."}
+  control_valve_stem_sticking:
+    - {voice: v1, text: "valve sticking, hunting, packing tight"}
+    - {voice: v3, text: "cv stem sticky, positioner hunting, freed up"}
+    - {voice: v2, text: "Control valve stem observed sticking with loop hunting; packing adjusted and stem freed."}
+  suction_strainer_fouling:
+    - {voice: v1, text: "suction strainer choked, flow low, cleaned"}
+    - {voice: v4, text: "pump flow dropping suction strainer full of muck cleaned it out"}
+    - {voice: v5, text: "Strainer check: high dP. Action: clean suction strainer."}
+  heat_exchanger_tube_fouling:
+    - {voice: v2, text: "Exchanger approach temperature rising with increased pressure drop; tube-side fouling suspected, cleaning planned."}
+    - {voice: v1, text: "hx dP high, outlet temp up, tubes fouled"}
+    - {voice: v3, text: "exch fouled, poor duty, chem clean scheduled"}
+  heat_exchanger_tube_leak:
+    - {voice: v4, text: "cross contamination found tube leaking on exchanger plugged the tube"}
+    - {voice: v2, text: "Cross-contamination detected across the exchanger; hydro test identified a leaking tube, tube plugged."}
+    - {voice: v1, text: "tube leak on hx, hydrotest, plugged 2 tubes"}
+  gasket_joint_leakage:
+    - {voice: v1, text: "flange weeping, gasket blown, replaced"}
+    - {voice: v3, text: "joint leak at bonnet, new gasket, torqued"}
+    - {voice: v5, text: "Joint leak noted. Action: replace gasket, bolt-up to torque."}
+  corrosion_erosion:
+    - {voice: v2, text: "Wall thinning found on casing/piping from corrosion-erosion during inspection; UT readings logged, repair planned."}
+    - {voice: v1, text: "wall thin, corrosion, UT low, patch"}
+    - {voice: v4, text: "metal thinning bad corrosion on pump casing ut readings low needs repair"}
+  tank_shell_corrosion:
+    - {voice: v2, text: "External and internal shell corrosion observed on tank during inspection; plate thickness reducing, coating and patch repair planned."}
+    - {voice: v1, text: "tank shell corroded, roof rusty, coat"}
+    - {voice: v5, text: "Tank inspection: shell corrosion, roof pitting. Action: recoat/patch."}
+
+# Routine / genuinely ambiguous descriptions → correct outcome is `unclassified`.
+routine_phrases:
+  - {voice: v1, text: "routine pm done, greased, checked, all ok"}
+  - {voice: v5, text: "Scheduled PM: lubrication, general check. No abnormality found."}
+  - {voice: v3, text: "gen'l inspection, nothing abnormal, cont' running"}
+  - {voice: v4, text: "checked pump running normal no issue closed wo"}
+  - {voice: v2, text: "Preventive maintenance carried out per schedule; equipment found in satisfactory condition."}
+  - {voice: v1, text: "cleaned area, tightened fittings, ok"}
+  - {voice: v3, text: "painting + housekeeping around unit, no defect"}
+  - {voice: v4, text: "attended complaint found nothing wrong equipment ok"}
+  - {voice: v5, text: "Quarterly check: readings normal. Action: none."}
+  - {voice: v1, text: "topped up oil, wiped down, running fine"}
+
+# Terse action-taken snippets per mode (render_wo appends these).
+actions_bank:
+  mechanical_seal_leakage: ["Replaced mechanical seal cartridge; verified flush.", "Renewed seal faces; leak stopped after run-in."]
+  seal_flush_line_blockage: ["Cleaned flush line and orifice; restored flush flow.", "Backflushed flush line; strainer cleaned."]
+  gland_packing_leakage: ["Adjusted gland follower.", "Renewed packing rings."]
+  bearing_wear: ["Replaced DE/NDE bearings.", "Renewed bearings; realigned."]
+  bearing_seizure: ["Replaced seized bearing; re-lubricated.", "Overhauled bearing housing; new bearings fitted."]
+  shaft_misalignment: ["Laser alignment carried out; within tolerance.", "Shimmed and realigned coupling."]
+  cavitation: ["Cleared suction restriction; verified NPSH.", "Adjusted operation to restore suction."]
+  impeller_damage: ["Replaced damaged impeller.", "Fitted new impeller; balanced."]
+  impeller_wear: ["Replaced worn impeller and wear rings.", "Renewed impeller; clearances reset."]
+  coupling_failure: ["Renewed coupling element and bolts.", "Replaced coupling spacer."]
+  motor_winding_overheating: ["Checked load and phase balance; cooled and restarted.", "Cleaned motor cooling path; monitored winding temp."]
+  motor_bearing_failure: ["Replaced motor bearings.", "Renewed NDE bearing; greased."]
+  electrical_insulation_fault: ["Isolated motor; sent for rewind.", "Dried out windings; IR restored."]
+  lubrication_degradation: ["Drained and refilled correct grade lube.", "Re-lubricated bearings; sample sent."]
+  soft_foot: ["Corrected soft foot; retorqued hold-downs.", "Re-grouted and shimmed base."]
+  high_vibration: ["Logged vibration; continued trending.", "Monitoring; further diagnosis planned."]
+  instrument_drift: ["Recalibrated instrument.", "Bench-calibrated and reinstalled."]
+  control_valve_seat_leakage: ["Lapped valve seat; leak-tested.", "Replaced valve trim."]
+  control_valve_stem_sticking: ["Adjusted packing; freed stem.", "Serviced positioner; stroked valve."]
+  suction_strainer_fouling: ["Cleaned suction strainer.", "Removed and cleaned strainer element."]
+  heat_exchanger_tube_fouling: ["Chemical-cleaned tube side.", "Hydrojetted tubes; duty restored."]
+  heat_exchanger_tube_leak: ["Plugged leaking tube(s).", "Hydro-tested and plugged affected tubes."]
+  gasket_joint_leakage: ["Replaced gasket; bolted to torque.", "Renewed joint; leak-tested."]
+  corrosion_erosion: ["Logged UT; scheduled repair.", "Patch-repaired thinned section."]
+  tank_shell_corrosion: ["Recoated affected area.", "Patch-plated corroded section."]
+  unclassified: ["Routine work completed.", "No corrective action required.", "Closed after inspection."]
+
+# -----------------------------------------------------------------------------
+# HARD-CODED WORK ORDERS — authored verbatim, NOT generated.
+# These count toward each asset's wo_count (render_wo subtracts them before
+# filling the remainder with generated noise).
+#
+# THE PLANTED PATTERN (the Act-3 reveal): three mechanical-seal failures across
+# the CP200 sisters P-3401 / P-3105 / P-3402 — span 22 months, cumulative
+# downtime 41.0 h. Surrounded by earlier seal-adjacent history (flush-plan
+# thread) and one red-herring vibration WO on P-2210 with a DIFFERENT true mode,
+# so the demo shows discrimination, not blind aggregation.
+#
+# true_failure_mode is GROUND TRUTH ONLY — never seeded into the database.
+# -----------------------------------------------------------------------------
+work_orders:
+  # --- earlier seal-adjacent history (depth for the dossier timeline) ---
+  - wo_number: WO-2021-0453
+    asset_tag: P-3401
+    opened_on: 2021-08-10
+    closed_on: 2021-08-11
+    raw_description: "flush line to seal choked, cleaned strainer, flush plan not confirmed against OEM"
+    actions_taken: "Cleaned seal flush line and strainer; flush flow restored. Flush plan to be verified against OEM spec."
+    downtime_hours: 6
+    true_failure_mode: seal_flush_line_blockage
+  - wo_number: WO-2022-0731
+    asset_tag: P-1102
+    opened_on: 2022-11-05
+    closed_on: 2022-11-05
+    raw_description: "gland slight seepage noted during round, monitoring, flush temp a bit high"
+    actions_taken: "Seepage logged; seal monitored. Flush temperature to be watched."
+    downtime_hours: 2
+    true_failure_mode: mechanical_seal_leakage
+  - wo_number: WO-2023-0518
+    asset_tag: P-3105
+    opened_on: 2023-09-14
+    closed_on: 2023-09-15
+    raw_description: "seal flush pressure low, flush plan Y running, not per OEM plan 11"
+    actions_taken: "Flush pressure investigated; found running non-standard flush plan Y. Restored flush; OEM plan deviation flagged."
+    downtime_hours: 4
+    true_failure_mode: seal_flush_line_blockage
+
+  # --- THE THREE PLANTED MECHANICAL-SEAL FAILURES ---
+  - wo_number: WO-2024-0117
+    asset_tag: P-3401
+    opened_on: 2024-03-04
+    closed_on: 2024-03-05
+    raw_description: "seal weeping at gland, drips increasing on outboard side"
+    actions_taken: "Replaced mechanical seal cartridge. Flush line checked."
+    downtime_hours: 14
+    true_failure_mode: mechanical_seal_leakage
+  - wo_number: WO-2025-0289
+    asset_tag: P-3105
+    opened_on: 2025-06-10
+    closed_on: 2025-06-11
+    raw_description: "leakage at gland follower, product on baseplate, seal faces scored"
+    actions_taken: "Renewed seal cartridge; faces were scored. Flush plan questioned vs OEM."
+    downtime_hours: 16
+    true_failure_mode: mechanical_seal_leakage
+  - wo_number: WO-2026-0034
+    asset_tag: P-3402
+    opened_on: 2026-01-15
+    closed_on: 2026-01-16
+    raw_description: "mech seal gone. replaced cartridge. flush plan Y not per spec"
+    actions_taken: "Replaced cartridge seal. Confirmed flush plan Y in use, not OEM-specified Plan 11."
+    downtime_hours: 11
+    true_failure_mode: mechanical_seal_leakage
+
+  # --- red herring: vibration on the fourth sister, DIFFERENT true mode ---
+  - wo_number: WO-2024-0662
+    asset_tag: P-2210
+    opened_on: 2024-07-20
+    closed_on: 2024-07-21
+    raw_description: "high vibration DE, coupling checked, laser alignment out 0.4mm corrected"
+    actions_taken: "Laser alignment carried out; misalignment corrected with shims. Vibration normal after."
+    downtime_hours: 8
+    true_failure_mode: shaft_misalignment
+
+# -----------------------------------------------------------------------------
+# OPERATIONAL HISTORY NOTES — rendered into inspection / incident reports.
+# The flush-plan deviation thread lives here: it is the cross-source evidence
+# that makes "check seal flush plan against OEM spec" the recommended action,
+# independently corroborated by the manual's troubleshooting table.
+# kind: inspection | incident. owner_tag ties the report to a hero asset.
+# -----------------------------------------------------------------------------
+operational_history_notes:
+  - id: OHN-01
+    owner_tag: P-3401
+    kind: inspection
+    date: 2021-08-12
+    title: Seal flush line inspection after blockage (P-3401)
+    body: >-
+      Following WO-2021-0453 the API Plan 11 flush line on P-3401 was found
+      partially choked at the orifice. Line and strainer cleaned. The flush
+      arrangement in service could not be confirmed against the OEM-specified
+      Plan 11; recommend verifying the seal flush plan against the Rheinwerk
+      MSC-CP200 manual and standardising across all four sister pumps.
+  - id: OHN-02
+    owner_tag: P-3105
+    kind: inspection
+    date: 2023-09-15
+    title: Seal flush deviation noted (P-3105)
+    body: >-
+      During WO-2023-0518 the seal flush on P-3105 was found running a
+      non-standard "Plan Y" arrangement with low flush pressure, not the
+      OEM-specified Plan 11. Flush restored. This is the second sister pump on
+      which a flush-plan deviation has been recorded; a fleet-wide review of the
+      CP200 seal flush plan against OEM spec is recommended.
+  - id: OHN-03
+    owner_tag: P-3401
+    kind: incident
+    date: 2024-03-05
+    title: Mechanical seal failure and product release (P-3401)
+    body: >-
+      P-3401 mechanical seal failed with product weeping at the gland and
+      dripping on the outboard side (WO-2024-0117), 14 h downtime. Cartridge
+      seal replaced. Seal faces showed thermal distress consistent with
+      inadequate flush. The flush-plan deviation flagged in 2021 remains open;
+      correcting the seal flush plan to OEM spec is the standing recommendation.
+  - id: OHN-04
+    owner_tag: P-3105
+    kind: incident
+    date: 2025-06-11
+    title: Mechanical seal failure, faces scored (P-3105)
+    body: >-
+      P-3105 mechanical seal failed with leakage at the gland follower and
+      product on the baseplate; seal faces found scored (WO-2025-0289), 16 h
+      downtime. Same failure signature as P-3401 in 2024. Flush plan again
+      suspected off-spec. Third seal-flush concern across the sister set.
+  - id: OHN-05
+    owner_tag: P-3402
+    kind: incident
+    date: 2026-01-16
+    title: Mechanical seal failure, flush plan confirmed off-spec (P-3402)
+    body: >-
+      P-3402 mechanical seal failed (WO-2026-0034), 11 h downtime. On strip-down
+      the seal flush was confirmed running Plan Y, NOT the OEM-specified Plan 11.
+      This is the third mechanical-seal failure across the CP200 sisters in 22
+      months (P-3401 2024, P-3105 2025, P-3402 2026), cumulative 41 h downtime.
+      Root cause tied to the long-standing flush-plan deviation. Action: bring
+      all four CP200 seal flush plans to OEM Plan 11 per the MSC-CP200 manual.
+  - id: OHN-06
+    owner_tag: P-2210
+    kind: incident
+    date: 2024-07-21
+    title: High vibration corrected by alignment (P-2210)
+    body: >-
+      P-2210 tripped on high drive-end vibration (WO-2024-0662). Laser alignment
+      found the coupling out by 0.4 mm; corrected with shims. This is a
+      misalignment event, NOT a seal failure — distinct from the mechanical-seal
+      pattern on the other three sisters.
+  - id: OHN-07
+    owner_tag: P-3401
+    kind: inspection
+    date: 2022-02-10
+    title: Annual condition inspection (P-3401)
+    body: >-
+      Routine annual inspection of P-3401. Vibration and bearing temperatures
+      within limits. Seal flush flow adequate at time of check. General
+      condition satisfactory; continue monitoring flush arrangement.
+
+# -----------------------------------------------------------------------------
+# DOCUMENTS — authored content blocks (P10: the generator formats, never authors).
+# The manual is the Tier-1 OEM manual for the hero CP200 class. Section headings
+# are clear and numbered so the M3 structure-aware chunker can split on them.
+# -----------------------------------------------------------------------------
+documents:
+  manual:
+    owner_class: CP200
+    title: >-
+      Rheinwerk MSC-CP200 Centrifugal Process Pump — Operation & Maintenance Manual
+    doc_no: RW-CP200-OM-Rev4
+    intro: >-
+      This manual covers the installation, operation and maintenance of the
+      Rheinwerk MSC-CP200 single-stage overhung centrifugal process pump for hot
+      organic duty. Read Section 2 (Safety) in full before any work. Retain this
+      manual with the equipment records for the life of the pump.
+    sections:
+      - number: "1"
+        title: "General Description"
+        paragraphs:
+          - >-
+            The MSC-CP200 is a single-stage, overhung, radially-split centrifugal
+            process pump conforming to the general arrangement of ISO 2858 and the
+            API 610 OH2 configuration. It is designed for the transfer of hot
+            organic liquids at temperatures up to 220 C and differential heads up
+            to 160 m. The pump is foot-mounted on a fabricated baseplate and is
+            close-coupled to a standard IEC flange motor through a spacer coupling.
+          - >-
+            The wetted parts are supplied in carbon steel with 12% chrome
+            internals as standard, with optional stainless and duplex trims for
+            corrosive service. The pump uses a cartridge mechanical seal as
+            standard, arranged for an API Plan 11 flush taken from pump discharge
+            through a flow-control orifice back to the seal chamber.
+        subsections:
+          - number: "1.1"
+            title: "Intended Use"
+            paragraphs:
+              - >-
+                The pump is intended for clean to mildly contaminated hot organic
+                liquids within the performance envelope stamped on the nameplate.
+                Operation outside the rated flow, head, temperature or NPSH margin
+                voids the warranty and will shorten seal and bearing life.
+              - >-
+                Typical services include column bottoms, hot ester feed and
+                product transfer, and hot resin blend transfer. The pump is not
+                suitable for slurries, abrasive service or liquids containing
+                significant solids without a purpose-selected trim and seal plan.
+          - number: "1.2"
+            title: "Nameplate and Identification"
+            paragraphs:
+              - >-
+                Each pump carries a stainless nameplate stating model, serial
+                number, rated duty point, maximum working pressure and test
+                pressure. Always quote the serial number when ordering spares.
+          - number: "1.3"
+            title: "Construction"
+            paragraphs:
+              - >-
+                The pump is of back pull-out construction: the bearing housing,
+                shaft, impeller and seal can be withdrawn from the rear of the
+                casing without disturbing the casing or the connected pipework.
+                This shortens seal and bearing maintenance and is the basis of the
+                cartridge seal replacement procedure in Section 5.3.
+              - >-
+                The casing is centreline-supported for hot service so that thermal
+                growth is symmetrical about the shaft, preserving alignment as the
+                pump heats to operating temperature. The impeller is keyed and
+                threaded to the shaft and locked against the operating direction
+                of rotation.
+          - number: "1.4"
+            title: "Performance Range"
+            paragraphs:
+              - >-
+                The MSC-CP200 frame covers flows to 220 m3/h and differential
+                heads to 160 m at the maximum trim. Each pump is supplied trimmed
+                to its specific duty; the as-built performance curve is issued
+                with the pump data sheet. Prolonged operation far from the best
+                efficiency point increases radial load, vibration and seal and
+                bearing wear.
+      - number: "2"
+        title: "Safety"
+        paragraphs:
+          - >-
+            Hot organic liquids present burn, fire and toxic-exposure hazards.
+            Before any maintenance the pump must be isolated, de-pressurised,
+            drained, cooled below 45 C and locked out in accordance with the site
+            LOTO procedure. Confirm zero energy before breaking any joint.
+          - >-
+            Never run the pump dry or against a closed discharge for more than a
+            few seconds. Never operate with guards removed. Personal protective
+            equipment appropriate to the pumped fluid must be worn at all times.
+        subsections:
+          - number: "2.1"
+            title: "Residual Hazards"
+            paragraphs:
+              - >-
+                Even after isolation, trapped liquid may remain in the casing and
+                seal chamber and may be hot or under pressure. Slacken joints
+                gradually and stand clear of the parting line.
+          - number: "2.2"
+            title: "Personal Protective Equipment"
+            paragraphs:
+              - >-
+                As a minimum, wear safety glasses with side shields, chemical-
+                resistant gloves rated for the pumped fluid, and heat-resistant
+                gloves when the pump may be hot. Face shield and apron are
+                required when breaking joints on hot organic service. Consult the
+                product safety data sheet for fluid-specific requirements.
+          - number: "2.3"
+            title: "Fire and Emergency"
+            paragraphs:
+              - >-
+                Hot organic liquids may be above their flash point. In the event
+                of a seal or joint release, stop the pump, isolate at the nearest
+                accessible valves, and follow the site emergency procedure. Do not
+                attempt to tighten joints on a pump under pressure and at
+                temperature.
+          - number: "2.4"
+            title: "Noise"
+            paragraphs:
+              - >-
+                Sound pressure levels near the pump and driver can exceed 85
+                dB(A). Hearing protection is required in designated areas.
+                Abnormal noise (cavitation crackle, bearing rumble) is also a
+                diagnostic signal and must be reported, not merely tolerated.
+      - number: "3"
+        title: "Installation"
+        paragraphs:
+          - >-
+            Install the pump on a rigid, level foundation. Grout the baseplate
+            fully to avoid a soft-foot condition, which is a common source of
+            vibration and premature seal and bearing failure. Check that no more
+            than 0.05 mm soft foot exists at each mounting foot.
+          - >-
+            Pipework must be independently supported so that no piping loads are
+            transmitted to the pump nozzles. Excessive nozzle loads distort the
+            casing and cause internal rubbing and seal misalignment.
+        subsections:
+          - number: "3.1"
+            title: "Coupling Alignment"
+            paragraphs:
+              - >-
+                Align the pump and motor shafts by reverse-dial or laser method
+                to within 0.05 mm parallel and 0.05 mm/100 mm angular, cold, with
+                the coupling spacer removed. Re-check alignment hot after the
+                first run, as thermal growth on hot organic duty is significant.
+          - number: "3.2"
+            title: "Seal Flush Piping"
+            paragraphs:
+              - >-
+                The standard seal arrangement is an API Plan 11 flush: a line from
+                the pump discharge through a flow-control orifice to the seal
+                chamber, ensuring positive flush flow across the seal faces and
+                venting of vapour. The flush orifice size is stamped on the seal
+                cartridge and listed in Section 7. Do NOT substitute a different
+                flush plan (for example                 a bypass "Plan Y" arrangement) without
+                OEM approval — inadequate flush is the leading cause of seal-face
+                distress and leakage on this pump. Verify the installed flush plan
+                against this manual at commissioning and after any seal work.
+          - number: "3.3"
+            title: "Baseplate and Grouting"
+            paragraphs:
+              - >-
+                The baseplate must be fully grouted with a non-shrink grout, with
+                all voids filled, to provide a rigid, continuous support. A
+                partially grouted or hollow baseplate behaves as a soft foot and
+                is a persistent source of vibration. After grouting has cured,
+                re-check that each foot sits flat with no more than 0.05 mm gap
+                before final bolt-up.
+          - number: "3.4"
+            title: "Suction Piping and NPSH"
+            paragraphs:
+              - >-
+                Design the suction line short and direct, with a steady rise to
+                the pump and no high points that can trap vapour. Provide the NPSH
+                margin stated on the data sheet; hot organic liquids are often
+                near their bubble point and are unforgiving of suction losses. A
+                fouled suction strainer or an undersized suction line will induce
+                cavitation, unstable flow and impeller erosion.
+              - >-
+                A temporary conical suction strainer is recommended for
+                commissioning to protect the pump from construction debris. Remove
+                or replace it once the system is clean; a neglected strainer is a
+                common cause of gradual flow loss.
+      - number: "4"
+        title: "Operation"
+        paragraphs:
+          - >-
+            Prime the pump and open the seal flush before starting. Start against
+            a nearly closed discharge and open the discharge valve promptly to
+            reach the rated operating region. Do not run below the minimum
+            continuous stable flow stamped on the nameplate.
+          - >-
+            Monitor bearing housing temperature, seal chamber temperature, flush
+            flow and vibration during operation. A rising seal chamber
+            temperature or falling flush flow indicates a flush restriction and
+            must be investigated before the seal is damaged.
+        subsections:
+          - number: "4.1"
+            title: "Normal Operating Limits"
+            paragraphs:
+              - >-
+                Bearing housing temperature should not exceed 85 C. Overall
+                vibration should remain below 4.5 mm/s RMS. Seal flush flow must
+                remain within the range on the seal data sheet at all times.
+          - number: "4.2"
+            title: "Start-up"
+            paragraphs:
+              - >-
+                Confirm the pump is primed and the suction valve is fully open.
+                Open the seal flush and confirm flush flow before starting. Start
+                the driver against a nearly closed discharge valve, then open the
+                discharge promptly to bring the pump into its operating region.
+                Do not run against a closed discharge for more than a few seconds
+                as the liquid will overheat and flash.
+          - number: "4.3"
+            title: "Shutdown"
+            paragraphs:
+              - >-
+                Close the discharge valve slowly and stop the driver. Keep the
+                seal flush in service until the seal chamber has cooled. For hot
+                organic service, allow the pump to cool gradually before draining
+                to avoid thermal shock and to protect the seal faces.
+          - number: "4.4"
+            title: "Routine Monitoring"
+            paragraphs:
+              - >-
+                On each operator round, record bearing housing temperature, seal
+                chamber temperature, flush flow indication, discharge pressure and
+                overall vibration. Trend these readings; a slow rise in seal
+                chamber temperature or a fall in flush flow is an early indicator
+                of a developing flush restriction and should be actioned before
+                the seal is damaged. Report any external leakage at the gland
+                immediately.
+          - number: "4.5"
+            title: "Minimum Flow and Parallel Operation"
+            paragraphs:
+              - >-
+                Do not operate continuously below the minimum continuous stable
+                flow on the data sheet; low-flow operation raises temperature,
+                radial load and internal recirculation. When two sisters run in
+                parallel, confirm both are sharing load and neither is running
+                back on its curve near shut-off.
+      - number: "5"
+        title: "Maintenance"
+        paragraphs:
+          - >-
+            Maintenance intervals are given in Section 5.1. The single most
+            important maintenance item on hot organic duty is the mechanical seal
+            and its flush system. The cartridge seal replacement procedure is
+            given in full in Section 5.3.
+        subsections:
+          - number: "5.1"
+            title: "Maintenance Schedule"
+            paragraphs:
+              - >-
+                Weekly: check bearing and seal chamber temperature, vibration,
+                flush flow and for any external leakage. Monthly: check coupling
+                condition and alignment indication. Annually: inspect bearings,
+                renew lubricant, inspect the seal and verify the flush orifice and
+                flush plan against this manual.
+          - number: "5.2"
+            title: "Bearing Lubrication"
+            paragraphs:
+              - >-
+                Bearings are grease-lubricated as standard. Use only the specified
+                grade. Over-greasing causes overheating; contamination or water
+                ingress degrades the lubricant and accelerates bearing wear.
+          - number: "5.3"
+            title: "Seal Cartridge Replacement Procedure"
+            paragraphs:
+              - >-
+                The MSC-CP200 uses a self-contained cartridge mechanical seal to
+                make replacement fast and repeatable. Follow the numbered steps
+                below. Cleanliness of the seal faces and correct flush restoration
+                are critical to seal life.
+            steps:
+              - "Isolate, de-pressurise, drain and cool the pump; apply LOTO and confirm zero energy (see Section 2 and the site LOTO SOP)."
+              - "Disconnect and remove the coupling spacer; do not disturb the alignment shims."
+              - "Disconnect the seal flush piping at the seal chamber and cap the lines to keep them clean."
+              - "Remove the bearing housing / back pull-out assembly from the casing, leaving the casing and pipework in place."
+              - "Release the cartridge clamping ring set-screws and withdraw the spent cartridge seal from the shaft as a complete unit."
+              - "Clean the shaft and seal chamber faces; inspect the shaft sleeve seat for scoring or fretting and renew if damaged."
+              - "Fit the new cartridge seal, ensuring the setting clips are in place; do NOT remove the clips until the assembly is complete."
+              - "Reassemble the back pull-out into the casing; torque the casing bolts evenly to the values in Section 7."
+              - "Tighten the cartridge drive collar, then remove and retain the seal setting clips."
+              - "Reconnect the seal flush piping. Verify the flush plan is OEM Plan 11 and the flush orifice is the correct size — do not leave a substitute flush arrangement in service."
+              - "Refit the coupling spacer and re-check alignment; correct if disturbed."
+              - "Remove LOTO, restore the flush, prime, and start the pump. Confirm positive flush flow and no leakage before returning to service."
+          - number: "5.4"
+            title: "Bearing Replacement"
+            paragraphs:
+              - >-
+                Renew bearings at the scheduled interval or when condition
+                monitoring indicates wear (rising vibration, noise or bearing
+                housing temperature). Cleanliness is essential; a single hard
+                particle will destroy a new bearing.
+            steps:
+              - "Isolate, drain, cool and apply LOTO as for seal work (Section 5.3, steps 1-2)."
+              - "Remove the back pull-out assembly and, if fitted, the cartridge seal."
+              - "Record the existing shim pack; remove the bearing end cover and lock-nut."
+              - "Withdraw the shaft from the bearing housing and remove the old bearings with a proper puller — never hammer."
+              - "Clean the shaft and housing; inspect the shaft seats and housing bore for damage."
+              - "Heat the new bearings inductively to the recommended temperature and fit them square to the shoulder; do not exceed the maximum bearing temperature."
+              - "Reassemble with the recorded shim pack; set and check the end float."
+              - "Re-lubricate with the correct grade and quantity; do not over-grease."
+              - "Reassemble the back pull-out and return the pump to service per Section 5.3."
+          - number: "5.5"
+            title: "Seal Flush System Maintenance"
+            paragraphs:
+              - >-
+                The API Plan 11 flush is the seal's lifeline on hot organic duty
+                and is the single most important item to keep in specification.
+                The flush takes a controlled bleed from the pump discharge,
+                through a flow orifice, into the seal chamber, cooling and
+                lubricating the faces and sweeping away vapour.
+              - >-
+                At every seal inspection, confirm the flush line is clear, the
+                orifice is the correct size and not eroded or plugged, and any
+                flush strainer is clean. Confirm the flush arrangement is the
+                OEM-specified Plan 11 and has not been altered in the field to a
+                non-standard "Plan Y" bypass. A restricted or non-standard flush
+                starves the faces, drives them hot, and produces the scored faces
+                and gland weeping that precede a full seal failure.
+              - >-
+                If repeated seal failures occur across sister pumps in the same
+                service, treat the flush system as the prime suspect and audit the
+                flush plan on every sister against this manual before renewing
+                further seals. Renewing a seal without correcting an inadequate
+                flush simply repeats the failure.
+          - number: "5.6"
+            title: "Fault Diagnosis Approach"
+            paragraphs:
+              - >-
+                Diagnose from evidence, not assumption. Distinguish leakage faults
+                (seal, flush, gasket) from vibration faults (misalignment,
+                cavitation, bearing, soft foot) using the symptom, the flush and
+                temperature trends, and vibration data. The troubleshooting table
+                in Section 6 maps common symptoms to their probable causes and the
+                correct first action.
+      - number: "6"
+        title: "Troubleshooting"
+        paragraphs:
+          - >-
+            The table below lists common symptoms, their probable causes and the
+            recommended action. For seal leakage, always verify the seal flush
+            plan and flush line against Section 3.2 before renewing the seal —
+            renewing a seal without correcting an inadequate flush will only
+            repeat the failure.
+        # Rendered as the Section 6 symptom/cause/action table.
+        troubleshooting:
+          - symptom: "Seal leakage; product weeping or dripping at gland"
+            cause: "Inadequate seal flush — flush line blocked or non-OEM flush plan (e.g. Plan Y); worn or scored faces"
+            action: "Verify seal flush plan against OEM Plan 11 (Section 3.2); inspect and clear flush line/orifice/strainer; renew cartridge seal if faces damaged"
+          - symptom: "Seal chamber temperature rising; flush flow low"
+            cause: "Flush line restriction, fouled orifice or blocked strainer"
+            action: "Inspect and clean the flush line and orifice; confirm flush flow to seal data sheet"
+          - symptom: "High vibration"
+            cause: "Shaft misalignment, cavitation, or soft foot"
+            action: "Check coupling alignment (laser) and correct; verify NPSH margin against cavitation; check hold-down bolts / soft foot"
+          - symptom: "Crackling / gravel noise, unstable flow"
+            cause: "Cavitation from insufficient NPSH or suction restriction"
+            action: "Restore suction conditions; clean suction strainer; confirm NPSH available exceeds required"
+          - symptom: "Bearing noise / high bearing temperature"
+            cause: "Bearing wear, lubrication degradation or over-greasing"
+            action: "Renew bearings; use correct lubricant grade and quantity"
+          - symptom: "Low developed head / flow"
+            cause: "Impeller wear or damage, or worn wear rings"
+            action: "Inspect and renew impeller and wear rings; reset clearances"
+          - symptom: "Loss of drive / sudden vibration"
+            cause: "Coupling element failure"
+            action: "Renew coupling element and bolts; re-check alignment"
+      - number: "7"
+        title: "Spare Parts"
+        paragraphs:
+          - >-
+            The recommended spares for the MSC-CP200 are listed below. Always
+            quote the pump serial number and the part number when ordering. The
+            cartridge seal and the flush orifice are the critical spares for hot
+            organic duty and should be held in stock for each installed pump.
+        # Rendered as the Section 7 parts table.
+        parts:
+          - {item: "Cartridge mechanical seal", part_no: "RW-CP200-SEAL-C", material: "SiC/Carbon, Viton", qty: "1"}
+          - {item: "Seal flush orifice (Plan 11)", part_no: "RW-CP200-ORF-3.0", material: "SS316", qty: "1"}
+          - {item: "Impeller", part_no: "RW-CP200-IMP", material: "12% Cr", qty: "1"}
+          - {item: "Wear ring set", part_no: "RW-CP200-WR", material: "12% Cr", qty: "1 set"}
+          - {item: "Drive-end bearing", part_no: "RW-CP200-BRG-DE", material: "-", qty: "1"}
+          - {item: "Non-drive-end bearing", part_no: "RW-CP200-BRG-NDE", material: "-", qty: "1"}
+          - {item: "Shaft sleeve", part_no: "RW-CP200-SLV", material: "SS316", qty: "1"}
+          - {item: "Casing gasket set", part_no: "RW-CP200-GKT", material: "Graphite", qty: "1 set"}
+          - {item: "Coupling element", part_no: "RW-CP200-CPL-EL", material: "Elastomer", qty: "1"}
+          - {item: "Bearing housing oil seal", part_no: "RW-CP200-OS", material: "Viton", qty: "2"}
+          - {item: "Casing wear ring", part_no: "RW-CP200-CWR", material: "12% Cr", qty: "1"}
+          - {item: "Impeller wear ring", part_no: "RW-CP200-IWR", material: "12% Cr", qty: "1"}
+          - {item: "Shaft key", part_no: "RW-CP200-KEY", material: "SS316", qty: "1"}
+          - {item: "Bearing lock-nut and washer", part_no: "RW-CP200-LN", material: "Steel", qty: "1 set"}
+          - {item: "Seal chamber gasket", part_no: "RW-CP200-SCG", material: "Graphite", qty: "1"}
+          - {item: "Deflector", part_no: "RW-CP200-DEF", material: "NBR", qty: "1"}
+          - {item: "Casing drain plug", part_no: "RW-CP200-DP", material: "SS316", qty: "1"}
+          - {item: "Flush line tubing kit", part_no: "RW-CP200-FLK", material: "SS316", qty: "1 set"}
+        # Rendered as the Section 7 fastener torque table.
+        torques:
+          - {fastener: "Casing bolts M16", value: "210 Nm"}
+          - {fastener: "Bearing housing bolts M12", value: "85 Nm"}
+          - {fastener: "Coupling hub set-screw", value: "35 Nm"}
+          - {fastener: "Cartridge drive collar", value: "12 Nm"}
+      - number: "8"
+        title: "Technical Data"
+        paragraphs:
+          - >-
+            Nominal technical data for the MSC-CP200 frame is given below. The
+            duty-specific values are on the nameplate and the pump data sheet.
+        technical_data:
+          - {parameter: "Configuration", value: "Single-stage overhung, OH2"}
+          - {parameter: "Max flow", value: "220 m3/h"}
+          - {parameter: "Max differential head", value: "160 m"}
+          - {parameter: "Max working temperature", value: "220 C"}
+          - {parameter: "Max working pressure", value: "25 bar(g)"}
+          - {parameter: "Seal type", value: "Cartridge mechanical, API Plan 11"}
+          - {parameter: "Bearing lubrication", value: "Grease (standard)"}
+          - {parameter: "Bearing temp alarm", value: "85 C"}
+          - {parameter: "Vibration alarm", value: "4.5 mm/s RMS"}
+          - {parameter: "Coupling", value: "Spacer, flexible element"}
+
+  # 10 SOPs. Tier-1 (hero-related) get full step numbering; the rest are thin.
+  # scanned_page: true renders ONE page as an image (the honest OCR demo page).
+  sops:
+    - id: SOP-001
+      title: "Pump Isolation & Mechanical Seal Replacement (CP200)"
+      owner_class: CP200
+      tier: 1
+      purpose: >-
+        To safely isolate an MSC-CP200 pump and replace the cartridge mechanical
+        seal, restoring the OEM-specified seal flush plan.
+      steps:
+        - "Obtain a work permit and confirm the pump is scheduled out of service."
+        - "Stop the pump locally and verify no rotation."
+        - "Close suction and discharge isolation valves; tag them shut."
+        - "Isolate the motor electrically and apply LOTO per SOP-003; confirm zero energy."
+        - "De-pressurise and drain the pump to the closed drain; allow to cool below 45 C."
+        - "Disconnect and cap the seal flush piping."
+        - "Follow the OEM cartridge seal replacement procedure (MSC-CP200 manual Section 5.3)."
+        - "On reassembly, verify the seal flush plan is OEM Plan 11 with the correct orifice — do not leave a substitute flush plan in service."
+        - "Re-check coupling alignment before removing LOTO."
+        - "Restore flush, remove LOTO and isolations, prime and restart; confirm no leakage and positive flush flow."
+      scanned_page: true
+    - id: SOP-002
+      title: "Hot Work Permit Procedure"
+      owner_class: null
+      tier: 1
+      purpose: >-
+        To control ignition sources during welding, grinding or cutting in
+        process areas.
+      steps:
+        - "Identify the hot-work location and surrounding hazards."
+        - "Obtain a hot-work permit signed by the area authority."
+        - "Gas-test the area; confirm below 10% LEL before starting and periodically during work."
+        - "Remove or cover combustibles within 15 m; provide a fire watch and extinguisher."
+        - "Isolate and blind any connected process lines."
+        - "Perform the work; maintain the fire watch for 30 minutes after completion."
+        - "Close out the permit and confirm the area is safe."
+    - id: SOP-003
+      title: "Lockout / Tagout (LOTO) Procedure"
+      owner_class: null
+      tier: 1
+      purpose: >-
+        To ensure equipment is isolated from all energy sources before
+        maintenance.
+      steps:
+        - "Identify all energy sources for the equipment (electrical, mechanical, hydraulic, thermal, stored)."
+        - "Notify affected personnel of the shutdown."
+        - "Shut down the equipment using normal stopping procedure."
+        - "Isolate each energy source at the disconnecting means."
+        - "Apply an individual lock and tag to each isolation point."
+        - "Release or restrain stored energy (pressure, springs, thermal)."
+        - "Verify isolation by attempting a normal start (try-out); confirm zero energy."
+        - "Carry out the maintenance work."
+        - "On completion, remove tools, replace guards, and remove locks/tags only by the person who applied them."
+        - "Notify affected personnel before re-energising."
+    - id: SOP-004
+      title: "Bearing Lubrication Routine"
+      owner_class: null
+      tier: 3
+      purpose: "Routine greasing of rotating equipment bearings."
+      steps:
+        - "Confirm the correct grease grade and quantity for the bearing."
+        - "Clean the grease nipple and apply the specified quantity."
+        - "Record the lubrication in the PM log."
+    - id: SOP-005
+      title: "Vibration Data Collection Routine"
+      owner_class: null
+      tier: 3
+      purpose: "Routine collection of vibration readings on rotating equipment."
+      steps:
+        - "Collect overall vibration at the defined measurement points."
+        - "Compare against alarm limits and log the readings."
+        - "Raise a work order if any point exceeds the alarm limit."
+    - id: SOP-006
+      title: "Control Valve Calibration Routine"
+      owner_class: CV
+      tier: 3
+      purpose: "Routine stroke and calibration check of control valves."
+      steps:
+        - "Place the loop in manual and notify the control room."
+        - "Stroke the valve 0-50-100% and verify positioner response."
+        - "Calibrate as required and return the loop to auto."
+    - id: SOP-007
+      title: "Heat Exchanger Cleaning Routine"
+      owner_class: HEX
+      tier: 3
+      purpose: "Isolation and cleaning of shell-and-tube exchangers."
+      steps:
+        - "Isolate and drain both shell and tube sides."
+        - "Open the exchanger and clean the tubes."
+        - "Reassemble with new gaskets and leak-test."
+    - id: SOP-008
+      title: "Tank Gauging and Inspection Routine"
+      owner_class: TK
+      tier: 3
+      purpose: "Routine gauging and external inspection of storage tanks."
+      steps:
+        - "Record tank level and temperature."
+        - "Inspect the shell and roof externally for corrosion or leaks."
+        - "Log findings and raise a work order for any defect."
+    - id: SOP-009
+      title: "Motor Insulation Resistance Test Routine"
+      owner_class: MOT
+      tier: 3
+      purpose: "Routine IR testing of electric motors."
+      steps:
+        - "Isolate and lock out the motor per SOP-003."
+        - "Measure insulation resistance with a megger."
+        - "Log the reading and flag any value below 1 Mohm."
+    - id: SOP-010
+      title: "Compressor Routine Check"
+      owner_class: COMP
+      tier: 3
+      purpose: "Routine checks on rotary screw compressors."
+      steps:
+        - "Check oil level, discharge temperature and pressure."
+        - "Drain condensate and check for abnormal noise or vibration."
+        - "Log the readings."
+
+# -----------------------------------------------------------------------------
+# PM SCHEDULE — set-dressing table (registered as a document, minimal content).
+# -----------------------------------------------------------------------------
+pm_schedule:
+  - {asset_tag: P-3401, task: Seal & flush inspection, frequency: Annual, last_done: 2025-05-01, next_due: 2026-05-01}
+  - {asset_tag: P-3402, task: Seal & flush inspection, frequency: Annual, last_done: 2025-05-01, next_due: 2026-05-01}
+  - {asset_tag: P-3105, task: Seal & flush inspection, frequency: Annual, last_done: 2025-04-15, next_due: 2026-04-15}
+  - {asset_tag: P-2210, task: Alignment & vibration check, frequency: Quarterly, last_done: 2026-04-01, next_due: 2026-07-01}
+  - {asset_tag: E-3110, task: Tube-side cleaning, frequency: Annual, last_done: 2025-11-01, next_due: 2026-11-01}
+  - {asset_tag: A-2110, task: Gearbox oil change, frequency: Annual, last_done: 2025-09-01, next_due: 2026-09-01}
+  - {asset_tag: C-4110, task: Oil & filter change, frequency: Semi-annual, last_done: 2026-01-10, next_due: 2026-07-10}
+  - {asset_tag: CV-3101, task: Stroke & calibration, frequency: Annual, last_done: 2025-12-01, next_due: 2026-12-01}
+  - {asset_tag: TK-4201, task: External inspection, frequency: Annual, last_done: 2025-08-01, next_due: 2026-08-01}
+  - {asset_tag: M-3401, task: IR test & greasing, frequency: Annual, last_done: 2025-05-01, next_due: 2026-05-01}
+
+# -----------------------------------------------------------------------------
+# SPARES CATALOGUE — set-dressing table (registered as a document).
+# ₹ costs plausible for an Indian plant.
+# -----------------------------------------------------------------------------
+spares_catalogue:
+  - {part_no: RW-CP200-SEAL-C, description: CP200 cartridge mechanical seal, asset_class: CP200, qty_on_hand: 3, reorder_level: 2, unit_cost_inr: 185000}
+  - {part_no: RW-CP200-ORF-3.0, description: CP200 seal flush orifice Plan 11, asset_class: CP200, qty_on_hand: 6, reorder_level: 4, unit_cost_inr: 4500}
+  - {part_no: RW-CP200-IMP, description: CP200 impeller 12Cr, asset_class: CP200, qty_on_hand: 2, reorder_level: 1, unit_cost_inr: 240000}
+  - {part_no: RW-CP200-BRG-DE, description: CP200 drive-end bearing, asset_class: CP200, qty_on_hand: 4, reorder_level: 2, unit_cost_inr: 18500}
+  - {part_no: RW-CP100-SEAL, description: CP100 component mechanical seal, asset_class: CP100, qty_on_hand: 5, reorder_level: 3, unit_cost_inr: 42000}
+  - {part_no: BB-IE3-BRG, description: Motor bearing set IE3-160, asset_class: MOT, qty_on_hand: 6, reorder_level: 3, unit_cost_inr: 9500}
+  - {part_no: AL-STX-GKT, description: Exchanger gasket set, asset_class: HEX, qty_on_hand: 4, reorder_level: 2, unit_cost_inr: 15000}
+  - {part_no: SZ-TE-SEAL, description: Agitator mechanical seal, asset_class: AGI, qty_on_hand: 2, reorder_level: 1, unit_cost_inr: 130000}
+  - {part_no: EZ-TRIM, description: Control valve trim kit, asset_class: CV, qty_on_hand: 3, reorder_level: 2, unit_cost_inr: 28000}
+  - {part_no: GA45-OILFLT, description: Compressor oil filter, asset_class: COMP, qty_on_hand: 8, reorder_level: 4, unit_cost_inr: 3200}

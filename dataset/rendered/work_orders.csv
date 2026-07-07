@@ -1,0 +1,501 @@
+wo_number,asset_tag,opened_on,closed_on,raw_description,actions_taken,downtime_hours
+WO-2020-2018,P-1102,2020-01-01,2020-01-04,Vibration traced to shaft misalignment across the coupling; laser alignment carried out and readings brought within tolerance.,Laser alignment carried out; within tolerance.,9.0
+WO-2020-2021,P-2202,2020-01-01,2020-01-02,Packing leak noted. Action: adjust gland. Status: monitor.,Renewed packing rings.,5.1
+WO-2020-2047,A-2120,2020-01-07,2020-01-08,"Bearing check: noise Y, temp 76C, vib high. Recommend replace.",Renewed bearings; realigned.,10.1
+WO-2020-2007,P-3401,2020-01-16,2020-01-20,"brg noisy DE side, temp 78C, vib high",Replaced DE/NDE bearings.,6.7
+WO-2020-2051,C-4110,2020-01-18,2020-01-21,Vibration survey: overall high. Root cause: not isolated. Action: monitor and trend.,Logged vibration; continued trending.,1.1
+WO-2020-2050,A-3110,2020-02-04,2020-02-05,"grease contam'd, relubed brgs, oil grade wrong earlier",Re-lubricated bearings; sample sent.,1.2
+WO-2020-2048,A-3110,2020-02-09,2020-02-13,"brg NDE rumbling, vib 6.2 mm/s, plan replace",Renewed bearings; realigned.,6.1
+WO-2020-2068,TK-3201,2020-02-19,2020-02-20,"External and internal shell corrosion observed on tank during inspection; plate thickness reducing, coating and patch repair planned.",Recoated affected area.,23.0
+WO-2020-2073,TK-4202,2020-02-27,2020-02-28,"wall thin, corrosion, UT low, patch",Patch-repaired thinned section.,18.7
+WO-2020-2035,M-2201,2020-03-01,2020-03-01,"megger low, earth fault, motor out",Dried out windings; IR restored.,19.1
+WO-2020-2020,P-2201,2020-03-02,2020-03-03,"brg NDE rumbling, vib 6.2 mm/s, plan replace",Replaced DE/NDE bearings.,9.7
+WO-2020-2039,M-4101,2020-03-06,2020-03-06,"Lube check: level low, colour dark. Action: drain and refill correct grade.",Re-lubricated bearings; sample sent.,1.8
+WO-2020-2062,CV-2101,2020-03-08,2020-03-12,"gauge reading off vs field, recalibrated",Bench-calibrated and reinstalled.,1.6
+WO-2020-2012,P-3402,2020-03-20,2020-03-23,"grease contam'd, relubed brgs, oil grade wrong earlier",Drained and refilled correct grade lube.,2.1
+WO-2020-2043,E-3110,2020-03-20,2020-03-21,"hx dP high, outlet temp up, tubes fouled",Hydrojetted tubes; duty restored.,8.4
+WO-2020-2061,CV-2101,2020-03-20,2020-03-21,"topped up oil, wiped down, running fine",Routine work completed.,1.8
+WO-2020-2010,P-3402,2020-04-04,2020-04-07,"chk'd flush plan, line partially blocked, strainer dirty",Backflushed flush line; strainer cleaned.,5.3
+WO-2020-2034,M-1101,2020-04-05,2020-04-06,"Motor bearing check: DE ok, NDE noisy. Action: replace NDE bearing.",Replaced motor bearings.,9.9
+WO-2020-2030,M-3105,2020-04-07,2020-04-09,"motor tripped on OL, winding hot, smell",Cleaned motor cooling path; monitored winding temp.,6.2
+WO-2020-2054,C-4110,2020-04-07,2020-04-10,"Motor tripped on thermal overload; winding temperature elevated, phase currents checked for imbalance.",Cleaned motor cooling path; monitored winding temp.,16.6
+WO-2020-2053,C-4110,2020-04-08,2020-04-08,Preventive maintenance carried out per schedule; equipment found in satisfactory condition.,Closed after inspection.,1.5
+WO-2020-2029,M-3402,2020-04-10,2020-04-11,checked pump running normal no issue closed wo,Closed after inspection.,3.8
+WO-2020-2072,TK-4202,2020-04-11,2020-04-14,attended complaint found nothing wrong equipment ok,Closed after inspection.,3.1
+WO-2020-2017,P-1102,2020-04-14,2020-04-17,"routine pm done, greased, checked, all ok",Routine work completed.,3.1
+WO-2020-2028,M-3401,2020-04-16,2020-04-17,Vibration survey: overall high. Root cause: not isolated. Action: monitor and trend.,Monitoring; further diagnosis planned.,3.5
+WO-2020-2041,E-2110,2020-04-17,2020-04-21,"tube leak on hx, hydrotest, plugged 2 tubes",Plugged leaking tube(s).,21.7
+WO-2020-2065,CV-3201,2020-04-17,2020-04-20,"cv passing when shut, seat eroded",Replaced valve trim.,6.1
+WO-2020-2019,P-2201,2020-04-18,2020-04-19,"pump crackling, flow swinging, suction low",Cleared suction restriction; verified NPSH.,7.3
+WO-2020-2069,TK-3201,2020-04-20,2020-04-21,"tank shell corroded, roof rusty, coat",Patch-plated corroded section.,20.9
+WO-2020-2046,E-4110,2020-05-03,2020-05-06,"routine pm done, greased, checked, all ok",Routine work completed.,1.6
+WO-2020-2032,M-3105,2020-05-12,2020-05-14,"oil dark, water in oil, changed",Re-lubricated bearings; sample sent.,5.0
+WO-2020-2040,E-1110,2020-05-14,2020-05-15,"Wall thinning found on casing/piping from corrosion-erosion during inspection; UT readings logged, repair planned.",Patch-repaired thinned section.,9.3
+WO-2020-2058,C-4210,2020-05-20,2020-05-21,"Lube check: level low, colour dark. Action: drain and refill correct grade.",Drained and refilled correct grade lube.,2.0
+WO-2020-2055,C-4110,2020-06-04,2020-06-07,"Joint leak noted. Action: replace gasket, bolt-up to torque.",Renewed joint; leak-tested.,5.5
+WO-2020-2067,TK-1201,2020-06-04,2020-06-04,"flange weeping, gasket blown, replaced",Renewed joint; leak-tested.,4.4
+WO-2020-2074,TK-4203,2020-06-10,2020-06-12,"Joint leak noted. Action: replace gasket, bolt-up to torque.",Replaced gasket; bolted to torque.,2.9
+WO-2020-2004,P-3401,2020-06-11,2020-06-15,"pump crackling, flow swinging, suction low",Cleared suction restriction; verified NPSH.,2.8
+WO-2020-2006,P-3401,2020-06-12,2020-06-12,"Drive-end bearing exhibiting elevated noise and vibration on routine survey; wear suspected, replacement planned.",Replaced DE/NDE bearings.,7.4
+WO-2020-2009,P-3402,2020-06-18,2020-06-18,attended complaint found nothing wrong equipment ok,Closed after inspection.,0.6
+WO-2020-2014,P-3105,2020-06-18,2020-06-18,"head dropping slow, impeller worn, wear rings gone",Renewed impeller; clearances reset.,14.9
+WO-2020-2045,E-3210,2020-06-23,2020-06-26,"cleaned area, tightened fittings, ok",Closed after inspection.,1.7
+WO-2020-2071,TK-4201,2020-07-03,2020-07-07,Preventive maintenance carried out per schedule; equipment found in satisfactory condition.,Closed after inspection.,0.0
+WO-2020-2022,P-2202,2020-07-07,2020-07-09,Packing leak noted. Action: adjust gland. Status: monitor.,Renewed packing rings.,2.9
+WO-2020-2000,P-3401,2020-07-26,2020-07-27,"Seal flush flow found restricted; flushing line and orifice cleaned, flush pressure restored to spec.",Backflushed flush line; strainer cleaned.,6.4
+WO-2020-2059,C-4210,2020-08-07,2020-08-07,"overall vib high 7 mm/s, cause tbd, monitoring",Logged vibration; continued trending.,1.6
+WO-2020-2038,M-4101,2020-08-08,2020-08-08,motor making noise bearing on non drive end bad replaced both bearings,Replaced motor bearings.,13.1
+WO-2020-2066,CV-3201,2020-08-11,2020-08-12,control valve not closing tight passing across seat debris found lapped seat,Replaced valve trim.,4.9
+WO-2020-2036,M-3301,2020-08-19,2020-08-20,"IR low <1Mohm, earth fault, motor isolated",Dried out windings; IR restored.,19.1
+WO-2020-2027,P-4101,2020-08-20,2020-08-24,vibration high did alignment it was out fixed with shims runs smooth now,Laser alignment carried out; within tolerance.,7.6
+WO-2020-2042,E-2110,2020-09-25,2020-09-27,"wall thin, corrosion, UT low, patch",Logged UT; scheduled repair.,8.5
+WO-2020-2037,M-3301,2020-09-28,2020-09-29,motor making noise bearing on non drive end bad replaced both bearings,Replaced motor bearings.,13.0
+WO-2020-2033,M-2210,2020-10-11,2020-10-15,"Lube check: level low, colour dark. Action: drain and refill correct grade.",Drained and refilled correct grade lube.,4.5
+WO-2020-2001,P-3401,2020-10-18,2020-10-21,vibration high did alignment it was out fixed with shims runs smooth now,Shimmed and realigned coupling.,6.8
+WO-2020-2049,A-3110,2020-10-18,2020-10-21,"brg NDE rumbling, vib 6.2 mm/s, plan replace",Renewed bearings; realigned.,6.6
+WO-2020-2031,M-3105,2020-10-21,2020-10-22,"motor tripped on OL, winding hot, smell",Checked load and phase balance; cooled and restarted.,12.8
+WO-2020-2056,C-4120,2020-10-27,2020-10-28,"mtr o/heat, tripped OL relay, wdg temp high",Checked load and phase balance; cooled and restarted.,7.0
+WO-2020-2016,P-3105,2020-10-28,2020-10-31,"oil dark, water in oil, changed",Drained and refilled correct grade lube.,3.6
+WO-2020-2060,CV-1101,2020-10-30,2020-11-03,Control valve stem observed sticking with loop hunting; packing adjusted and stem freed.,Adjusted packing; freed stem.,2.9
+WO-2020-2015,P-3105,2020-11-02,2020-11-03,"Bearing check: noise Y, temp 76C, vib high. Recommend replace.",Renewed bearings; realigned.,10.4
+WO-2020-2008,P-3402,2020-11-06,2020-11-07,vibration high did alignment it was out fixed with shims runs smooth now,Shimmed and realigned coupling.,8.3
+WO-2020-2013,P-3105,2020-11-12,2020-11-12,"oil dark, water in oil, changed",Drained and refilled correct grade lube.,4.7
+WO-2020-2044,E-3110,2020-11-14,2020-11-16,"tube leak on hx, hydrotest, plugged 2 tubes",Plugged leaking tube(s).,16.0
+WO-2020-2023,P-3301,2020-11-22,2020-11-26,"Bearing check: noise Y, temp 76C, vib high. Recommend replace.",Replaced DE/NDE bearings.,4.6
+WO-2020-2011,P-3402,2020-11-27,2020-11-29,Pump showing cavitation symptoms — gravel-like noise and unstable flow; suction conditions investigated.,Adjusted operation to restore suction.,2.5
+WO-2020-2003,P-3401,2020-12-01,2020-12-01,"flush line choked, flow low, cleaned orifice",Cleaned flush line and orifice; restored flush flow.,6.3
+WO-2020-2063,CV-2101,2020-12-01,2020-12-04,Valve check: passing closed. Cause: seat erosion. Action: lap/replace trim.,Lapped valve seat; leak-tested.,6.4
+WO-2020-2052,C-4110,2020-12-14,2020-12-17,"overall vib high 7 mm/s, cause tbd, monitoring",Monitoring; further diagnosis planned.,2.9
+WO-2020-2064,CV-2101,2020-12-18,2020-12-20,"cv stem sticky, positioner hunting, freed up",Adjusted packing; freed stem.,5.5
+WO-2020-2005,P-3401,2020-12-25,2020-12-29,Pump showing cavitation symptoms — gravel-like noise and unstable flow; suction conditions investigated.,Adjusted operation to restore suction.,2.0
+WO-2020-2002,P-3401,2020-12-26,2020-12-29,"flush line choked, flow low, cleaned orifice",Backflushed flush line; strainer cleaned.,3.3
+WO-2020-2024,P-4101,2020-12-27,2020-12-31,Flexible coupling element found failed causing loss of drive; element and bolts renewed.,Replaced coupling spacer.,7.2
+WO-2020-2025,P-4101,2020-12-28,2020-12-31,"align'mnt off ~0.4mm, laser done, corrected shims",Shimmed and realigned coupling.,5.7
+WO-2020-2026,P-4101,2020-12-29,2021-01-01,"topped up oil, wiped down, running fine",Closed after inspection.,2.4
+WO-2020-2070,TK-4201,2020-12-29,2021-01-01,"flange weeping, gasket blown, replaced",Replaced gasket; bolted to torque.,2.5
+WO-2020-2057,C-4120,2020-12-30,2020-12-30,"brg noisy DE side, temp 78C, vib high",Replaced DE/NDE bearings.,7.9
+WO-2021-2029,P-4101,2021-01-05,2021-01-09,"Observed process fluid leakage at the mechanical seal during rounds; seal faces suspected worn, leak rate increasing.",Renewed seal faces; leak stopped after run-in.,11.2
+WO-2021-2040,E-1110,2021-01-08,2021-01-11,"hx dP high, outlet temp up, tubes fouled",Hydrojetted tubes; duty restored.,8.0
+WO-2021-2059,C-4120,2021-01-10,2021-01-12,"motor tripped on OL, winding hot, smell",Checked load and phase balance; cooled and restarted.,19.8
+WO-2021-2041,E-2110,2021-01-18,2021-01-22,"exch fouled, poor duty, chem clean scheduled",Chemical-cleaned tube side.,7.2
+WO-2021-2013,P-2210,2021-01-20,2021-01-24,"Bearing check: noise Y, temp 76C, vib high. Recommend replace.",Renewed bearings; realigned.,4.1
+WO-2021-2027,P-4101,2021-02-01,2021-02-05,Packing leak noted. Action: adjust gland. Status: monitor.,Renewed packing rings.,3.1
+WO-2021-2028,P-4101,2021-02-02,2021-02-06,"high vib, coupling checked, alignment out",Shimmed and realigned coupling.,9.5
+WO-2021-2045,E-3210,2021-02-05,2021-02-05,"tube leak on hx, hydrotest, plugged 2 tubes",Plugged leaking tube(s).,21.1
+WO-2021-2017,P-1102,2021-02-08,2021-02-10,"pump crackling, flow swinging, suction low",Adjusted operation to restore suction.,7.9
+WO-2021-2056,C-4110,2021-02-09,2021-02-11,Quarterly check: readings normal. Action: none.,Routine work completed.,1.0
+WO-2021-2001,P-3401,2021-02-10,2021-02-13,Preventive maintenance carried out per schedule; equipment found in satisfactory condition.,Routine work completed.,1.7
+WO-2021-2071,TK-4201,2021-02-28,2021-03-01,"tank shell corroded, roof rusty, coat",Patch-plated corroded section.,39.1
+WO-2021-2035,M-2201,2021-03-04,2021-03-05,Insulation resistance found low with earth fault indication; motor isolated and sent for rewind assessment.,Isolated motor; sent for rewind.,11.7
+WO-2021-2021,P-2202,2021-03-09,2021-03-10,vibration high did alignment it was out fixed with shims runs smooth now,Laser alignment carried out; within tolerance.,5.1
+WO-2021-2038,E-1110,2021-03-14,2021-03-14,"exch fouled, poor duty, chem clean scheduled",Chemical-cleaned tube side.,7.0
+WO-2021-2006,P-3105,2021-03-18,2021-03-19,"align'mnt off ~0.4mm, laser done, corrected shims",Shimmed and realigned coupling.,7.3
+WO-2021-2051,A-2110,2021-03-23,2021-03-23,Vibration traced to shaft misalignment across the coupling; laser alignment carried out and readings brought within tolerance.,Shimmed and realigned coupling.,8.9
+WO-2021-2050,A-2110,2021-03-26,2021-03-27,"routine pm done, greased, checked, all ok",Routine work completed.,1.6
+WO-2021-2063,C-4210,2021-03-27,2021-03-30,"oil dark, water in oil, changed",Drained and refilled correct grade lube.,3.4
+WO-2021-2043,E-3110,2021-03-29,2021-03-29,"wall thin, corrosion, UT low, patch",Logged UT; scheduled repair.,17.6
+WO-2021-2053,A-2110,2021-04-03,2021-04-04,"Bearing check: noise Y, temp 76C, vib high. Recommend replace.",Replaced DE/NDE bearings.,7.1
+WO-2021-2037,M-4101,2021-04-04,2021-04-05,"megger low, earth fault, motor out",Dried out windings; IR restored.,20.6
+WO-2021-2008,P-3105,2021-04-07,2021-04-08,"cavitation noise, NPSH low, throttled disch",Adjusted operation to restore suction.,6.5
+WO-2021-2011,P-2210,2021-04-08,2021-04-12,vibration high did alignment it was out fixed with shims runs smooth now,Shimmed and realigned coupling.,9.0
+WO-2021-2069,CV-4101,2021-04-09,2021-04-09,"valve sticking, hunting, packing tight",Serviced positioner; stroked valve.,3.5
+WO-2021-2020,P-2202,2021-04-11,2021-04-15,vibration high did alignment it was out fixed with shims runs smooth now,Laser alignment carried out; within tolerance.,6.7
+WO-2021-2024,P-3301,2021-04-17,2021-04-21,Strainer check: high dP. Action: clean suction strainer.,Removed and cleaned strainer element.,1.8
+WO-2021-2036,M-3301,2021-04-19,2021-04-22,"IR low <1Mohm, earth fault, motor isolated",Dried out windings; IR restored.,19.3
+WO-2021-2016,P-1102,2021-04-21,2021-04-24,Pump showing cavitation symptoms — gravel-like noise and unstable flow; suction conditions investigated.,Cleared suction restriction; verified NPSH.,4.7
+WO-2021-2030,P-4101,2021-04-22,2021-04-25,"suction strainer choked, flow low, cleaned",Cleaned suction strainer.,2.5
+WO-2021-2065,CV-1101,2021-04-24,2021-04-28,"gen'l inspection, nothing abnormal, cont' running",Closed after inspection.,2.5
+WO-2021-2049,E-4110,2021-04-26,2021-04-26,"flange weeping, gasket blown, replaced",Renewed joint; leak-tested.,2.6
+WO-2021-2015,P-1101,2021-04-28,2021-04-30,"Bearing check: noise Y, temp 76C, vib high. Recommend replace.",Replaced DE/NDE bearings.,8.7
+WO-2021-2034,M-1101,2021-05-05,2021-05-06,"Motor bearing check: DE ok, NDE noisy. Action: replace NDE bearing.",Replaced motor bearings.,18.0
+WO-2021-2073,TK-4203,2021-05-05,2021-05-09,"flange weeping, gasket blown, replaced",Renewed joint; leak-tested.,3.7
+WO-2021-2046,E-3210,2021-05-14,2021-05-18,"Joint leak noted. Action: replace gasket, bolt-up to torque.",Renewed joint; leak-tested.,4.2
+WO-2021-2058,C-4110,2021-05-15,2021-05-19,"Drive-end bearing exhibiting elevated noise and vibration on routine survey; wear suspected, replacement planned.",Replaced DE/NDE bearings.,10.2
+WO-2021-2014,P-1101,2021-05-16,2021-05-20,"painting + housekeeping around unit, no defect",No corrective action required.,3.4
+WO-2021-2018,P-1102,2021-05-16,2021-05-17,pump flow dropping suction strainer full of muck cleaned it out,Removed and cleaned strainer element.,1.4
+WO-2021-2007,P-3105,2021-05-22,2021-05-22,"coupling element torn, no drive, replaced spacer",Renewed coupling element and bolts.,7.0
+WO-2021-2070,TK-3201,2021-05-23,2021-05-23,"External and internal shell corrosion observed on tank during inspection; plate thickness reducing, coating and patch repair planned.",Recoated affected area.,26.8
+WO-2021-2068,CV-4101,2021-05-30,2021-06-02,"cv stem sticky, positioner hunting, freed up",Adjusted packing; freed stem.,5.8
+WO-2021-2000,P-3401,2021-06-11,2021-06-13,"brg NDE rumbling, vib 6.2 mm/s, plan replace",Renewed bearings; realigned.,4.7
+WO-2021-2022,P-2202,2021-06-12,2021-06-14,"Observed process fluid leakage at the mechanical seal during rounds; seal faces suspected worn, leak rate increasing.",Replaced mechanical seal cartridge; verified flush.,8.4
+WO-2021-2044,E-3110,2021-06-16,2021-06-19,"cleaned area, tightened fittings, ok",No corrective action required.,0.7
+WO-2021-2048,E-4110,2021-06-21,2021-06-25,Preventive maintenance carried out per schedule; equipment found in satisfactory condition.,Closed after inspection.,1.1
+WO-2021-2019,P-2201,2021-06-23,2021-06-23,"suction strainer choked, flow low, cleaned",Removed and cleaned strainer element.,2.8
+WO-2021-2031,M-3402,2021-07-08,2021-07-11,"grease contam'd, relubed brgs, oil grade wrong earlier",Re-lubricated bearings; sample sent.,3.5
+WO-2021-2060,C-4120,2021-07-10,2021-07-13,"cleaned area, tightened fittings, ok",Routine work completed.,3.9
+WO-2021-2033,M-2210,2021-07-17,2021-07-18,"motor NDE brg noisy, vib on motor side",Renewed NDE bearing; greased.,12.8
+WO-2021-2010,P-3105,2021-07-18,2021-07-22,"grease contam'd, relubed brgs, oil grade wrong earlier",Drained and refilled correct grade lube.,2.1
+WO-2021-2023,P-3301,2021-07-19,2021-07-21,"pump crackling, flow swinging, suction low",Adjusted operation to restore suction.,7.6
+WO-2021-2072,TK-4201,2021-08-08,2021-08-12,"xmtr drift ~3%, recal done, tag ok now",Bench-calibrated and reinstalled.,2.2
+WO-2021-0453,P-3401,2021-08-10,2021-08-11,"flush line to seal choked, cleaned strainer, flush plan not confirmed against OEM",Cleaned seal flush line and strainer; flush flow restored. Flush plan to be verified against OEM spec.,6.0
+WO-2021-2062,C-4210,2021-08-20,2021-08-23,"Bearing check: noise Y, temp 76C, vib high. Recommend replace.",Renewed bearings; realigned.,7.8
+WO-2021-2025,P-3301,2021-08-23,2021-08-26,"coupling element torn, no drive, replaced spacer",Replaced coupling spacer.,3.3
+WO-2021-2057,C-4110,2021-10-03,2021-10-04,"joint leak at bonnet, new gasket, torqued",Replaced gasket; bolted to torque.,2.8
+WO-2021-2005,P-3402,2021-10-08,2021-10-09,"brg noisy DE side, temp 78C, vib high",Renewed bearings; realigned.,9.5
+WO-2021-2055,A-3120,2021-10-10,2021-10-14,"brg noisy DE side, temp 78C, vib high",Replaced DE/NDE bearings.,7.7
+WO-2021-2066,CV-1101,2021-10-18,2021-10-21,"valve sticking, hunting, packing tight",Serviced positioner; stroked valve.,2.8
+WO-2021-2032,M-3402,2021-10-19,2021-10-22,"megger low, earth fault, motor out",Dried out windings; IR restored.,8.1
+WO-2021-2047,E-4110,2021-10-23,2021-10-26,"Wall thinning found on casing/piping from corrosion-erosion during inspection; UT readings logged, repair planned.",Patch-repaired thinned section.,13.9
+WO-2021-2039,E-1110,2021-10-25,2021-10-27,"Cross-contamination detected across the exchanger; hydro test identified a leaking tube, tube plugged.",Hydro-tested and plugged affected tubes.,21.7
+WO-2021-2012,P-2210,2021-11-04,2021-11-06,"brg NDE rumbling, vib 6.2 mm/s, plan replace",Replaced DE/NDE bearings.,11.5
+WO-2021-2003,P-3401,2021-11-11,2021-11-15,"high vib, coupling checked, alignment out",Shimmed and realigned coupling.,7.3
+WO-2021-2042,E-2110,2021-11-18,2021-11-22,"exch fouled, poor duty, chem clean scheduled",Chemical-cleaned tube side.,8.9
+WO-2021-2026,P-3301,2021-11-29,2021-11-29,vibration high did alignment it was out fixed with shims runs smooth now,Shimmed and realigned coupling.,8.3
+WO-2021-2004,P-3401,2021-12-12,2021-12-15,"flush line choked, flow low, cleaned orifice",Backflushed flush line; strainer cleaned.,7.2
+WO-2021-2052,A-2110,2021-12-19,2021-12-21,"Drive-end bearing exhibiting elevated noise and vibration on routine survey; wear suspected, replacement planned.",Replaced DE/NDE bearings.,8.2
+WO-2021-2054,A-3110,2021-12-20,2021-12-23,"mech seal weeping DE side, drops on baseplate, temp 71C",Replaced mechanical seal cartridge; verified flush.,9.8
+WO-2021-2067,CV-3101,2021-12-22,2021-12-25,"cv stem sticky, positioner hunting, freed up",Adjusted packing; freed stem.,4.0
+WO-2021-2061,C-4120,2021-12-23,2021-12-24,"joint leak at bonnet, new gasket, torqued",Renewed joint; leak-tested.,4.7
+WO-2021-2002,P-3401,2021-12-27,2021-12-28,Vibration traced to shaft misalignment across the coupling; laser alignment carried out and readings brought within tolerance.,Shimmed and realigned coupling.,9.6
+WO-2021-2009,P-3105,2021-12-29,2022-01-02,"coupling element torn, no drive, replaced spacer",Renewed coupling element and bolts.,6.2
+WO-2021-2064,C-4210,2021-12-31,2021-12-31,"Bearing check: noise Y, temp 76C, vib high. Recommend replace.",Replaced DE/NDE bearings.,9.0
+WO-2022-2007,P-3402,2022-01-01,2022-01-04,"routine pm done, greased, checked, all ok",No corrective action required.,0.2
+WO-2022-2014,P-3105,2022-01-01,2022-01-04,Performance check: head low. Impeller vanes eroded. Action: replace impeller.,Renewed impeller; clearances reset.,14.2
+WO-2022-2054,A-2120,2022-01-02,2022-01-04,"Drive-end bearing exhibiting elevated noise and vibration on routine survey; wear suspected, replacement planned.",Replaced DE/NDE bearings.,8.9
+WO-2022-2017,P-2210,2022-01-08,2022-01-09,vibration high did alignment it was out fixed with shims runs smooth now,Shimmed and realigned coupling.,8.7
+WO-2022-2026,P-2201,2022-01-13,2022-01-15,"suction strainer choked, flow low, cleaned",Cleaned suction strainer.,2.9
+WO-2022-2002,P-3402,2022-01-17,2022-01-18,coupling gone rubber element broken pump not turning fitted new one,Renewed coupling element and bolts.,7.3
+WO-2022-2067,TK-1201,2022-01-18,2022-01-22,"Tank inspection: shell corrosion, roof pitting. Action: recoat/patch.",Patch-plated corroded section.,15.8
+WO-2022-2058,C-4210,2022-01-22,2022-01-22,"Lube check: level low, colour dark. Action: drain and refill correct grade.",Drained and refilled correct grade lube.,3.8
+WO-2022-2006,P-3402,2022-01-25,2022-01-26,"cavitation noise, NPSH low, throttled disch",Cleared suction restriction; verified NPSH.,3.6
+WO-2022-2060,CV-1101,2022-01-29,2022-01-29,Control valve stem observed sticking with loop hunting; packing adjusted and stem freed.,Serviced positioner; stroked valve.,4.5
+WO-2022-2001,P-3401,2022-01-31,2022-02-04,"grease contam'd, relubed brgs, oil grade wrong earlier",Drained and refilled correct grade lube.,1.8
+WO-2022-2023,P-1101,2022-02-08,2022-02-09,"cavitation noise, NPSH low, throttled disch",Cleared suction restriction; verified NPSH.,4.0
+WO-2022-2051,A-2120,2022-02-08,2022-02-08,attended complaint found nothing wrong equipment ok,Routine work completed.,3.1
+WO-2022-2032,M-3401,2022-02-14,2022-02-15,"IR low <1Mohm, earth fault, motor isolated",Isolated motor; sent for rewind.,11.8
+WO-2022-2040,M-3301,2022-02-15,2022-02-16,"vib elevated, no clear cause yet, trending",Logged vibration; continued trending.,3.2
+WO-2022-2044,E-3110,2022-02-16,2022-02-18,"Cross-contamination detected across the exchanger; hydro test identified a leaking tube, tube plugged.",Plugged leaking tube(s).,14.6
+WO-2022-2069,TK-1201,2022-03-05,2022-03-07,"External and internal shell corrosion observed on tank during inspection; plate thickness reducing, coating and patch repair planned.",Recoated affected area.,30.9
+WO-2022-2031,P-4101,2022-03-13,2022-03-14,Vibration traced to shaft misalignment across the coupling; laser alignment carried out and readings brought within tolerance.,Laser alignment carried out; within tolerance.,4.9
+WO-2022-2053,A-2120,2022-03-29,2022-04-02,"cleaned area, tightened fittings, ok",Routine work completed.,2.6
+WO-2022-2071,TK-3201,2022-04-01,2022-04-05,"gauge reading off vs field, recalibrated",Bench-calibrated and reinstalled.,1.4
+WO-2022-2022,P-1101,2022-04-07,2022-04-11,attended complaint found nothing wrong equipment ok,Routine work completed.,1.3
+WO-2022-2055,A-3110,2022-04-12,2022-04-12,"Drive-end bearing exhibiting elevated noise and vibration on routine survey; wear suspected, replacement planned.",Renewed bearings; realigned.,9.2
+WO-2022-2041,E-1110,2022-04-23,2022-04-24,"hx dP high, outlet temp up, tubes fouled",Hydrojetted tubes; duty restored.,5.9
+WO-2022-2012,P-3402,2022-04-25,2022-04-27,"grease contam'd, relubed brgs, oil grade wrong earlier",Re-lubricated bearings; sample sent.,4.3
+WO-2022-2016,P-2210,2022-04-26,2022-04-28,"Drive-end bearing exhibiting elevated noise and vibration on routine survey; wear suspected, replacement planned.",Replaced DE/NDE bearings.,9.6
+WO-2022-2011,P-3402,2022-05-03,2022-05-06,"Bearing check: noise Y, temp 76C, vib high. Recommend replace.",Renewed bearings; realigned.,8.7
+WO-2022-2000,P-3401,2022-05-17,2022-05-21,Vibration traced to shaft misalignment across the coupling; laser alignment carried out and readings brought within tolerance.,Laser alignment carried out; within tolerance.,7.9
+WO-2022-2027,P-2202,2022-05-21,2022-05-21,"gland packing dripping, tightened, still weeping slight",Adjusted gland follower.,3.7
+WO-2022-2035,M-3105,2022-06-01,2022-06-01,"megger low, earth fault, motor out",Dried out windings; IR restored.,10.8
+WO-2022-2042,E-1110,2022-06-13,2022-06-13,"Cross-contamination detected across the exchanger; hydro test identified a leaking tube, tube plugged.",Plugged leaking tube(s).,16.4
+WO-2022-2018,P-2210,2022-06-14,2022-06-16,"head dropping slow, impeller worn, wear rings gone",Replaced worn impeller and wear rings.,14.3
+WO-2022-2043,E-1110,2022-06-15,2022-06-16,"Exchanger approach temperature rising with increased pressure drop; tube-side fouling suspected, cleaning planned.",Chemical-cleaned tube side.,11.6
+WO-2022-2046,E-3210,2022-06-15,2022-06-15,attended complaint found nothing wrong equipment ok,Routine work completed.,3.8
+WO-2022-2066,TK-1201,2022-06-16,2022-06-20,"joint leak at bonnet, new gasket, torqued",Renewed joint; leak-tested.,3.2
+WO-2022-2070,TK-3201,2022-06-16,2022-06-18,"painting + housekeeping around unit, no defect",Closed after inspection.,0.7
+WO-2022-2050,A-2110,2022-06-17,2022-06-18,seal leaking again same pump product on floor faces look scored need cartridge,Renewed seal faces; leak stopped after run-in.,17.7
+WO-2022-2005,P-3402,2022-06-18,2022-06-21,"head dropping slow, impeller worn, wear rings gone",Replaced worn impeller and wear rings.,7.5
+WO-2022-2020,P-2210,2022-06-30,2022-07-02,"chk'd flush plan, line partially blocked, strainer dirty",Backflushed flush line; strainer cleaned.,5.0
+WO-2022-2028,P-3301,2022-06-30,2022-07-02,"suction strainer choked, flow low, cleaned",Cleaned suction strainer.,2.7
+WO-2022-2036,M-3105,2022-07-03,2022-07-03,"Lube check: level low, colour dark. Action: drain and refill correct grade.",Drained and refilled correct grade lube.,2.7
+WO-2022-2063,CV-3101,2022-07-05,2022-07-06,"xmtr drift ~3%, recal done, tag ok now",Bench-calibrated and reinstalled.,2.8
+WO-2022-2025,P-2201,2022-07-06,2022-07-07,Flexible coupling element found failed causing loss of drive; element and bolts renewed.,Replaced coupling spacer.,7.9
+WO-2022-2049,A-2110,2022-07-12,2022-07-15,"Lube check: level low, colour dark. Action: drain and refill correct grade.",Drained and refilled correct grade lube.,1.6
+WO-2022-2052,A-2120,2022-07-17,2022-07-19,"coupling element torn, no drive, replaced spacer",Renewed coupling element and bolts.,6.7
+WO-2022-2064,CV-4101,2022-07-17,2022-07-19,"gauge reading off vs field, recalibrated",Recalibrated instrument.,1.2
+WO-2022-2008,P-3402,2022-07-22,2022-07-24,"align'mnt off ~0.4mm, laser done, corrected shims",Laser alignment carried out; within tolerance.,7.7
+WO-2022-2010,P-3402,2022-07-24,2022-07-26,Flexible coupling element found failed causing loss of drive; element and bolts renewed.,Renewed coupling element and bolts.,4.9
+WO-2022-2057,C-4110,2022-07-28,2022-07-28,"Lube check: level low, colour dark. Action: drain and refill correct grade.",Re-lubricated bearings; sample sent.,3.1
+WO-2022-2073,TK-4202,2022-08-02,2022-08-05,"topped up oil, wiped down, running fine",Routine work completed.,0.8
+WO-2022-2062,CV-3101,2022-08-03,2022-08-03,Transmitter reading deviating from field reference; instrument recalibrated to true value.,Recalibrated instrument.,1.3
+WO-2022-2074,TK-4202,2022-08-07,2022-08-08,Quarterly check: readings normal. Action: none.,Routine work completed.,1.7
+WO-2022-2033,M-3402,2022-08-13,2022-08-16,"motor NDE brg noisy, vib on motor side",Replaced motor bearings.,11.9
+WO-2022-2021,P-2210,2022-08-14,2022-08-18,checked pump running normal no issue closed wo,Closed after inspection.,3.0
+WO-2022-2034,M-3402,2022-09-08,2022-09-09,"oil dark, water in oil, changed",Re-lubricated bearings; sample sent.,4.5
+WO-2022-2003,P-3402,2022-09-10,2022-09-10,vibration high did alignment it was out fixed with shims runs smooth now,Laser alignment carried out; within tolerance.,4.6
+WO-2022-2072,TK-3201,2022-09-12,2022-09-15,"Scheduled PM: lubrication, general check. No abnormality found.",Closed after inspection.,0.5
+WO-2022-2068,TK-1201,2022-09-25,2022-09-28,"External and internal shell corrosion observed on tank during inspection; plate thickness reducing, coating and patch repair planned.",Patch-plated corroded section.,30.4
+WO-2022-2045,E-3210,2022-09-30,2022-10-02,"exch fouled, poor duty, chem clean scheduled",Chemical-cleaned tube side.,9.7
+WO-2022-2024,P-1101,2022-10-12,2022-10-12,Pump showing cavitation symptoms — gravel-like noise and unstable flow; suction conditions investigated.,Cleared suction restriction; verified NPSH.,2.8
+WO-2022-2037,M-3105,2022-10-14,2022-10-15,"IR low <1Mohm, earth fault, motor isolated",Isolated motor; sent for rewind.,18.1
+WO-2022-2030,P-4101,2022-10-19,2022-10-20,"suction strainer choked, flow low, cleaned",Removed and cleaned strainer element.,1.1
+WO-2022-2047,E-3210,2022-10-21,2022-10-23,"tube leak on hx, hydrotest, plugged 2 tubes",Plugged leaking tube(s).,26.9
+WO-2022-2013,P-3105,2022-10-23,2022-10-24,checked pump running normal no issue closed wo,No corrective action required.,2.2
+WO-2022-2015,P-3105,2022-10-30,2022-11-02,"brg NDE rumbling, vib 6.2 mm/s, plan replace",Renewed bearings; realigned.,4.4
+WO-2022-0731,P-1102,2022-11-05,2022-11-05,"gland slight seepage noted during round, monitoring, flush temp a bit high",Seepage logged; seal monitored. Flush temperature to be watched.,2.0
+WO-2022-2065,CV-4101,2022-11-14,2022-11-17,"cv stem sticky, positioner hunting, freed up",Adjusted packing; freed stem.,2.0
+WO-2022-2019,P-2210,2022-11-16,2022-11-16,"impeller worn, clearances open, perf down",Renewed impeller; clearances reset.,11.0
+WO-2022-2061,CV-2101,2022-11-16,2022-11-17,"cv stem sticky, positioner hunting, freed up",Serviced positioner; stroked valve.,3.2
+WO-2022-2048,E-3210,2022-11-19,2022-11-22,"Wall thinning found on casing/piping from corrosion-erosion during inspection; UT readings logged, repair planned.",Logged UT; scheduled repair.,15.4
+WO-2022-2004,P-3402,2022-11-20,2022-11-21,"oil dark, water in oil, changed",Drained and refilled correct grade lube.,2.7
+WO-2022-2039,M-3301,2022-11-21,2022-11-21,"motor NDE brg noisy, vib on motor side",Replaced motor bearings.,16.6
+WO-2022-2009,P-3402,2022-11-29,2022-11-30,"pump crackling, flow swinging, suction low",Adjusted operation to restore suction.,3.3
+WO-2022-2056,A-3120,2022-12-07,2022-12-10,"brg noisy DE side, temp 78C, vib high",Renewed bearings; realigned.,7.4
+WO-2022-2029,P-4101,2022-12-09,2022-12-13,"align'mnt off ~0.4mm, laser done, corrected shims",Shimmed and realigned coupling.,6.4
+WO-2022-2059,CV-1101,2022-12-09,2022-12-11,"valve sticking, hunting, packing tight",Serviced positioner; stroked valve.,4.2
+WO-2022-2038,M-2210,2022-12-18,2022-12-19,"megger low, earth fault, motor out",Isolated motor; sent for rewind.,13.2
+WO-2023-2056,E-3210,2023-01-01,2023-01-02,"tube leak on hx, hydrotest, plugged 2 tubes",Plugged leaking tube(s).,27.9
+WO-2023-2001,P-3401,2023-01-11,2023-01-13,"flush line choked, flow low, cleaned orifice",Backflushed flush line; strainer cleaned.,3.5
+WO-2023-2027,P-2201,2023-01-12,2023-01-15,"Observed process fluid leakage at the mechanical seal during rounds; seal faces suspected worn, leak rate increasing.",Renewed seal faces; leak stopped after run-in.,16.2
+WO-2023-2041,M-2210,2023-01-16,2023-01-17,"IR low <1Mohm, earth fault, motor isolated",Dried out windings; IR restored.,11.7
+WO-2023-2009,P-3402,2023-01-21,2023-01-21,Quarterly check: readings normal. Action: none.,Routine work completed.,2.2
+WO-2023-2057,E-4110,2023-01-25,2023-01-25,"exch fouled, poor duty, chem clean scheduled",Hydrojetted tubes; duty restored.,11.5
+WO-2023-2050,M-4101,2023-01-30,2023-02-01,Insulation resistance found low with earth fault indication; motor isolated and sent for rewind assessment.,Dried out windings; IR restored.,11.6
+WO-2023-2032,P-4101,2023-01-31,2023-02-01,"high vib, coupling checked, alignment out",Laser alignment carried out; within tolerance.,5.0
+WO-2023-2016,P-3105,2023-02-20,2023-02-24,"Bearing check: noise Y, temp 76C, vib high. Recommend replace.",Replaced DE/NDE bearings.,9.5
+WO-2023-2036,M-3402,2023-02-21,2023-02-24,"cleaned area, tightened fittings, ok",Routine work completed.,3.7
+WO-2023-2003,P-3401,2023-02-27,2023-02-27,Vibration traced to shaft misalignment across the coupling; laser alignment carried out and readings brought within tolerance.,Laser alignment carried out; within tolerance.,9.3
+WO-2023-2071,CV-1101,2023-02-28,2023-03-03,"cv passing when shut, seat eroded",Lapped valve seat; leak-tested.,7.8
+WO-2023-2062,A-3120,2023-03-03,2023-03-06,"coupling element torn, no drive, replaced spacer",Renewed coupling element and bolts.,5.3
+WO-2023-2052,E-1110,2023-03-08,2023-03-09,"tube leak on hx, hydrotest, plugged 2 tubes",Hydro-tested and plugged affected tubes.,13.4
+WO-2023-2086,TK-4203,2023-03-08,2023-03-09,"External and internal shell corrosion observed on tank during inspection; plate thickness reducing, coating and patch repair planned.",Patch-plated corroded section.,33.7
+WO-2023-2014,P-3105,2023-03-13,2023-03-15,"flush line choked, flow low, cleaned orifice",Backflushed flush line; strainer cleaned.,6.4
+WO-2023-2042,M-1101,2023-03-14,2023-03-14,"oil dark, water in oil, changed",Re-lubricated bearings; sample sent.,4.0
+WO-2023-2074,CV-2101,2023-03-18,2023-03-19,Valve check: passing closed. Cause: seat erosion. Action: lap/replace trim.,Lapped valve seat; leak-tested.,7.1
+WO-2023-2029,P-2202,2023-03-20,2023-03-24,Vibration traced to shaft misalignment across the coupling; laser alignment carried out and readings brought within tolerance.,Laser alignment carried out; within tolerance.,4.0
+WO-2023-2020,P-1101,2023-04-02,2023-04-02,vibration high did alignment it was out fixed with shims runs smooth now,Shimmed and realigned coupling.,4.7
+WO-2023-2072,CV-1101,2023-04-02,2023-04-02,"gauge reading off vs field, recalibrated",Bench-calibrated and reinstalled.,2.9
+WO-2023-2028,P-2202,2023-04-07,2023-04-08,Pump showing cavitation symptoms — gravel-like noise and unstable flow; suction conditions investigated.,Cleared suction restriction; verified NPSH.,7.9
+WO-2023-2079,TK-1201,2023-04-18,2023-04-20,"External and internal shell corrosion observed on tank during inspection; plate thickness reducing, coating and patch repair planned.",Recoated affected area.,38.1
+WO-2023-2007,P-3402,2023-04-21,2023-04-22,"Bearing check: noise Y, temp 76C, vib high. Recommend replace.",Replaced DE/NDE bearings.,5.7
+WO-2023-2010,P-3105,2023-04-23,2023-04-27,"Lube check: level low, colour dark. Action: drain and refill correct grade.",Re-lubricated bearings; sample sent.,1.9
+WO-2023-2019,P-2210,2023-04-24,2023-04-28,"brg noisy DE side, temp 78C, vib high",Replaced DE/NDE bearings.,10.5
+WO-2023-2067,C-4210,2023-05-01,2023-05-04,"Lube check: level low, colour dark. Action: drain and refill correct grade.",Drained and refilled correct grade lube.,2.0
+WO-2023-2055,E-3110,2023-05-08,2023-05-11,"Exchanger approach temperature rising with increased pressure drop; tube-side fouling suspected, cleaning planned.",Chemical-cleaned tube side.,5.6
+WO-2023-2059,A-2110,2023-05-10,2023-05-11,Preventive maintenance carried out per schedule; equipment found in satisfactory condition.,Routine work completed.,1.1
+WO-2023-2066,C-4120,2023-05-10,2023-05-10,"vib elevated, no clear cause yet, trending",Logged vibration; continued trending.,3.5
+WO-2023-2015,P-3105,2023-05-13,2023-05-14,checked pump running normal no issue closed wo,Closed after inspection.,1.3
+WO-2023-2012,P-3105,2023-05-14,2023-05-16,"oil dark, water in oil, changed",Re-lubricated bearings; sample sent.,3.0
+WO-2023-2013,P-3105,2023-05-17,2023-05-18,"cleaned area, tightened fittings, ok",No corrective action required.,3.8
+WO-2023-2065,C-4120,2023-05-17,2023-05-19,"routine pm done, greased, checked, all ok",No corrective action required.,3.7
+WO-2023-2083,TK-4201,2023-05-17,2023-05-19,checked pump running normal no issue closed wo,No corrective action required.,2.0
+WO-2023-2060,A-2120,2023-05-19,2023-05-20,coupling gone rubber element broken pump not turning fitted new one,Renewed coupling element and bolts.,7.8
+WO-2023-2048,M-3301,2023-05-21,2023-05-22,"motor NDE brg noisy, vib on motor side",Replaced motor bearings.,17.0
+WO-2023-2076,CV-3101,2023-05-22,2023-05-26,Preventive maintenance carried out per schedule; equipment found in satisfactory condition.,Routine work completed.,3.1
+WO-2023-2064,C-4110,2023-05-26,2023-05-26,Vibration survey: overall high. Root cause: not isolated. Action: monitor and trend.,Monitoring; further diagnosis planned.,3.1
+WO-2023-2045,M-2201,2023-05-27,2023-05-29,"Motor bearing check: DE ok, NDE noisy. Action: replace NDE bearing.",Replaced motor bearings.,13.1
+WO-2023-2021,P-1102,2023-05-28,2023-06-01,"Bearing check: noise Y, temp 76C, vib high. Recommend replace.",Replaced DE/NDE bearings.,5.9
+WO-2023-2077,CV-3201,2023-06-06,2023-06-09,Transmitter reading deviating from field reference; instrument recalibrated to true value.,Recalibrated instrument.,1.7
+WO-2023-2004,P-3402,2023-06-07,2023-06-11,"grease contam'd, relubed brgs, oil grade wrong earlier",Drained and refilled correct grade lube.,3.8
+WO-2023-2078,CV-4101,2023-06-07,2023-06-08,"valve sticking, hunting, packing tight",Serviced positioner; stroked valve.,2.2
+WO-2023-2039,M-3105,2023-06-10,2023-06-11,"Motor bearing check: DE ok, NDE noisy. Action: replace NDE bearing.",Replaced motor bearings.,9.6
+WO-2023-2002,P-3401,2023-06-16,2023-06-16,"grease contam'd, relubed brgs, oil grade wrong earlier",Drained and refilled correct grade lube.,3.9
+WO-2023-2033,P-4101,2023-06-16,2023-06-16,"brg noisy DE side, temp 78C, vib high",Replaced DE/NDE bearings.,5.8
+WO-2023-2080,TK-1201,2023-06-22,2023-06-24,"External and internal shell corrosion observed on tank during inspection; plate thickness reducing, coating and patch repair planned.",Recoated affected area.,28.9
+WO-2023-2087,TK-4203,2023-06-25,2023-06-29,"External and internal shell corrosion observed on tank during inspection; plate thickness reducing, coating and patch repair planned.",Recoated affected area.,24.5
+WO-2023-2070,C-4210,2023-07-01,2023-07-03,"Lube check: level low, colour dark. Action: drain and refill correct grade.",Re-lubricated bearings; sample sent.,4.3
+WO-2023-2006,P-3402,2023-07-02,2023-07-06,"Lube check: level low, colour dark. Action: drain and refill correct grade.",Re-lubricated bearings; sample sent.,1.9
+WO-2023-2049,M-4101,2023-07-02,2023-07-06,"motor NDE brg noisy, vib on motor side",Replaced motor bearings.,16.4
+WO-2023-2018,P-2210,2023-07-04,2023-07-06,"flush line choked, flow low, cleaned orifice",Backflushed flush line; strainer cleaned.,4.2
+WO-2023-2008,P-3402,2023-07-05,2023-07-05,"grease contam'd, relubed brgs, oil grade wrong earlier",Re-lubricated bearings; sample sent.,4.6
+WO-2023-2081,TK-3201,2023-07-20,2023-07-20,"Tank inspection: shell corrosion, roof pitting. Action: recoat/patch.",Recoated affected area.,39.4
+WO-2023-2017,P-2210,2023-08-07,2023-08-09,"cavitation noise, NPSH low, throttled disch",Adjusted operation to restore suction.,6.0
+WO-2023-2031,P-4101,2023-08-11,2023-08-15,"seal leak'g at gland, prod'ct dripping outboard, flush temp high",Renewed seal faces; leak stopped after run-in.,14.9
+WO-2023-2058,A-2110,2023-08-16,2023-08-18,vibration high did alignment it was out fixed with shims runs smooth now,Shimmed and realigned coupling.,5.5
+WO-2023-2047,M-2201,2023-08-26,2023-08-28,"motor NDE brg noisy, vib on motor side",Replaced motor bearings.,11.0
+WO-2023-2073,CV-2101,2023-09-02,2023-09-04,"cv stem sticky, positioner hunting, freed up",Adjusted packing; freed stem.,4.2
+WO-2023-2084,TK-4202,2023-09-03,2023-09-04,"tank shell corroded, roof rusty, coat",Recoated affected area.,24.0
+WO-2023-2075,CV-3101,2023-09-08,2023-09-11,Transmitter reading deviating from field reference; instrument recalibrated to true value.,Bench-calibrated and reinstalled.,1.9
+WO-2023-2025,P-2201,2023-09-10,2023-09-10,Pump showing cavitation symptoms — gravel-like noise and unstable flow; suction conditions investigated.,Adjusted operation to restore suction.,2.1
+WO-2023-2035,M-3401,2023-09-11,2023-09-14,"overall vib high 7 mm/s, cause tbd, monitoring",Monitoring; further diagnosis planned.,3.6
+WO-2023-0518,P-3105,2023-09-14,2023-09-15,"seal flush pressure low, flush plan Y running, not per OEM plan 11",Flush pressure investigated; found running non-standard flush plan Y. Restored flush; OEM plan deviation flagged.,4.0
+WO-2023-2022,P-1102,2023-09-15,2023-09-15,Flexible coupling element found failed causing loss of drive; element and bolts renewed.,Replaced coupling spacer.,8.1
+WO-2023-2037,M-3402,2023-09-15,2023-09-16,"mtr o/heat, tripped OL relay, wdg temp high",Cleaned motor cooling path; monitored winding temp.,7.6
+WO-2023-2051,E-1110,2023-09-22,2023-09-22,"hx dP high, outlet temp up, tubes fouled",Chemical-cleaned tube side.,4.2
+WO-2023-2082,TK-4201,2023-09-24,2023-09-26,"Tank inspection: shell corrosion, roof pitting. Action: recoat/patch.",Recoated affected area.,17.9
+WO-2023-2061,A-3110,2023-09-26,2023-09-29,"oil dark, water in oil, changed",Drained and refilled correct grade lube.,4.2
+WO-2023-2038,M-3105,2023-09-27,2023-09-30,"motor NDE brg noisy, vib on motor side",Renewed NDE bearing; greased.,10.3
+WO-2023-2023,P-1102,2023-10-03,2023-10-07,"Scheduled PM: lubrication, general check. No abnormality found.",No corrective action required.,1.8
+WO-2023-2000,P-3401,2023-10-06,2023-10-08,"brg NDE rumbling, vib 6.2 mm/s, plan replace",Renewed bearings; realigned.,6.5
+WO-2023-2043,M-1101,2023-10-10,2023-10-14,"Motor tripped on thermal overload; winding temperature elevated, phase currents checked for imbalance.",Checked load and phase balance; cooled and restarted.,13.9
+WO-2023-2026,P-2201,2023-10-13,2023-10-13,"Drive-end bearing exhibiting elevated noise and vibration on routine survey; wear suspected, replacement planned.",Renewed bearings; realigned.,8.2
+WO-2023-2069,C-4210,2023-10-13,2023-10-17,"joint leak at bonnet, new gasket, torqued",Renewed joint; leak-tested.,3.5
+WO-2023-2011,P-3105,2023-10-16,2023-10-19,Flexible coupling element found failed causing loss of drive; element and bolts renewed.,Replaced coupling spacer.,4.6
+WO-2023-2054,E-2110,2023-10-27,2023-10-29,metal thinning bad corrosion on pump casing ut readings low needs repair,Logged UT; scheduled repair.,14.4
+WO-2023-2024,P-2201,2023-11-03,2023-11-06,seal leaking again same pump product on floor faces look scored need cartridge,Renewed seal faces; leak stopped after run-in.,12.1
+WO-2023-2053,E-2110,2023-11-13,2023-11-13,"Exchanger approach temperature rising with increased pressure drop; tube-side fouling suspected, cleaning planned.",Hydrojetted tubes; duty restored.,4.2
+WO-2023-2040,M-2210,2023-11-20,2023-11-23,"Motor tripped on thermal overload; winding temperature elevated, phase currents checked for imbalance.",Cleaned motor cooling path; monitored winding temp.,19.9
+WO-2023-2085,TK-4203,2023-11-27,2023-12-01,"tank shell corroded, roof rusty, coat",Recoated affected area.,9.3
+WO-2023-2005,P-3402,2023-12-11,2023-12-11,"Lube check: level low, colour dark. Action: drain and refill correct grade.",Drained and refilled correct grade lube.,1.2
+WO-2023-2030,P-3301,2023-12-13,2023-12-15,"Observed process fluid leakage at the mechanical seal during rounds; seal faces suspected worn, leak rate increasing.",Renewed seal faces; leak stopped after run-in.,15.9
+WO-2023-2046,M-2201,2023-12-16,2023-12-16,"IR low <1Mohm, earth fault, motor isolated",Dried out windings; IR restored.,9.8
+WO-2023-2044,M-1101,2023-12-21,2023-12-22,"oil dark, water in oil, changed",Drained and refilled correct grade lube.,1.5
+WO-2023-2063,A-3120,2023-12-26,2023-12-27,"brg noisy DE side, temp 78C, vib high",Replaced DE/NDE bearings.,11.6
+WO-2023-2068,C-4210,2023-12-26,2023-12-28,"painting + housekeeping around unit, no defect",Closed after inspection.,3.7
+WO-2023-2034,M-3401,2023-12-27,2023-12-28,"motor tripped on OL, winding hot, smell",Checked load and phase balance; cooled and restarted.,11.2
+WO-2024-2013,P-1101,2024-01-11,2024-01-14,"mech seal weeping DE side, drops on baseplate, temp 71C",Replaced mechanical seal cartridge; verified flush.,16.8
+WO-2024-2036,E-3210,2024-01-12,2024-01-15,"flange weeping, gasket blown, replaced",Replaced gasket; bolted to torque.,5.8
+WO-2024-2052,CV-3101,2024-01-15,2024-01-17,"painting + housekeeping around unit, no defect",No corrective action required.,2.2
+WO-2024-2008,P-2210,2024-01-16,2024-01-19,"cavitation noise, NPSH low, throttled disch",Cleared suction restriction; verified NPSH.,3.7
+WO-2024-2034,E-3110,2024-01-26,2024-01-30,metal thinning bad corrosion on pump casing ut readings low needs repair,Logged UT; scheduled repair.,10.5
+WO-2024-2002,P-3401,2024-02-01,2024-02-03,"chk'd flush plan, line partially blocked, strainer dirty",Cleaned flush line and orifice; restored flush flow.,4.2
+WO-2024-2015,P-2201,2024-02-10,2024-02-12,Pump showing cavitation symptoms — gravel-like noise and unstable flow; suction conditions investigated.,Adjusted operation to restore suction.,7.9
+WO-2024-2012,P-1101,2024-02-14,2024-02-18,Flexible coupling element found failed causing loss of drive; element and bolts renewed.,Replaced coupling spacer.,8.8
+WO-2024-2039,A-2120,2024-02-26,2024-02-27,"align'mnt off ~0.4mm, laser done, corrected shims",Laser alignment carried out; within tolerance.,8.5
+WO-2024-0117,P-3401,2024-03-04,2024-03-05,"seal weeping at gland, drips increasing on outboard side",Replaced mechanical seal cartridge. Flush line checked.,14.0
+WO-2024-2044,A-3120,2024-03-15,2024-03-16,"grease contam'd, relubed brgs, oil grade wrong earlier",Re-lubricated bearings; sample sent.,4.0
+WO-2024-2009,P-2210,2024-03-26,2024-03-28,"Lube check: level low, colour dark. Action: drain and refill correct grade.",Drained and refilled correct grade lube.,1.6
+WO-2024-2041,A-2120,2024-03-28,2024-03-28,Flexible coupling element found failed causing loss of drive; element and bolts renewed.,Replaced coupling spacer.,8.3
+WO-2024-2043,A-3110,2024-03-28,2024-03-28,"Scheduled PM: lubrication, general check. No abnormality found.",Routine work completed.,2.4
+WO-2024-2028,M-2201,2024-03-31,2024-04-01,"grease contam'd, relubed brgs, oil grade wrong earlier",Drained and refilled correct grade lube.,2.8
+WO-2024-2007,P-2210,2024-04-08,2024-04-09,"grease contam'd, relubed brgs, oil grade wrong earlier",Re-lubricated bearings; sample sent.,2.0
+WO-2024-2026,M-2210,2024-04-08,2024-04-09,"Motor bearing check: DE ok, NDE noisy. Action: replace NDE bearing.",Renewed NDE bearing; greased.,17.3
+WO-2024-2053,CV-3101,2024-04-17,2024-04-21,"xmtr drift ~3%, recal done, tag ok now",Bench-calibrated and reinstalled.,2.0
+WO-2024-2003,P-3401,2024-04-20,2024-04-21,"pump crackling, flow swinging, suction low",Cleared suction restriction; verified NPSH.,4.8
+WO-2024-2048,C-4110,2024-04-30,2024-05-04,"oil dark, water in oil, changed",Re-lubricated bearings; sample sent.,2.3
+WO-2024-2056,CV-3201,2024-05-02,2024-05-05,Transmitter reading deviating from field reference; instrument recalibrated to true value.,Bench-calibrated and reinstalled.,1.6
+WO-2024-2018,P-2202,2024-05-08,2024-05-10,seal leaking again same pump product on floor faces look scored need cartridge,Replaced mechanical seal cartridge; verified flush.,15.9
+WO-2024-2061,TK-3201,2024-05-14,2024-05-16,"xmtr drift ~3%, recal done, tag ok now",Recalibrated instrument.,1.9
+WO-2024-2029,M-2201,2024-05-22,2024-05-24,"Lube check: level low, colour dark. Action: drain and refill correct grade.",Drained and refilled correct grade lube.,4.6
+WO-2024-2062,TK-3201,2024-06-01,2024-06-03,"xmtr drift ~3%, recal done, tag ok now",Recalibrated instrument.,2.3
+WO-2024-2021,P-4101,2024-06-11,2024-06-11,"gland packing dripping, tightened, still weeping slight",Adjusted gland follower.,5.4
+WO-2024-2024,M-3402,2024-06-15,2024-06-17,"megger low, earth fault, motor out",Isolated motor; sent for rewind.,18.6
+WO-2024-2045,A-3120,2024-06-20,2024-06-21,"grease contam'd, relubed brgs, oil grade wrong earlier",Re-lubricated bearings; sample sent.,4.7
+WO-2024-2042,A-3110,2024-06-25,2024-06-27,Vibration traced to shaft misalignment across the coupling; laser alignment carried out and readings brought within tolerance.,Laser alignment carried out; within tolerance.,4.1
+WO-2024-2004,P-3105,2024-07-07,2024-07-09,"Lube check: level low, colour dark. Action: drain and refill correct grade.",Re-lubricated bearings; sample sent.,4.1
+WO-2024-2023,M-3401,2024-07-15,2024-07-18,"Motor tripped on thermal overload; winding temperature elevated, phase currents checked for imbalance.",Cleaned motor cooling path; monitored winding temp.,19.6
+WO-2024-2027,M-1101,2024-07-15,2024-07-16,"mtr o/heat, tripped OL relay, wdg temp high",Cleaned motor cooling path; monitored winding temp.,9.3
+WO-2024-2051,CV-3101,2024-07-15,2024-07-15,"joint leak at bonnet, new gasket, torqued",Replaced gasket; bolted to torque.,2.2
+WO-2024-0662,P-2210,2024-07-20,2024-07-21,"high vibration DE, coupling checked, laser alignment out 0.4mm corrected",Laser alignment carried out; misalignment corrected with shims. Vibration normal after.,8.0
+WO-2024-2035,E-3110,2024-07-21,2024-07-23,Quarterly check: readings normal. Action: none.,No corrective action required.,2.8
+WO-2024-2049,C-4120,2024-07-23,2024-07-25,"oil dark, water in oil, changed",Drained and refilled correct grade lube.,4.3
+WO-2024-2060,TK-3201,2024-07-30,2024-08-02,"Joint leak noted. Action: replace gasket, bolt-up to torque.",Replaced gasket; bolted to torque.,4.6
+WO-2024-2010,P-2210,2024-08-02,2024-08-06,"impeller worn, clearances open, perf down",Renewed impeller; clearances reset.,13.4
+WO-2024-2040,A-2120,2024-08-05,2024-08-07,"Drive-end bearing exhibiting elevated noise and vibration on routine survey; wear suspected, replacement planned.",Renewed bearings; realigned.,5.3
+WO-2024-2016,P-2201,2024-08-14,2024-08-15,"brg NDE rumbling, vib 6.2 mm/s, plan replace",Renewed bearings; realigned.,7.3
+WO-2024-2001,P-3401,2024-08-19,2024-08-21,"flush line choked, flow low, cleaned orifice",Cleaned flush line and orifice; restored flush flow.,6.4
+WO-2024-2030,M-4101,2024-08-23,2024-08-23,"mtr o/heat, tripped OL relay, wdg temp high",Checked load and phase balance; cooled and restarted.,17.6
+WO-2024-2058,CV-4101,2024-08-23,2024-08-25,"cv passing when shut, seat eroded",Lapped valve seat; leak-tested.,7.3
+WO-2024-2017,P-2201,2024-08-30,2024-09-03,"mech seal weeping DE side, drops on baseplate, temp 71C",Replaced mechanical seal cartridge; verified flush.,13.3
+WO-2024-2031,E-1110,2024-09-07,2024-09-11,"hx dP high, outlet temp up, tubes fouled",Hydrojetted tubes; duty restored.,6.1
+WO-2024-2025,M-2210,2024-09-14,2024-09-15,"Motor bearing check: DE ok, NDE noisy. Action: replace NDE bearing.",Replaced motor bearings.,13.0
+WO-2024-2065,TK-4203,2024-10-06,2024-10-07,attended complaint found nothing wrong equipment ok,No corrective action required.,3.9
+WO-2024-2055,CV-3201,2024-10-11,2024-10-13,control valve not closing tight passing across seat debris found lapped seat,Lapped valve seat; leak-tested.,6.8
+WO-2024-2050,CV-2101,2024-10-12,2024-10-15,"valve sticking, hunting, packing tight",Adjusted packing; freed stem.,5.7
+WO-2024-2037,E-4110,2024-10-16,2024-10-19,"joint leak at bonnet, new gasket, torqued",Renewed joint; leak-tested.,3.6
+WO-2024-2047,C-4110,2024-10-16,2024-10-18,"mtr o/heat, tripped OL relay, wdg temp high",Checked load and phase balance; cooled and restarted.,19.3
+WO-2024-2005,P-3105,2024-10-18,2024-10-18,Pump showing cavitation symptoms — gravel-like noise and unstable flow; suction conditions investigated.,Cleared suction restriction; verified NPSH.,6.0
+WO-2024-2054,CV-3101,2024-10-24,2024-10-25,Preventive maintenance carried out per schedule; equipment found in satisfactory condition.,No corrective action required.,0.7
+WO-2024-2000,P-3401,2024-10-28,2024-10-28,"oil dark, water in oil, changed",Re-lubricated bearings; sample sent.,2.0
+WO-2024-2033,E-3110,2024-10-28,2024-11-01,"Cross-contamination detected across the exchanger; hydro test identified a leaking tube, tube plugged.",Hydro-tested and plugged affected tubes.,17.7
+WO-2024-2032,E-2110,2024-11-05,2024-11-08,"joint leak at bonnet, new gasket, torqued",Renewed joint; leak-tested.,6.0
+WO-2024-2063,TK-4201,2024-11-14,2024-11-17,"Joint leak noted. Action: replace gasket, bolt-up to torque.",Replaced gasket; bolted to torque.,4.0
+WO-2024-2064,TK-4201,2024-11-15,2024-11-15,"flange weeping, gasket blown, replaced",Renewed joint; leak-tested.,2.4
+WO-2024-2038,A-2110,2024-11-18,2024-11-18,"high vib, coupling checked, alignment out",Shimmed and realigned coupling.,6.0
+WO-2024-2014,P-1102,2024-11-28,2024-12-01,"brg noisy DE side, temp 78C, vib high",Replaced DE/NDE bearings.,5.6
+WO-2024-2022,M-3401,2024-12-03,2024-12-05,"IR low <1Mohm, earth fault, motor isolated",Isolated motor; sent for rewind.,15.7
+WO-2024-2059,TK-1201,2024-12-03,2024-12-04,"painting + housekeeping around unit, no defect",Routine work completed.,1.0
+WO-2024-2019,P-3301,2024-12-08,2024-12-09,Strainer check: high dP. Action: clean suction strainer.,Cleaned suction strainer.,3.9
+WO-2024-2020,P-3301,2024-12-19,2024-12-21,"Drive-end bearing exhibiting elevated noise and vibration on routine survey; wear suspected, replacement planned.",Replaced DE/NDE bearings.,8.3
+WO-2024-2057,CV-3201,2024-12-19,2024-12-21,"valve sticking, hunting, packing tight",Serviced positioner; stroked valve.,4.3
+WO-2024-2006,P-2210,2024-12-23,2024-12-27,"align'mnt off ~0.4mm, laser done, corrected shims",Laser alignment carried out; within tolerance.,7.9
+WO-2024-2011,P-2210,2024-12-23,2024-12-26,attended complaint found nothing wrong equipment ok,Routine work completed.,3.1
+WO-2024-2046,A-3120,2024-12-26,2024-12-28,"seal leak'g at gland, prod'ct dripping outboard, flush temp high",Renewed seal faces; leak stopped after run-in.,12.4
+WO-2025-2055,A-3110,2025-01-03,2025-01-05,"cleaned area, tightened fittings, ok",Closed after inspection.,4.0
+WO-2025-2000,P-3401,2025-01-04,2025-01-07,"cleaned area, tightened fittings, ok",Routine work completed.,1.0
+WO-2025-2064,C-4120,2025-01-07,2025-01-09,"brg NDE rumbling, vib 6.2 mm/s, plan replace",Replaced DE/NDE bearings.,8.9
+WO-2025-2009,P-2210,2025-01-09,2025-01-11,"Seal flush flow found restricted; flushing line and orifice cleaned, flush pressure restored to spec.",Backflushed flush line; strainer cleaned.,4.6
+WO-2025-2048,E-4110,2025-01-13,2025-01-15,"Scheduled PM: lubrication, general check. No abnormality found.",Routine work completed.,0.5
+WO-2025-2006,P-3105,2025-01-20,2025-01-23,"chk'd flush plan, line partially blocked, strainer dirty",Backflushed flush line; strainer cleaned.,5.1
+WO-2025-2074,TK-4203,2025-01-31,2025-02-03,"Joint leak noted. Action: replace gasket, bolt-up to torque.",Renewed joint; leak-tested.,4.5
+WO-2025-2022,P-3301,2025-02-04,2025-02-07,"pump crackling, flow swinging, suction low",Cleared suction restriction; verified NPSH.,5.0
+WO-2025-2068,CV-2101,2025-02-06,2025-02-07,"xmtr drift ~3%, recal done, tag ok now",Recalibrated instrument.,2.6
+WO-2025-2035,M-4101,2025-02-10,2025-02-12,"mtr o/heat, tripped OL relay, wdg temp high",Checked load and phase balance; cooled and restarted.,10.9
+WO-2025-2047,E-4110,2025-02-14,2025-02-16,"Cross-contamination detected across the exchanger; hydro test identified a leaking tube, tube plugged.",Plugged leaking tube(s).,25.4
+WO-2025-2072,CV-4101,2025-02-16,2025-02-18,control valve not closing tight passing across seat debris found lapped seat,Lapped valve seat; leak-tested.,3.0
+WO-2025-2012,P-2210,2025-02-23,2025-02-23,"cavitation noise, NPSH low, throttled disch",Cleared suction restriction; verified NPSH.,4.9
+WO-2025-2063,C-4120,2025-03-03,2025-03-06,"Lube check: level low, colour dark. Action: drain and refill correct grade.",Re-lubricated bearings; sample sent.,2.0
+WO-2025-2018,P-1102,2025-03-04,2025-03-07,pump flow dropping suction strainer full of muck cleaned it out,Removed and cleaned strainer element.,1.1
+WO-2025-2070,CV-3101,2025-03-09,2025-03-12,control valve not closing tight passing across seat debris found lapped seat,Replaced valve trim.,6.3
+WO-2025-2010,P-2210,2025-03-10,2025-03-11,"pump crackling, flow swinging, suction low",Adjusted operation to restore suction.,4.4
+WO-2025-2027,M-3105,2025-03-30,2025-04-02,"motor tripped on OL, winding hot, smell",Cleaned motor cooling path; monitored winding temp.,15.8
+WO-2025-2038,E-2110,2025-03-30,2025-04-02,"exch fouled, poor duty, chem clean scheduled",Hydrojetted tubes; duty restored.,6.4
+WO-2025-2033,M-3301,2025-04-02,2025-04-04,"painting + housekeeping around unit, no defect",Routine work completed.,0.4
+WO-2025-2014,P-2210,2025-04-04,2025-04-08,"Drive-end bearing exhibiting elevated noise and vibration on routine survey; wear suspected, replacement planned.",Replaced DE/NDE bearings.,8.2
+WO-2025-2020,P-3301,2025-04-04,2025-04-08,"seal leak'g at gland, prod'ct dripping outboard, flush temp high",Replaced mechanical seal cartridge; verified flush.,14.1
+WO-2025-2034,M-4101,2025-04-06,2025-04-08,"Motor tripped on thermal overload; winding temperature elevated, phase currents checked for imbalance.",Cleaned motor cooling path; monitored winding temp.,19.7
+WO-2025-2011,P-2210,2025-04-07,2025-04-09,"grease contam'd, relubed brgs, oil grade wrong earlier",Drained and refilled correct grade lube.,1.2
+WO-2025-2057,A-3110,2025-04-17,2025-04-17,Vibration traced to shaft misalignment across the coupling; laser alignment carried out and readings brought within tolerance.,Shimmed and realigned coupling.,6.7
+WO-2025-2040,E-2110,2025-04-25,2025-04-26,"exch fouled, poor duty, chem clean scheduled",Hydrojetted tubes; duty restored.,10.2
+WO-2025-2039,E-2110,2025-04-29,2025-05-02,"joint leak at bonnet, new gasket, torqued",Replaced gasket; bolted to torque.,3.6
+WO-2025-2071,CV-3201,2025-04-29,2025-04-29,"cv passing when shut, seat eroded",Replaced valve trim.,7.4
+WO-2025-2060,C-4110,2025-05-06,2025-05-10,"Lube check: level low, colour dark. Action: drain and refill correct grade.",Re-lubricated bearings; sample sent.,1.3
+WO-2025-2051,A-2110,2025-05-11,2025-05-12,"coupling element torn, no drive, replaced spacer",Renewed coupling element and bolts.,4.0
+WO-2025-2062,C-4120,2025-05-12,2025-05-15,Quarterly check: readings normal. Action: none.,No corrective action required.,1.8
+WO-2025-2032,M-3301,2025-05-29,2025-06-01,"overall vib high 7 mm/s, cause tbd, monitoring",Logged vibration; continued trending.,2.2
+WO-2025-2045,E-3210,2025-06-02,2025-06-03,"flange weeping, gasket blown, replaced",Renewed joint; leak-tested.,4.3
+WO-2025-2025,M-3401,2025-06-06,2025-06-09,"motor tripped on OL, winding hot, smell",Cleaned motor cooling path; monitored winding temp.,19.7
+WO-2025-2069,CV-2101,2025-06-06,2025-06-10,"gauge reading off vs field, recalibrated",Recalibrated instrument.,2.7
+WO-2025-0289,P-3105,2025-06-10,2025-06-11,"leakage at gland follower, product on baseplate, seal faces scored",Renewed seal cartridge; faces were scored. Flush plan questioned vs OEM.,16.0
+WO-2025-2056,A-3110,2025-06-15,2025-06-17,"high vib, coupling checked, alignment out",Shimmed and realigned coupling.,4.9
+WO-2025-2003,P-3105,2025-06-19,2025-06-19,vibration high did alignment it was out fixed with shims runs smooth now,Shimmed and realigned coupling.,4.7
+WO-2025-2065,C-4210,2025-06-21,2025-06-22,"Lube check: level low, colour dark. Action: drain and refill correct grade.",Drained and refilled correct grade lube.,3.0
+WO-2025-2028,M-3105,2025-06-28,2025-07-01,"motor NDE brg noisy, vib on motor side",Renewed NDE bearing; greased.,13.5
+WO-2025-2024,M-3401,2025-07-03,2025-07-04,"mtr o/heat, tripped OL relay, wdg temp high",Checked load and phase balance; cooled and restarted.,16.3
+WO-2025-2066,CV-1101,2025-07-03,2025-07-03,"flange weeping, gasket blown, replaced",Replaced gasket; bolted to torque.,5.9
+WO-2025-2001,P-3401,2025-07-10,2025-07-10,"brg NDE rumbling, vib 6.2 mm/s, plan replace",Renewed bearings; realigned.,9.6
+WO-2025-2019,P-2201,2025-07-10,2025-07-10,pump flow dropping suction strainer full of muck cleaned it out,Cleaned suction strainer.,3.2
+WO-2025-2046,E-4110,2025-07-13,2025-07-14,"hx dP high, outlet temp up, tubes fouled",Chemical-cleaned tube side.,9.6
+WO-2025-2054,A-2120,2025-07-13,2025-07-14,"high vib, coupling checked, alignment out",Shimmed and realigned coupling.,9.4
+WO-2025-2052,A-2110,2025-07-15,2025-07-16,"oil dark, water in oil, changed",Drained and refilled correct grade lube.,3.1
+WO-2025-2031,M-2201,2025-07-19,2025-07-23,"mtr o/heat, tripped OL relay, wdg temp high",Cleaned motor cooling path; monitored winding temp.,7.2
+WO-2025-2043,E-3110,2025-07-21,2025-07-23,metal thinning bad corrosion on pump casing ut readings low needs repair,Patch-repaired thinned section.,12.3
+WO-2025-2067,CV-1101,2025-07-22,2025-07-24,control valve not closing tight passing across seat debris found lapped seat,Replaced valve trim.,5.0
+WO-2025-2023,M-3401,2025-08-04,2025-08-06,motor making noise bearing on non drive end bad replaced both bearings,Renewed NDE bearing; greased.,17.7
+WO-2025-2061,C-4110,2025-08-04,2025-08-05,"brg NDE rumbling, vib 6.2 mm/s, plan replace",Replaced DE/NDE bearings.,8.8
+WO-2025-2050,A-2110,2025-08-06,2025-08-06,seal leaking again same pump product on floor faces look scored need cartridge,Renewed seal faces; leak stopped after run-in.,16.2
+WO-2025-2059,A-3120,2025-08-09,2025-08-13,Vibration traced to shaft misalignment across the coupling; laser alignment carried out and readings brought within tolerance.,Laser alignment carried out; within tolerance.,5.2
+WO-2025-2030,M-1101,2025-08-21,2025-08-23,"Motor bearing check: DE ok, NDE noisy. Action: replace NDE bearing.",Replaced motor bearings.,17.2
+WO-2025-2008,P-2210,2025-08-31,2025-09-01,"align'mnt off ~0.4mm, laser done, corrected shims",Laser alignment carried out; within tolerance.,8.0
+WO-2025-2042,E-3110,2025-09-02,2025-09-04,"flange weeping, gasket blown, replaced",Renewed joint; leak-tested.,3.1
+WO-2025-2016,P-1101,2025-09-03,2025-09-05,"suction strainer choked, flow low, cleaned",Removed and cleaned strainer element.,2.5
+WO-2025-2021,P-3301,2025-09-09,2025-09-09,"mech seal weeping DE side, drops on baseplate, temp 71C",Replaced mechanical seal cartridge; verified flush.,9.1
+WO-2025-2017,P-1102,2025-09-10,2025-09-14,"Drive-end bearing exhibiting elevated noise and vibration on routine survey; wear suspected, replacement planned.",Renewed bearings; realigned.,8.5
+WO-2025-2004,P-3105,2025-09-21,2025-09-21,"impeller worn, clearances open, perf down",Replaced worn impeller and wear rings.,11.0
+WO-2025-2026,M-3402,2025-09-29,2025-10-02,"painting + housekeeping around unit, no defect",No corrective action required.,2.2
+WO-2025-2029,M-3105,2025-10-01,2025-10-05,"oil dark, water in oil, changed",Drained and refilled correct grade lube.,4.8
+WO-2025-2007,P-3105,2025-10-02,2025-10-05,"Bearing check: noise Y, temp 76C, vib high. Recommend replace.",Renewed bearings; realigned.,4.1
+WO-2025-2058,A-3110,2025-10-10,2025-10-11,vibration high did alignment it was out fixed with shims runs smooth now,Shimmed and realigned coupling.,9.3
+WO-2025-2041,E-3110,2025-10-28,2025-10-31,metal thinning bad corrosion on pump casing ut readings low needs repair,Patch-repaired thinned section.,7.8
+WO-2025-2073,TK-4202,2025-11-15,2025-11-18,"joint leak at bonnet, new gasket, torqued",Renewed joint; leak-tested.,5.3
+WO-2025-2053,A-2110,2025-11-23,2025-11-25,"Observed process fluid leakage at the mechanical seal during rounds; seal faces suspected worn, leak rate increasing.",Replaced mechanical seal cartridge; verified flush.,17.5
+WO-2025-2049,E-4110,2025-12-05,2025-12-09,"wall thin, corrosion, UT low, patch",Logged UT; scheduled repair.,13.0
+WO-2025-2013,P-2210,2025-12-06,2025-12-07,"Drive-end bearing exhibiting elevated noise and vibration on routine survey; wear suspected, replacement planned.",Renewed bearings; realigned.,8.2
+WO-2025-2044,E-3110,2025-12-14,2025-12-17,cross contamination found tube leaking on exchanger plugged the tube,Plugged leaking tube(s).,27.1
+WO-2025-2002,P-3402,2025-12-21,2025-12-23,"chk'd flush plan, line partially blocked, strainer dirty",Cleaned flush line and orifice; restored flush flow.,7.6
+WO-2025-2005,P-3105,2025-12-23,2025-12-25,"Lube check: level low, colour dark. Action: drain and refill correct grade.",Drained and refilled correct grade lube.,3.6
+WO-2025-2037,E-1110,2025-12-23,2025-12-23,"flange weeping, gasket blown, replaced",Renewed joint; leak-tested.,4.0
+WO-2025-2015,P-1101,2025-12-26,2025-12-28,"coupling element torn, no drive, replaced spacer",Replaced coupling spacer.,6.5
+WO-2025-2036,E-1110,2025-12-27,2025-12-30,Quarterly check: readings normal. Action: none.,No corrective action required.,3.9
+WO-2026-2002,P-3401,2026-01-03,2026-01-06,"oil dark, water in oil, changed",Re-lubricated bearings; sample sent.,1.3
+WO-2026-2008,P-3105,2026-01-10,2026-01-11,"high vib, coupling checked, alignment out",Laser alignment carried out; within tolerance.,9.7
+WO-2026-2009,P-3105,2026-01-10,2026-01-12,"flush line choked, flow low, cleaned orifice",Cleaned flush line and orifice; restored flush flow.,7.7
+WO-2026-2001,P-3401,2026-01-11,2026-01-12,vibration high did alignment it was out fixed with shims runs smooth now,Laser alignment carried out; within tolerance.,8.6
+WO-2026-2029,A-2120,2026-01-13,2026-01-16,"Observed process fluid leakage at the mechanical seal during rounds; seal faces suspected worn, leak rate increasing.",Renewed seal faces; leak stopped after run-in.,9.1
+WO-2026-2023,E-1110,2026-01-14,2026-01-18,metal thinning bad corrosion on pump casing ut readings low needs repair,Logged UT; scheduled repair.,18.8
+WO-2026-0034,P-3402,2026-01-15,2026-01-16,mech seal gone. replaced cartridge. flush plan Y not per spec,"Replaced cartridge seal. Confirmed flush plan Y in use, not OEM-specified Plan 11.",11.0
+WO-2026-2020,M-2201,2026-01-16,2026-01-17,"motor tripped on OL, winding hot, smell",Checked load and phase balance; cooled and restarted.,13.6
+WO-2026-2034,CV-3101,2026-01-26,2026-01-28,"gauge reading off vs field, recalibrated",Bench-calibrated and reinstalled.,1.5
+WO-2026-2018,M-3401,2026-02-02,2026-02-02,"Motor tripped on thermal overload; winding temperature elevated, phase currents checked for imbalance.",Checked load and phase balance; cooled and restarted.,14.4
+WO-2026-2025,E-2110,2026-02-02,2026-02-05,"tube leak on hx, hydrotest, plugged 2 tubes",Plugged leaking tube(s).,18.3
+WO-2026-2031,A-2120,2026-02-06,2026-02-06,Preventive maintenance carried out per schedule; equipment found in satisfactory condition.,Routine work completed.,2.1
+WO-2026-2013,P-2210,2026-02-09,2026-02-12,Vibration traced to shaft misalignment across the coupling; laser alignment carried out and readings brought within tolerance.,Laser alignment carried out; within tolerance.,4.5
+WO-2026-2011,P-2210,2026-02-13,2026-02-16,"brg noisy DE side, temp 78C, vib high",Replaced DE/NDE bearings.,8.2
+WO-2026-2033,C-4210,2026-02-17,2026-02-20,"Lube check: level low, colour dark. Action: drain and refill correct grade.",Drained and refilled correct grade lube.,1.5
+WO-2026-2005,P-3402,2026-02-20,2026-02-23,"brg NDE rumbling, vib 6.2 mm/s, plan replace",Replaced DE/NDE bearings.,9.1
+WO-2026-2019,M-2210,2026-03-02,2026-03-05,"Scheduled PM: lubrication, general check. No abnormality found.",Closed after inspection.,2.2
+WO-2026-2038,TK-4201,2026-03-08,2026-03-12,"wall thin, corrosion, UT low, patch",Patch-repaired thinned section.,14.6
+WO-2026-2006,P-3402,2026-03-11,2026-03-14,Pump showing cavitation symptoms — gravel-like noise and unstable flow; suction conditions investigated.,Cleared suction restriction; verified NPSH.,3.1
+WO-2026-2032,A-3120,2026-03-11,2026-03-11,"mech seal weeping DE side, drops on baseplate, temp 71C",Replaced mechanical seal cartridge; verified flush.,9.8
+WO-2026-2024,E-2110,2026-03-16,2026-03-19,cross contamination found tube leaking on exchanger plugged the tube,Hydro-tested and plugged affected tubes.,10.6
+WO-2026-2017,P-2202,2026-03-19,2026-03-23,"mech seal weeping DE side, drops on baseplate, temp 71C",Renewed seal faces; leak stopped after run-in.,9.6
+WO-2026-2022,M-4101,2026-03-25,2026-03-25,motor making noise bearing on non drive end bad replaced both bearings,Renewed NDE bearing; greased.,15.7
+WO-2026-2000,P-3401,2026-03-30,2026-03-30,"Seal flush flow found restricted; flushing line and orifice cleaned, flush pressure restored to spec.",Cleaned flush line and orifice; restored flush flow.,5.9
+WO-2026-2039,TK-4202,2026-04-07,2026-04-11,"External and internal shell corrosion observed on tank during inspection; plate thickness reducing, coating and patch repair planned.",Patch-plated corroded section.,26.4
+WO-2026-2021,M-4101,2026-04-16,2026-04-20,"mtr o/heat, tripped OL relay, wdg temp high",Cleaned motor cooling path; monitored winding temp.,10.7
+WO-2026-2012,P-2210,2026-04-23,2026-04-23,"brg NDE rumbling, vib 6.2 mm/s, plan replace",Replaced DE/NDE bearings.,9.8
+WO-2026-2003,P-3402,2026-04-28,2026-04-29,coupling gone rubber element broken pump not turning fitted new one,Renewed coupling element and bolts.,4.3
+WO-2026-2037,TK-1201,2026-05-03,2026-05-04,"Wall thinning found on casing/piping from corrosion-erosion during inspection; UT readings logged, repair planned.",Logged UT; scheduled repair.,19.0
+WO-2026-2015,P-1102,2026-05-06,2026-05-10,"Drive-end bearing exhibiting elevated noise and vibration on routine survey; wear suspected, replacement planned.",Replaced DE/NDE bearings.,5.3
+WO-2026-2016,P-1102,2026-05-08,2026-05-12,"brg NDE rumbling, vib 6.2 mm/s, plan replace",Renewed bearings; realigned.,5.7
+WO-2026-2007,P-3402,2026-05-17,2026-05-20,"impeller worn, clearances open, perf down",Renewed impeller; clearances reset.,6.1
+WO-2026-2004,P-3402,2026-05-20,2026-05-20,coupling gone rubber element broken pump not turning fitted new one,Renewed coupling element and bolts.,7.9
+WO-2026-2026,E-3110,2026-05-27,2026-05-27,"Exchanger approach temperature rising with increased pressure drop; tube-side fouling suspected, cleaning planned.",Hydrojetted tubes; duty restored.,7.9
+WO-2026-2014,P-1101,2026-05-29,2026-05-29,Packing leak noted. Action: adjust gland. Status: monitor.,Adjusted gland follower.,4.7
+WO-2026-2030,A-2120,2026-06-04,2026-06-08,"Drive-end bearing exhibiting elevated noise and vibration on routine survey; wear suspected, replacement planned.",Replaced DE/NDE bearings.,8.9
+WO-2026-2028,A-2110,2026-06-07,2026-06-09,"mech seal weeping DE side, drops on baseplate, temp 71C",Renewed seal faces; leak stopped after run-in.,15.0
+WO-2026-2010,P-2210,2026-06-09,2026-06-12,"cavitation noise, NPSH low, throttled disch",Cleared suction restriction; verified NPSH.,3.5
+WO-2026-2027,E-3210,2026-06-17,2026-06-18,"Exchanger approach temperature rising with increased pressure drop; tube-side fouling suspected, cleaning planned.",Hydrojetted tubes; duty restored.,9.6
+WO-2026-2036,CV-4101,2026-06-22,2026-06-24,Transmitter reading deviating from field reference; instrument recalibrated to true value.,Bench-calibrated and reinstalled.,1.9
+WO-2026-2035,CV-3201,2026-06-26,2026-06-30,"cv passing when shut, seat eroded",Lapped valve seat; leak-tested.,7.6

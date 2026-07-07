@@ -1,0 +1,11 @@
+part_no,description,asset_class,qty_on_hand,reorder_level,unit_cost_inr
+RW-CP200-SEAL-C,CP200 cartridge mechanical seal,CP200,3,2,185000
+RW-CP200-ORF-3.0,CP200 seal flush orifice Plan 11,CP200,6,4,4500
+RW-CP200-IMP,CP200 impeller 12Cr,CP200,2,1,240000
+RW-CP200-BRG-DE,CP200 drive-end bearing,CP200,4,2,18500
+RW-CP100-SEAL,CP100 component mechanical seal,CP100,5,3,42000
+BB-IE3-BRG,Motor bearing set IE3-160,MOT,6,3,9500
+AL-STX-GKT,Exchanger gasket set,HEX,4,2,15000
+SZ-TE-SEAL,Agitator mechanical seal,AGI,2,1,130000
+EZ-TRIM,Control valve trim kit,CV,3,2,28000
+GA45-OILFLT,Compressor oil filter,COMP,8,4,3200
