@@ -38,9 +38,31 @@ class Settings(BaseSettings):
     normalization_score_threshold: float = 0.55
     normalization_margin_threshold: float = 0.03
 
-    # Evidence Strength tiers (used in M4+)
+    # OCE assembler — retrieval caps (TDD §5, D-015). Semantic top-k per bucket.
+    retrieval_manual_k: int = 12
+    retrieval_sop_k: int = 8
+    retrieval_reports_k: int = 6
+    # D-015 lexical channel: lexical-only hits may exceed a bucket cap by ≤ this.
+    retrieval_lexical_overflow: int = 4
+    # OCE assembler — history / sister caps (TDD §5).
+    failure_history_cap: int = 30
+    sister_incidents_cap: int = 20
+
+    # Evidence Strength (TDD §6, D-003/P8). Formula constants — all hand-computable.
+    #   score = min(count, cap_count) * w_count
+    #         + distinct_source_types    * w_source_type
+    #         + (w_recency_near if newest < recency_threshold_months else w_recency_far)
+    #         + min(distinct_sister_assets, cap_sister) * w_sister
     evidence_strength_strong: float = 8.0
     evidence_strength_moderate: float = 4.0
+    evidence_w_count: float = 1.0
+    evidence_w_source_type: float = 1.5
+    evidence_w_recency_near: float = 2.0
+    evidence_w_recency_far: float = 0.5
+    evidence_w_sister: float = 1.5
+    evidence_cap_count: int = 4
+    evidence_cap_sister: int = 3
+    evidence_recency_threshold_months: int = 24
 
 
 @lru_cache

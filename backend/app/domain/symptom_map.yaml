@@ -1,0 +1,49 @@
+# =============================================================================
+# SYMPTOM MAP (P2) — the deterministic stand-in for LLM query understanding.
+# =============================================================================
+# Curated mapping from an operator's reported symptom category to (a) the
+# failure-mode codes plausible for it (used to FILTER sister incidents and the
+# pattern aggregate) and (b) query-expansion terms (folded into the single
+# retrieval query embedding, and mined by the lexical channel).
+#
+# Rules:
+#   - `modes` are normalized failure_mode codes from meridian.yaml's taxonomy.
+#   - `other` (and any unmapped category) → EMPTY modes → NO mode filter is
+#     applied downstream (recall over precision, D-005).
+#   - This file is deliberately ~one screen and hand-editable. It is code, not
+#     an LLM: given the same symptom, the same modes and terms, forever (P2).
+# =============================================================================
+
+seal_leak:
+  modes: [mechanical_seal_leakage, gland_packing_leakage, seal_flush_line_blockage]
+  terms: [gland, "seal faces", flush, weeping, "flush plan", baseplate, cartridge, "seal replacement"]
+
+vibration:
+  modes: [shaft_misalignment, bearing_wear, soft_foot, coupling_failure, high_vibration]
+  terms: [alignment, coupling, "soft foot", "2x running speed", vibration]
+
+overheating:
+  modes: [bearing_wear, bearing_seizure, motor_winding_overheating, lubrication_degradation]
+  terms: [temperature, bearing, winding, grease, "running hot"]
+
+pressure_anomaly:
+  modes: [cavitation, suction_strainer_fouling, impeller_wear, impeller_damage]
+  terms: [suction, discharge, NPSH, "differential head", pressure]
+
+abnormal_noise:
+  modes: [cavitation, bearing_wear, coupling_failure, impeller_damage]
+  terms: [noise, crackling, rumble, "gravel-like", knocking]
+
+trip:
+  modes: [motor_winding_overheating, bearing_seizure, electrical_insulation_fault, motor_bearing_failure]
+  terms: [tripped, overload, "earth fault", seized, "thermal protection"]
+
+low_flow:
+  modes: [suction_strainer_fouling, cavitation, impeller_wear, impeller_damage]
+  terms: [flow, suction, strainer, impeller, "developed head"]
+
+# No mode filter for unknown/benign symptoms — take everything, let the
+# reasoning layer discriminate. `modes: []` is the explicit no-filter signal.
+other:
+  modes: []
+  terms: []
