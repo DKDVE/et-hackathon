@@ -44,3 +44,8 @@ def expansion_terms(category: str) -> list[str]:
     if not entry:
         return []
     return list(entry.get("terms") or [])
+
+
+def known_symptoms() -> list[str]:
+    """The canonical symptom categories intake accepts (D-011 validation)."""
+    return sorted(_load().keys())

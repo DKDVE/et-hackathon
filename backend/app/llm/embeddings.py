@@ -16,7 +16,7 @@ _QUERY_PREFIX = "Represent this sentence for searching relevant passages: "
 
 
 @lru_cache(maxsize=1)
-def get_embedder() -> "Embedder":
+def get_embedder() -> Embedder:
     return Embedder()
 
 

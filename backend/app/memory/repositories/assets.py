@@ -6,6 +6,8 @@ duty. No LLM, no graph DB (D-004).
 
 from __future__ import annotations
 
+from collections.abc import Sequence
+
 from sqlalchemy import or_, select
 from sqlalchemy.orm import Session
 
@@ -15,6 +17,16 @@ from app.domain.models import AssetProfile
 
 def get_asset_id_by_tag(session: Session, tag: str) -> int | None:
     return session.scalar(select(Asset.id).where(Asset.tag == tag))
+
+
+def list_asset_profiles(session: Session) -> Sequence[tuple[Asset, AssetClass]]:
+    """All assets + their class, ordered by tag (asset registry)."""
+    rows = session.execute(
+        select(Asset, AssetClass)
+        .join(AssetClass, Asset.asset_class_id == AssetClass.id)
+        .order_by(Asset.tag)
+    ).all()
+    return [(a, k) for a, k in rows]
 
 
 def get_asset_class_id(session: Session, asset_id: int) -> int | None:

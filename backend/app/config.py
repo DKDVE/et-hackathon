@@ -16,6 +16,10 @@ class Settings(BaseSettings):
     embedding_dim: int = EMBEDDING_DIM
     demo_fallback: bool = False
 
+    # M6 reasoning layer gate (P5). MUST default false: nothing may crash when it
+    # is off — M5 serves a deterministic-only dossier and degrades honestly.
+    reasoning_enabled: bool = False
+
     # CORS
     frontend_origin: str = "http://localhost:5173"
 

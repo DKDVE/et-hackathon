@@ -19,6 +19,22 @@ from app.db.models import Chunk, DocType, Document
 ScopeKind = str  # "asset_or_class" | "asset_or_sisters"
 
 
+def get_chunk_source(
+    session: Session, chunk_id: int
+) -> tuple[Chunk, Document] | None:
+    """A single chunk + its owning document, for the PDF deep-link SourceViewer."""
+    row = session.execute(
+        select(Chunk, Document)
+        .join(Document, Chunk.document_id == Document.id)
+        .where(Chunk.id == chunk_id)
+    ).first()
+    return (row[0], row[1]) if row else None
+
+
+def get_document(session: Session, document_id: int) -> Document | None:
+    return session.get(Document, document_id)
+
+
 def _scope(
     kind: ScopeKind, asset_id: int, class_id: int | None, sister_ids: Sequence[int]
 ) -> ColumnElement[bool]:

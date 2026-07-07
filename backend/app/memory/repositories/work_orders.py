@@ -21,6 +21,23 @@ def _f(value: Any) -> float | None:
     return float(value) if value is not None else None  # Numeric -> float
 
 
+def get_work_order_source(
+    session: Session, wo_number: str
+) -> tuple[WorkOrder, str, str, str | None, str | None] | None:
+    """A single WO for the SourceViewer: (wo, asset_tag, asset_name, mode_code,
+    mode_name). Accepts the wo_number with or without the ``WO-`` prefix."""
+    candidates = [wo_number]
+    if not wo_number.startswith("WO-"):
+        candidates.append(f"WO-{wo_number}")
+    row = session.execute(
+        select(WorkOrder, Asset.tag, Asset.name, FailureMode.code, FailureMode.name)
+        .join(Asset, WorkOrder.asset_id == Asset.id)
+        .outerjoin(FailureMode, WorkOrder.failure_mode_id == FailureMode.id)
+        .where(WorkOrder.wo_number.in_(candidates))
+    ).first()
+    return (row[0], row[1], row[2], row[3], row[4]) if row else None
+
+
 def get_failure_history(
     session: Session, asset_id: int, *, cap: int
 ) -> list[WorkOrderRecord]:
