@@ -1,0 +1,50 @@
+import type { EventCardData } from "@/components/events/EventCard";
+
+// ponytail: static Stitch reference data until M5 events API
+export const MOCK_EVENTS: EventCardData[] = [
+  {
+    id: "1042",
+    tag: "P-3401",
+    symptom: "High Vibration Exception",
+    criticality: "A",
+    timeAgo: "12 min ago",
+    unit: "Ethylene-1",
+    status: "Open",
+    statusDot: "open",
+    actionLabel: "Review",
+    href: "/events/1042",
+  },
+  {
+    id: "1043",
+    tag: "C-1102",
+    symptom: "Thermal Variance",
+    criticality: "B",
+    timeAgo: "45 min ago",
+    unit: "Ethylene-1",
+    status: "Open",
+    statusDot: "open",
+    actionLabel: "Assign",
+  },
+  {
+    id: "1044",
+    tag: "V-805",
+    symptom: "Pressure Drop",
+    criticality: "B",
+    timeAgo: "2h ago",
+    unit: "Ethylene-2",
+    status: "Assigned",
+    statusDot: "assigned",
+    actionLabel: "Review",
+  },
+  {
+    id: "1045",
+    tag: "E-2201",
+    symptom: "Flow Rate Fluctuation",
+    criticality: "C",
+    timeAgo: "5h ago",
+    unit: "Ethylene-1",
+    status: "Reviewed",
+    statusDot: "reviewed",
+    actionLabel: "Details",
+  },
+];

@@ -1,0 +1,35 @@
+{
+  "projectId": "7365042348042161424",
+  "projectName": "projects/7365042348042161424",
+  "designSystemId": "assets/5895438689689797248",
+  "screens": {
+    "eventBoard": {
+      "id": "0f9563d233bf4038b0f58daa37eac828",
+      "name": "projects/7365042348042161424/screens/0f9563d233bf4038b0f58daa37eac828",
+      "title": "Operational Events — Live Board",
+      "legacyId": "a340955e60ef4ec4bd90af6f24de39c8"
+    },
+    "assetRegistry": {
+      "id": "ce0f4f211b694ec9be9928f0a815d96a",
+      "name": "projects/7365042348042161424/screens/ce0f4f211b694ec9be9928f0a815d96a",
+      "title": "Asset Registry — OCE Industrial Intelligence",
+      "legacyId": "06aab84ea65c4544b0d807ecb2382f0e"
+    },
+    "dossierView": {
+      "id": "d8dd124f714745e082a83baff45e6a5b",
+      "name": "projects/7365042348042161424/screens/d8dd124f714745e082a83baff45e6a5b",
+      "title": "Event Dossier — Asset P-3401",
+      "legacyId": "b6bed7c1d5a74adc8f67bff7d081bfed"
+    },
+    "assetProfile": {
+      "id": "90d02cedc0c64aab97fa2247d4be1fd9",
+      "name": "projects/7365042348042161424/screens/90d02cedc0c64aab97fa2247d4be1fd9",
+      "title": "Asset Profile — P-3401 Centrifugal Pump"
+    },
+    "systemSettings": {
+      "id": "7e5cf3bd635047f686cf7b59e9c8daba",
+      "name": "projects/7365042348042161424/screens/7e5cf3bd635047f686cf7b59e9c8daba",
+      "title": "System Settings — OCE Intelligence"
+    }
+  }
+}
