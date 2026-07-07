@@ -55,6 +55,12 @@ def _parse_sse(text: str) -> list[tuple[str, dict]]:
 
 @pytest.fixture(scope="module")
 def client() -> TestClient:
+    import os
+
+    os.environ["REASONING_ENABLED"] = "false"
+    from app.config import get_settings
+
+    get_settings.cache_clear()
     return TestClient(create_app())
 
 
@@ -133,7 +139,7 @@ def test_cited_chunk_resolves_to_source_with_page(client: TestClient, flow: dict
     assert body["file_url"].endswith(f"/file/{body['document_id']}")
 
 
-def test_evidence_endpoint_contract_404s_until_m6(client: TestClient, flow: dict) -> None:
+def test_evidence_endpoint_contract_404s_without_sections(client: TestClient, flow: dict) -> None:
     resp = client.get(f"/api/dossiers/{flow['dossier_id']}/evidence/cause:1")
     assert resp.status_code == 404
-    assert "reasoning layer not enabled" in resp.json()["detail"]
+    assert "no claim" in resp.json()["detail"]

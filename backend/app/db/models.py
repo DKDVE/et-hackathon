@@ -68,6 +68,12 @@ class DossierStatus(StrEnum):
     failed = "failed"
 
 
+class ReasoningRunStatus(StrEnum):
+    ok = "ok"
+    repaired = "repaired"
+    failed = "failed"
+
+
 class EvidenceKind(StrEnum):
     work_order = "work_order"
     chunk = "chunk"
@@ -227,6 +233,47 @@ class Dossier(Base):
 
     event: Mapped[OperationalEvent] = relationship(back_populates="dossier")
     evidence_links: Mapped[list["EvidenceLink"]] = relationship(back_populates="dossier")
+    reasoning_runs: Mapped[list["ReasoningRun"]] = relationship(back_populates="dossier")
+
+
+class ReasoningRun(Base):
+    __tablename__ = "reasoning_runs"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    dossier_id: Mapped[int] = mapped_column(ForeignKey("dossiers.id", ondelete="CASCADE"))
+    node: Mapped[str] = mapped_column(Text, nullable=False)
+    model: Mapped[str] = mapped_column(Text, nullable=False)
+    prompt_version: Mapped[str] = mapped_column(Text, nullable=False)
+    started_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    latency_ms: Mapped[int] = mapped_column(nullable=False)
+    prompt_tokens: Mapped[int] = mapped_column(nullable=False, server_default="0")
+    completion_tokens: Mapped[int] = mapped_column(nullable=False, server_default="0")
+    status: Mapped[ReasoningRunStatus] = mapped_column(
+        Enum(
+            ReasoningRunStatus,
+            name="reasoning_run_status",
+            native_enum=True,
+            create_constraint=True,
+        ),
+        nullable=False,
+    )
+    output_digest: Mapped[str] = mapped_column(Text, nullable=False)
+
+    dossier: Mapped[Dossier] = relationship(back_populates="reasoning_runs")
+
+
+class ReasoningFallbackCache(Base):
+    __tablename__ = "reasoning_fallback_cache"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    cache_key: Mapped[str] = mapped_column(String(128), nullable=False, unique=True)
+    event_fingerprint: Mapped[str] = mapped_column(Text, nullable=False)
+    content_hash: Mapped[str] = mapped_column(String(64), nullable=False)
+    prompt_versions: Mapped[dict[str, Any]] = mapped_column(JSONB, nullable=False)
+    events: Mapped[list[dict[str, Any]]] = mapped_column(JSONB, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), nullable=False
+    )
 
 
 class EvidenceLink(Base):

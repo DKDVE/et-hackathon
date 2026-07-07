@@ -23,9 +23,29 @@ class Settings(BaseSettings):
     # CORS
     frontend_origin: str = "http://localhost:5173"
 
-    # LLM (used in M6+)
+    # LLM (M6, D-009/P7)
     llm_timeout_seconds: int = 60
     llm_max_retries: int = 2
+    llm_temperature: float = 0.2
+    llm_models: dict[str, str] = {
+        # Quality-critical root-cause synthesis — keep on Sonnet (D-009).
+        "analysis": "anthropic/claude-sonnet-4.6",
+        # Structured action/safety output; Haiku sufficient with slim context (M6.1).
+        "recommendation": "anthropic/claude-haiku-4.5",
+        # Per-claim verdict JSON; Haiku sufficient with claim-scoped input (M6.1).
+        "validation": "anthropic/claude-haiku-4.5",
+        # Contextual Q&A (FR-9, M8).
+        "chat": "anthropic/claude-haiku-4.5",
+    }
+    llm_max_tokens: dict[str, int] = {
+        "analysis": 1200,
+        "recommendation": 1400,
+        "validation": 900,
+        "chat": 600,
+    }
+
+    # D-021 — downtime cost for pattern impact display (₹/hr).
+    downtime_cost_per_hour_inr: int = 450_000
 
     # Ingestion / embeddings (M3, D-014)
     embedding_model: str = "BAAI/bge-large-en-v1.5"

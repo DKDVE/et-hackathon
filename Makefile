@@ -1,4 +1,4 @@
-.PHONY: up down dataset seed ingest test test-all golden verify-seed types lint typecheck audit-norm
+.PHONY: up down dataset seed ingest test test-all test-llm golden verify-seed audit-ground types lint typecheck audit-norm audit-prose demo-gate
 
 up:
 	docker compose up -d
@@ -31,6 +31,9 @@ test:
 test-all:
 	cd backend && pytest -v -m "not destructive"
 
+test-llm:
+	cd backend && pytest -v -m llm
+
 # Destructive DB verification (TRUNCATE + reseed structure phase). Run in
 # isolation — it wipes the substrate, so keep it out of the default suite.
 verify-seed:
@@ -42,7 +45,16 @@ golden:
 	cd backend && pytest -v -m slow tests/golden tests/test_assembler_determinism.py tests/test_lexical_channel.py
 
 audit-norm:
-	cd backend && python -m tests.audits.normalization_audit
+	docker compose exec -T backend python -m tests.audits.normalization_audit
+
+audit-ground:
+	docker compose exec -T backend python -m tests.audits.groundedness_audit $(DOSSIER_ID)
+
+audit-prose:
+	docker compose exec -T backend python -m tests.audits.prose_id_audit $(DOSSIER_ID)
+
+demo-gate:
+	@bash scripts/demo_gate.sh
 
 # Generate frontend API types from the backend OpenAPI schema (Task 5). The
 # backend must be up (`make up`); types land in frontend/src/lib/api-types.ts.

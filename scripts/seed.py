@@ -65,7 +65,10 @@ PLANTED_WOS = ("WO-2024-0117", "WO-2025-0289", "WO-2026-0034")
 EXPECTED = {"assets": 40, "classes": 8, "failure_modes": 25, "work_orders": 500, "documents": 60}
 
 _WIPE_ORDER = (
-    "evidence_links", "dossiers", "chunks", "documents", "operational_events",
+    "reasoning_runs",
+    "reasoning_fallback_cache",
+    "evidence_links",
+    "dossiers", "chunks", "documents", "operational_events",
     "work_orders", "assets", "failure_modes", "asset_classes",
 )
 

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import logging
+import threading
 from functools import lru_cache
 
 import numpy as np
@@ -20,11 +21,17 @@ def get_embedder() -> Embedder:
     return Embedder()
 
 
+def prewarm_embedder() -> None:
+    """Load embedding model (blocks until ready). Safe from a background thread."""
+    get_embedder()._load()
+
+
 class Embedder:
     """Lazy-loaded BGE embedder; one instance per process."""
 
     def __init__(self) -> None:
         self._model = None
+        self._load_lock = threading.Lock()
         settings = get_settings()
         self._model_name = settings.embedding_model
         self._batch_size = settings.embed_batch_size
@@ -32,10 +39,14 @@ class Embedder:
     def _load(self) -> None:
         if self._model is not None:
             return
-        from sentence_transformers import SentenceTransformer
+        with self._load_lock:
+            if self._model is not None:
+                return
+            from sentence_transformers import SentenceTransformer
 
-        logger.info("Loading embedding model %s", self._model_name)
-        self._model = SentenceTransformer(self._model_name)
+            logger.info("Loading embedding model %s", self._model_name)
+            self._model = SentenceTransformer(self._model_name)
+            logger.info("Embedding model %s ready", self._model_name)
 
     def embed_batch(self, texts: list[str]) -> list[list[float]]:
         if not texts:

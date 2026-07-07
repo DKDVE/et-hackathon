@@ -14,6 +14,8 @@ EXPECTED_TABLES = (
     "chunks",
     "dossiers",
     "evidence_links",
+    "reasoning_runs",
+    "reasoning_fallback_cache",
 )
 
 EXPECTED_ENUMS = (
@@ -23,6 +25,7 @@ EXPECTED_ENUMS = (
     "doc_type",
     "dossier_status",
     "evidence_kind",
+    "reasoning_run_status",
 )
 
 KEY_COLUMNS: dict[str, list[str]] = {

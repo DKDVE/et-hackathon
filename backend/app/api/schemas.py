@@ -128,3 +128,31 @@ class EvidenceBreakdown(BaseModel):
     score: float
     components: dict[str, Any]
     evidence_ids: list[str]
+
+
+# --- chat (FR-9) -------------------------------------------------------------
+
+
+class ChatTurn(BaseModel):
+    role: Literal["user", "assistant"]
+    text: str = Field(min_length=1)
+
+
+class ChatRequest(BaseModel):
+    question: str = Field(min_length=1)
+    history: list[ChatTurn] = Field(default_factory=list, max_length=6)
+
+
+class ChatResponse(BaseModel):
+    answer: str
+    citations: list[str]
+    refused: bool
+    grounding: Literal["evidenced", "hypothesis"] | None = None
+
+
+# --- config (D-021) ----------------------------------------------------------
+
+
+class AppConfig(BaseModel):
+    downtime_cost_per_hour_inr: int
+    downtime_cost_label: str

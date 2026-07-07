@@ -2,9 +2,8 @@
 
 One builder produces the shape shared by ``GET /api/dossiers/{id}`` and the
 ``context_ready`` SSE event; one async generator emits the FULL SSE vocabulary.
-M5 emits only the deterministic subset (``context_ready`` → ``degraded``); the
-M6 branch is a marked seam so the reasoning layer slots in without touching the
-frontend or this event ordering.
+M5 emits only the deterministic subset (``context_ready`` → ``degraded``); M6
+runs the reasoning graph when REASONING_ENABLED.
 """
 
 from __future__ import annotations
@@ -19,11 +18,10 @@ from app.db.engine import SessionLocal
 from app.db.models import Dossier
 from app.domain.models import SharedContext
 from app.memory.repositories import dossiers
+from app.reasoning.graph import reasoning_sse_events
 
 logger = logging.getLogger("oce.dossier")
 
-# The full SSE event vocabulary (TDD §7). Declared here so it is one source of
-# truth for the server, the E2E test, and the frontend contract.
 SSE_EVENTS = (
     "context_ready",
     "analysis",
@@ -35,11 +33,7 @@ SSE_EVENTS = (
 
 
 def build_dossier_response(dossier: Dossier) -> DossierResponse:
-    """Assemble the API view of a dossier row (deterministic sections + status).
-
-    ``degraded`` is populated whenever the reasoning layer did not run — in M5
-    that is always ``reasoning_disabled`` (reasoning off by default, P5).
-    """
+    """Assemble the API view of a dossier row (deterministic sections + status)."""
     reasoning_enabled = get_settings().reasoning_enabled
     ctx: SharedContext | None = None
     pool_size = 0
@@ -48,10 +42,14 @@ def build_dossier_response(dossier: Dossier) -> DossierResponse:
         pool_size = len(ctx.evidence_pool)
 
     degraded: DegradedInfo | None = None
-    if not reasoning_enabled:
+    if not reasoning_enabled and str(dossier.status) == "complete":
         degraded = DegradedInfo(
             reason="reasoning_disabled", deterministic_available=ctx is not None
         )
+    elif reasoning_enabled and dossier.sections is None and str(dossier.status) == "reasoning":
+        degraded = None  # in-flight
+    elif reasoning_enabled and dossier.sections is None and str(dossier.status) == "complete":
+        degraded = None
 
     return DossierResponse(
         dossier_id=dossier.id,
@@ -65,16 +63,16 @@ def build_dossier_response(dossier: Dossier) -> DossierResponse:
     )
 
 
-def _event(name: str, payload: DossierResponse | DegradedInfo) -> dict[str, str]:
-    return {"event": name, "data": payload.model_dump_json()}
+def _event(name: str, payload: DossierResponse | DegradedInfo | dict) -> dict[str, str]:
+    if isinstance(payload, (DossierResponse, DegradedInfo)):
+        data = payload.model_dump_json()
+    else:
+        data = json.dumps(payload)
+    return {"event": name, "data": data}
 
 
 async def dossier_sse(dossier_id: int) -> AsyncIterator[dict[str, str]]:
-    """Yield the SSE sequence for a dossier (sse-starlette event dicts).
-
-    M5: ``context_ready`` (deterministic sections) then ``degraded`` with
-    ``reasoning_disabled``. The reasoning branch below is the M6 seam.
-    """
+    """Yield the SSE sequence for a dossier (sse-starlette event dicts)."""
     with SessionLocal() as session:
         dossier = dossiers.get_by_id(session, dossier_id)
         if dossier is None:
@@ -86,9 +84,12 @@ async def dossier_sse(dossier_id: int) -> AsyncIterator[dict[str, str]]:
             }
             return
         response = build_dossier_response(dossier)
+        ctx = (
+            SharedContext.model_validate(dossier.shared_context)
+            if dossier.shared_context
+            else None
+        )
 
-    # context_ready carries the deterministic dossier; the degraded / reasoning
-    # events follow as their own frames, so strip the envelope's degraded here.
     context_frame = response.model_copy(update={"degraded": None})
     yield _event("context_ready", context_frame)
 
@@ -99,10 +100,18 @@ async def dossier_sse(dossier_id: int) -> AsyncIterator[dict[str, str]]:
         )
         return
 
-    # ── M6 seam ────────────────────────────────────────────────────────────
-    # When REASONING_ENABLED, run the LangGraph and emit, in order:
-    #   analysis → recommendation → validated → report_complete
-    # (or degraded{llm_failure|node_failure} on the failure path). No frontend
-    # change is required: the vocabulary and ordering are already the contract.
-    logger.warning("reasoning_enabled but M6 graph not wired; emitting degraded")
-    yield _event("degraded", DegradedInfo(reason="node_failure"))
+    if ctx is None:
+        yield _event("degraded", DegradedInfo(reason="node_failure"))
+        return
+
+    async for event_name, payload in reasoning_sse_events(dossier_id, ctx):
+        if event_name == "degraded":
+            yield _event("degraded", DegradedInfo(**payload))
+            return
+        if event_name == "report_complete":
+            with SessionLocal() as session:
+                dossier = dossiers.get_by_id(session, dossier_id)
+                if dossier is not None:
+                    yield _event("report_complete", build_dossier_response(dossier))
+                    return
+        yield _event(event_name, payload)

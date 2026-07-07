@@ -27,6 +27,14 @@ from app.db.models import Asset, Document, WorkOrder  # noqa: E402
 pytestmark = pytest.mark.destructive
 
 
+@pytest.fixture(scope="module", autouse=True)
+def _restore_substrate_after_verify() -> None:
+    """Task 0: verify-seed wipes structure; restore structure + ingest on exit."""
+    yield
+    seed.run_structure_phase()
+    seed.run_ingest_phase()
+
+
 @pytest.fixture(scope="module")
 def seeded() -> tuple[bool, list[str]]:
     return seed.run_structure_phase()
