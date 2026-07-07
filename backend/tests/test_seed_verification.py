@@ -21,6 +21,11 @@ import seed  # noqa: E402
 from app.db.engine import SessionLocal  # noqa: E402
 from app.db.models import Asset, Document, WorkOrder  # noqa: E402
 
+# This module TRUNCATEs and reloads the whole substrate (structure phase). It is
+# destructive and order-sensitive w.r.t. every DB-backed test, so it is excluded
+# from the default `make test` and run in isolation via `make verify-seed`.
+pytestmark = pytest.mark.destructive
+
 
 @pytest.fixture(scope="module")
 def seeded() -> tuple[bool, list[str]]:

@@ -1,4 +1,4 @@
-.PHONY: up down dataset seed ingest test test-all golden lint typecheck audit-norm
+.PHONY: up down dataset seed ingest test test-all golden verify-seed types lint typecheck audit-norm
 
 up:
 	docker compose up -d
@@ -26,10 +26,15 @@ ingest:
 	docker compose run --rm seed python /scripts/seed.py --phase ingest
 
 test:
-	cd backend && pytest -v -m "not slow"
+	cd backend && pytest -v -m "not slow and not destructive"
 
 test-all:
-	cd backend && pytest -v
+	cd backend && pytest -v -m "not destructive"
+
+# Destructive DB verification (TRUNCATE + reseed structure phase). Run in
+# isolation — it wipes the substrate, so keep it out of the default suite.
+verify-seed:
+	docker compose exec -T backend pytest -v -m destructive tests/test_seed_verification.py
 
 # M4 golden suite + slow assembler/lexical tests. Requires seed + ingest first
 # (loads the local embedding model, hits the compose DB).
@@ -38,6 +43,11 @@ golden:
 
 audit-norm:
 	cd backend && python -m tests.audits.normalization_audit
+
+# Generate frontend API types from the backend OpenAPI schema (Task 5). The
+# backend must be up (`make up`); types land in frontend/src/lib/api-types.ts.
+types:
+	cd frontend && npm run gen:types
 
 lint:
 	cd backend && ruff check .

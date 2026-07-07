@@ -192,10 +192,29 @@ def _merge_blocks(blocks: list[_Block], target: int) -> list[TextChunk]:
     return out
 
 
+def _is_bare_heading(block: _Block) -> bool:
+    """A clause block that is only its heading line, with no body beneath it.
+
+    Table-of-contents entries render exactly this way: on a contents page every
+    line is itself a numbered heading, so the block splitter flushes each into a
+    single-line block whose content is the caption alone. These carry no
+    retrievable information and pollute retrieval with heading-echoes (M5 Task 0).
+    Real sections always accumulate body lines below their heading, so a
+    multi-line block is never dropped.
+    """
+    return len(block.lines) == 1 and _heading_ref(block.lines[0].text) is not None
+
+
 def _chunk_by_clause(blocks: list[_Block], max_tokens: int) -> list[TextChunk]:
-    """Manual/SOP path — one chunk per numbered clause; max_tokens is a ceiling."""
+    """Manual/SOP path — one chunk per numbered clause; max_tokens is a ceiling.
+
+    Table-of-contents / orphan-heading blocks are dropped at ingest (Task 0):
+    they are heading echoes with no body and only add noise to retrieval.
+    """
     out: list[TextChunk] = []
     for block in blocks:
+        if _is_bare_heading(block):
+            continue
         for piece in _split_block_oversized(block, max_tokens):
             out.append(
                 TextChunk(

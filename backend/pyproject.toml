@@ -65,4 +65,5 @@ testpaths = ["tests"]
 pythonpath = ["."]
 markers = [
     "slow: loads the local embedding model (deselect with '-m \"not slow\"')",
+    "destructive: wipes/reseeds the database (run via `make verify-seed`, excluded from default `make test`)",
 ]

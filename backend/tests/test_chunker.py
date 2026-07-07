@@ -105,6 +105,45 @@ def _headingless_pages() -> list[PageText]:
     ]
 
 
+def _toc_pages() -> list[PageText]:
+    """Page 1 is a table of contents (every line is itself a heading); page 2 is
+    a real section with a body beneath its heading."""
+    return [
+        PageText(
+            page_number=1,
+            text=(
+                "1 General Description\n"
+                "2 Safety\n"
+                "5.3 Seal Cartridge Replacement Procedure\n"
+                "6 Troubleshooting"
+            ),
+        ),
+        PageText(
+            page_number=2,
+            text=(
+                "5.3 Seal Cartridge Replacement Procedure\n"
+                "Isolate the pump and relieve seal flush pressure before removal.\n"
+                "Fit the new cartridge and re-torque the gland to spec."
+            ),
+        ),
+    ]
+
+
+def test_toc_bare_headings_excluded_in_clause_mode() -> None:
+    """Task 0: contents/orphan heading lines (no body) are dropped at ingest, so
+    the real body-bearing clause is what survives for retrieval."""
+    chunks = chunk_pages(_toc_pages(), clause_boundaries=True)
+    cartridge = [c for c in chunks if c.section_ref == "5.3 Seal Cartridge Replacement Procedure"]
+    # the surviving cartridge chunk(s) come from the real section on page 2, not
+    # the page-1 contents echo
+    assert cartridge
+    assert all(c.page == 2 for c in cartridge)
+    assert "re-torque the gland" in " ".join(c.content for c in cartridge)
+    # no pure-heading TOC entry survives as its own chunk
+    bare = {"1 General Description", "2 Safety", "6 Troubleshooting"}
+    assert not any(c.content.strip() in bare for c in chunks)
+
+
 def test_headingless_doc_still_produces_chunks_in_clause_mode() -> None:
     """Regression (M3.2 root cause B): clause mode must never drop content for a
     document with no matching headings — either directly or via fallback."""
