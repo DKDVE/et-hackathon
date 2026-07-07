@@ -22,9 +22,9 @@ Render dataset artifacts, start the stack, seed the database:
 
 ```bash
 make dataset    # render PDFs/CSVs from dataset/design/meridian.yaml (~1 min)
-make up         # db + backend + frontend (frontend runs npm ci on first boot)
+make up         # db + backend + frontend — first build downloads ~3GB; allow 15–25 min
 make seed       # structure phase: wipe → load → verify
-make ingest     # chunk, embed, normalize (~3–5 min; downloads BGE model once)
+make ingest     # chunk, embed, normalize (~3–5 min; BGE model cached in image after first build)
 ```
 
 Wait for the backend log line **`Embedding model … ready`** before firing events
@@ -69,6 +69,8 @@ make test           # default unit suite
 make golden         # golden fixtures + assembler (needs seed + ingest)
 make verify-seed    # destructive DB check (run in isolation)
 make demo-gate      # night-before gate: tests + audits + timed demo run
+make images-save    # tarball backend+frontend+db images for USB-stick cold start
+make images-load    # load tarball on cold machine (then dataset/seed/ingest only)
 ```
 
 See `docs/demo-checklist.md` for the full rehearsal script.

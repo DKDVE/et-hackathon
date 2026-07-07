@@ -1,4 +1,4 @@
-.PHONY: up down dataset seed ingest test test-all test-llm golden verify-seed audit-ground types lint typecheck audit-norm audit-prose demo-gate
+.PHONY: up down dataset seed ingest test test-all test-llm golden verify-seed audit-ground types lint typecheck audit-norm audit-prose demo-gate images-save images-load
 
 up:
 	docker compose up -d
@@ -55,6 +55,21 @@ audit-prose:
 
 demo-gate:
 	@bash scripts/demo_gate.sh
+
+# Cold-machine contingency: save/load pre-built images for USB-stick transfer (NFR-6).
+# After load: cp .env.example .env, make dataset && make up && make seed && make ingest.
+IMAGE_TAR ?= docker-images.tar
+images-save:
+	docker compose build
+	docker save -o $(IMAGE_TAR) \
+		et-hackathon-backend \
+		et-hackathon-frontend \
+		pgvector/pgvector:pg16
+	@echo "Saved $(IMAGE_TAR) — copy to USB for cold-machine demo"
+
+images-load:
+	test -f $(IMAGE_TAR) || (echo "missing $(IMAGE_TAR); run make images-save on a warm machine" >&2; exit 1)
+	docker load -i $(IMAGE_TAR)
 
 # Generate frontend API types from the backend OpenAPI schema (Task 5). The
 # backend must be up (`make up`); types land in frontend/src/lib/api-types.ts.
