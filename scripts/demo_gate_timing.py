@@ -2,7 +2,11 @@
 """Timed demo-event dossier for ``make demo-gate`` (M9).
 
 Creates a fresh P-3401 seal-leak event, runs full reasoning via SSE, asserts
-wall < 60s and time-to-first-analysis < 30s, then tears down the scratch row.
+functional success, then classifies timing (PASS vs WARN via thresholds).
+
+Exit codes:
+  0 — functional OK (timing PASS or WARN)
+  1 — functional failure (bad SSE, missing analysis, API down)
 """
 
 from __future__ import annotations
@@ -27,6 +31,8 @@ DEMO_EVENT = {
 }
 
 BASE = os.environ.get("DEMO_GATE_API_URL", "http://localhost:8000")
+WALL_THRESHOLD = float(os.environ.get("DEMO_GATE_WALL_THRESHOLD", "60"))
+ANALYSIS_THRESHOLD = float(os.environ.get("DEMO_GATE_ANALYSIS_THRESHOLD", "30"))
 
 
 def _post(path: str, payload: dict[str, Any] | None = None) -> dict[str, Any]:
@@ -71,6 +77,21 @@ def _parse_sse(text: str) -> list[str]:
     return names
 
 
+def _analysis_tokens(dossier_id: int) -> int | None:
+    from sqlalchemy import select
+
+    from app.db.engine import SessionLocal
+    from app.db.models import ReasoningRun
+
+    with SessionLocal() as s:
+        row = s.scalar(
+            select(ReasoningRun)
+            .where(ReasoningRun.dossier_id == dossier_id, ReasoningRun.node == "analysis")
+            .order_by(ReasoningRun.id.desc())
+        )
+        return row.completion_tokens if row else None
+
+
 def main() -> int:
     if os.environ.get("REASONING_ENABLED", "").lower() not in ("true", "1"):
         print("REASONING_ENABLED must be true for timed demo run", file=sys.stderr)
@@ -102,14 +123,21 @@ def main() -> int:
         if t_analysis is None:
             print(f"no analysis event in SSE sequence: {names}", file=sys.stderr)
             return 1
-        if wall >= 60.0:
-            print(f"wall time {wall:.1f}s >= 60s", file=sys.stderr)
-            return 1
-        if t_analysis >= 30.0:
-            print(f"time-to-analysis {t_analysis:.1f}s >= 30s", file=sys.stderr)
-            return 1
 
-        print(f"wall={wall:.1f}s analysis_at={t_analysis:.1f}s dossier={dossier_id}")
+        tokens = _analysis_tokens(dossier_id)
+        timing_warn = wall >= WALL_THRESHOLD or t_analysis >= ANALYSIS_THRESHOLD
+        token_part = f" analysis_tokens={tokens}" if tokens is not None else ""
+        print(
+            f"wall={wall:.1f}s analysis_at={t_analysis:.1f}s dossier={dossier_id}{token_part}"
+        )
+        if timing_warn:
+            parts = []
+            if wall >= WALL_THRESHOLD:
+                parts.append(f"wall {wall:.1f}s >= {WALL_THRESHOLD:.0f}s")
+            if t_analysis >= ANALYSIS_THRESHOLD:
+                parts.append(f"time-to-analysis {t_analysis:.1f}s >= {ANALYSIS_THRESHOLD:.0f}s")
+            print(f"TIMING_WARN: {'; '.join(parts)}", file=sys.stderr)
+
         # ponytail: keep dossier for demo-gate audits (verify-seed already ran)
         event_id = None
         return 0

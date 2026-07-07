@@ -1,15 +1,18 @@
 #!/usr/bin/env bash
-# M9 night-before gate — one readable line per check, non-zero on any red.
+# M9 night-before gate — functional checks are red; timing checks are yellow WARN.
 set -uo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"
 
 GREEN='\033[32m'
+YELLOW='\033[33m'
 RED='\033[31m'
 NC='\033[0m'
 FAIL=0
+TIMING_ACTION='WARN: provider slow today → at T-30m regenerate cache on final board state; rehearse long-assembly narration; bookmark cached dossier as plan B'
 
 pass() { echo -e "${GREEN}PASS${NC} — $1"; }
+warn() { echo -e "${YELLOW}WARN${NC} — $1"; echo "  → $TIMING_ACTION"; }
 fail() { echo -e "${RED}FAIL${NC} — $1"; FAIL=1; }
 
 echo "=== demo-gate ==="
@@ -47,11 +50,18 @@ set +e
 TIMING_OUT="$(docker compose exec -T backend python /scripts/demo_gate_timing.py 2>&1)"
 TIMING_RC=$?
 set -e
-if [ "$TIMING_RC" -eq 0 ]; then
+TIMING_WARN=0
+if echo "$TIMING_OUT" | grep -q 'TIMING_WARN:'; then
+  TIMING_WARN=1
+fi
+if [ "$TIMING_RC" -eq 0 ] && [ "$TIMING_WARN" -eq 0 ]; then
   pass "timed demo-event dossier (wall <60s, analysis <30s)"
   echo "$TIMING_OUT"
+elif [ "$TIMING_RC" -eq 0 ] && [ "$TIMING_WARN" -eq 1 ]; then
+  warn "timed demo-event dossier (wall <60s, analysis <30s)"
+  echo "$TIMING_OUT"
 else
-  fail "timed demo-event dossier (wall <60s, analysis <30s)"
+  fail "timed demo-event dossier (functional failure)"
   echo "$TIMING_OUT" >&2
 fi
 
@@ -67,7 +77,7 @@ with SessionLocal() as s:
 " | tr -d '\r')"
 fi
 
-# 6 — groundedness + prose-ID on the timed dossier (verify-seed wipes prior rows)
+# 6 — groundedness + prose-ID on the timed dossier (after timed run, M9 order)
 if [ -z "$DOSSIER_ID" ]; then
   fail "groundedness walker (no complete dossier after timed run)"
   fail "prose-ID audit (no complete dossier after timed run)"
@@ -84,9 +94,38 @@ else
   fi
 fi
 
+# 7 — fallback cache present for demo event fingerprint (P9 / NFR-7)
+if docker compose exec -T backend python -c "
+from sqlalchemy import select
+from app.db.engine import SessionLocal
+from app.db.models import ReasoningFallbackCache
+from app.reasoning.prompts import analysis
+with SessionLocal() as s:
+    rows = s.scalars(select(ReasoningFallbackCache)).all()
+    ok = any(
+        (r.prompt_versions or {}).get('analysis') == analysis.PROMPT_VERSION and r.events
+        for r in rows
+    )
+    if not ok:
+        raise SystemExit(1)
+    key = next(
+        r.cache_key for r in rows
+        if (r.prompt_versions or {}).get('analysis') == analysis.PROMPT_VERSION and r.events
+    )
+    print(f'cache_key={key[:8]}… prompt={analysis.PROMPT_VERSION}')
+"; then
+  pass "fallback replay cache (analysis prompt current)"
+else
+  fail "fallback replay cache (run live demo event to populate v4 cache)"
+fi
+
 echo ""
 if [ "$FAIL" -eq 0 ]; then
-  echo -e "${GREEN}DEMO-GATE: ALL GREEN${NC}"
+  if [ "$TIMING_WARN" -eq 1 ]; then
+    echo -e "${YELLOW}DEMO-GATE: GREEN with timing WARN — see yellow above${NC}"
+  else
+    echo -e "${GREEN}DEMO-GATE: ALL GREEN${NC}"
+  fi
 else
   echo -e "${RED}DEMO-GATE: RED — see failures above${NC}"
 fi
