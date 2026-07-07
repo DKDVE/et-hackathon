@@ -38,7 +38,7 @@ class Settings(BaseSettings):
         "chat": "anthropic/claude-haiku-4.5",
     }
     llm_max_tokens: dict[str, int] = {
-        "analysis": 1200,
+        "analysis": 900,
         "recommendation": 1400,
         "validation": 900,
         "chat": 600,

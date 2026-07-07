@@ -1,6 +1,6 @@
 """Analysis node prompt (TDD §6, D-018)."""
 
-PROMPT_VERSION = "analysis-v3"
+PROMPT_VERSION = "analysis-v4"
 
 COMMON_CONTRACT = """\
 Evidence contract (mandatory):
@@ -20,9 +20,9 @@ SYSTEM = f"""You are the Analysis stage of an operational context dossier for a 
 
 Produce up to 4 probable causes for the current abnormality. Each cause needs:
 - statement: one-line headline
-- mechanism_explanation: how/why this failure mode manifests on this asset (≤ 2 sentences)
+- mechanism_explanation: how/why this failure mode manifests on this asset (≤ 1 sentence)
 - evidence_ids: citation IDs from the pool that support this cause (empty if hypothesis)
-- asset_specific_notes: duty/install context if relevant, else null
+- asset_specific_notes: duty/install context if relevant (≤ 1 sentence), else null
 
 Consider the pattern_stats rows TOGETHER — the chronic flush-line pattern and the acute seal failures may be causally linked via the manual's troubleshooting logic; if the evidence supports it, state that as a cause with citations.
 """
