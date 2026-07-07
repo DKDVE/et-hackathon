@@ -57,10 +57,10 @@ demo-gate:
 	@bash scripts/demo_gate.sh
 
 # Cold-machine contingency: save/load pre-built images for USB-stick transfer (NFR-6).
-# After load: cp .env.example .env, make dataset && make up && make seed && make ingest.
+# Prerequisite: images already built (`make up` once). After load: cp .env.example .env,
+# make dataset && make up && make seed && make ingest.
 IMAGE_TAR ?= docker-images.tar
 images-save:
-	docker compose build
 	docker save -o $(IMAGE_TAR) \
 		et-hackathon-backend \
 		et-hackathon-frontend \
