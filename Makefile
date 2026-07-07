@@ -1,4 +1,4 @@
-.PHONY: up down dataset seed ingest test test-all lint typecheck audit-norm
+.PHONY: up down dataset seed ingest test test-all golden lint typecheck audit-norm
 
 up:
 	docker compose up -d
@@ -30,6 +30,11 @@ test:
 
 test-all:
 	cd backend && pytest -v
+
+# M4 golden suite + slow assembler/lexical tests. Requires seed + ingest first
+# (loads the local embedding model, hits the compose DB).
+golden:
+	cd backend && pytest -v -m slow tests/golden tests/test_assembler_determinism.py tests/test_lexical_channel.py
 
 audit-norm:
 	cd backend && python -m tests.audits.normalization_audit

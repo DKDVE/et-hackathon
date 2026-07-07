@@ -1,0 +1,73 @@
+# Golden scenarios (M4, PRD §17). Each row is assembled against the seeded DB
+# and checked for the universal invariants (builds, deterministic, pool-integral,
+# buckets correctly typed). Optional `expect` keys add scenario-specific checks.
+#
+# Coverage: the four hot-organics sisters (rich context) across seal/vibration/
+# overheating/noise symptoms; one asset per other class (agitator, HEX, valve,
+# compressor, motor, tank); a Tier-3 thin asset (empty-ish, must not crash); and
+# an `other`-symptom event proving the no-mode-filter fallback (D-005).
+
+- id: p3105_seal_leak
+  asset: P-3105
+  symptom: seal_leak
+  note: "Seal weeping on solvent bottoms pump; flush pressure looks low."
+  expect: { min_sisters: 1 }
+
+- id: p3402_overheating
+  asset: P-3402
+  symptom: overheating
+  note: "Bearing housing running hot on ester product pump."
+
+- id: p2210_vibration
+  asset: P-2210
+  symptom: vibration
+  note: "High drive-end vibration, 2x running speed component on the coupling."
+
+- id: a3110_abnormal_noise
+  asset: A-3110
+  symptom: abnormal_noise
+  note: "Knocking noise from the agitator gearbox under load."
+
+- id: e1110_overheating
+  asset: E-1110
+  symptom: overheating
+  note: "Overhead condenser approach temperature climbing; tubes may be fouling."
+
+- id: cv3101_pressure_anomaly
+  asset: CV-3101
+  symptom: pressure_anomaly
+  note: "Ester feed flow control valve hunting; differential pressure unstable."
+
+- id: c4110_trip
+  asset: C-4110
+  symptom: trip
+  note: "Plant air compressor tripped on motor thermal overload."
+
+- id: m3401_trip
+  asset: M-3401
+  symptom: trip
+  note: "Ester feed pump A motor tripped, suspected earth fault."
+
+- id: p2201_low_flow
+  asset: P-2201
+  symptom: low_flow
+  note: "Reduced developed head on monomer charge pump; suspect strainer fouling."
+
+- id: tk4201_pressure_anomaly
+  asset: TK-4201
+  symptom: pressure_anomaly
+  note: "Tank breather pressure reading abnormal during transfer."
+
+# Tier-3 thin asset — honest empty-ish context, must not crash, empty-ish pool.
+- id: m1101_thin
+  asset: M-1101
+  symptom: vibration
+  note: "Slight vibration on distillate transfer motor."
+  expect: { thin: true }
+
+# `other`/unknown symptom → no mode filter (recall over precision, D-005).
+- id: p3401_other_no_filter
+  asset: P-3401
+  symptom: other
+  note: "General condition review requested by reliability engineer."
+  expect: { no_mode_filter: true }
