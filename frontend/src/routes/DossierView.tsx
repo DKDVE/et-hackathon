@@ -13,10 +13,21 @@ import { LockedReasoning } from "@/components/dossier/LockedReasoning";
 import { ReasoningSections } from "@/components/dossier/ReasoningSections";
 import { PatternPanel } from "@/components/dossier/PatternPanel";
 import { SimilarIncidents } from "@/components/dossier/SimilarIncidents";
+import { TracePanel } from "@/components/dossier/TracePanel";
 import { SourceProvider } from "@/components/source/SourceViewer";
 import { Button } from "@/components/ui/button";
-import { createDossier, getAppConfig, type AppConfig, type DossierResponse } from "@/lib/api";
+import { cn } from "@/lib/utils";
+import {
+  createDossier,
+  getAppConfig,
+  getDossierRuns,
+  type AppConfig,
+  type DossierResponse,
+  type ReasoningRunsResponse,
+} from "@/lib/api";
 import { isContextReady, useDossierStream } from "@/lib/dossierStream";
+
+type DossierTab = "dossier" | "trace";
 
 export function DossierView() {
   const { id } = useParams<{ id: string }>();
@@ -27,6 +38,8 @@ export function DossierView() {
   const [error, setError] = useState<string | null>(null);
   const [config, setConfig] = useState<AppConfig | null>(null);
   const [chatOpen, setChatOpen] = useState(false);
+  const [tab, setTab] = useState<DossierTab>("dossier");
+  const [trace, setTrace] = useState<ReasoningRunsResponse | null>(null);
 
   useEffect(() => {
     getAppConfig().then(setConfig).catch(() => {
@@ -58,6 +71,21 @@ export function DossierView() {
   const reasoningPending =
     reasoningEnabled && !degraded && stream.analysis == null && stream.validated == null;
   const isComplete = dossier?.status === "complete" && dossier.sections != null;
+  const showTraceTab =
+    isComplete && (trace != null && (trace.runs.length > 0 || !reasoningEnabled));
+
+  useEffect(() => {
+    if (dossierId == null || !isComplete) return;
+    let cancelled = false;
+    getDossierRuns(dossierId)
+      .then((t) => !cancelled && setTrace(t))
+      .catch(() => {
+        /* ponytail: trace tab stays hidden on fetch failure */
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [dossierId, isComplete]);
 
   return (
     <SourceProvider>
@@ -79,7 +107,31 @@ export function DossierView() {
         {ctx && (
           <div className="grid grid-cols-1 gap-10 pb-16 lg:grid-cols-12">
             <div className="flex flex-col gap-10 lg:col-span-8">
-              <div className="flex flex-wrap gap-3 no-print">
+              <div className="flex flex-wrap items-center gap-3 no-print">
+                {showTraceTab && (
+                  <div className="flex gap-2">
+                    {(
+                      [
+                        ["dossier", "Dossier"],
+                        ["trace", "Trace"],
+                      ] as const
+                    ).map(([value, label]) => (
+                      <button
+                        key={value}
+                        type="button"
+                        onClick={() => setTab(value)}
+                        className={cn(
+                          "rounded-full px-4 py-1.5 text-xs font-bold uppercase tracking-widest transition-all",
+                          tab === value
+                            ? "bg-primary text-primary-foreground"
+                            : "bg-secondary text-muted-foreground hover:text-foreground",
+                        )}
+                      >
+                        {label}
+                      </button>
+                    ))}
+                  </div>
+                )}
                 {isComplete && id && (
                   <Link
                     to={`/events/${id}/report`}
@@ -97,17 +149,23 @@ export function DossierView() {
                 )}
               </div>
 
-              {reasoningEnabled ? (
-                <>
-                  {reasoningPending && <LockedReasoning degraded={null} />}
-                  <ReasoningSections stream={stream} degraded={degraded} />
-                </>
+              {tab === "trace" && trace ? (
+                <TracePanel trace={trace} />
               ) : (
-                <LockedReasoning degraded={degraded} />
+                <>
+                  {reasoningEnabled ? (
+                    <>
+                      {reasoningPending && <LockedReasoning degraded={null} />}
+                      <ReasoningSections stream={stream} degraded={degraded} />
+                    </>
+                  ) : (
+                    <LockedReasoning degraded={degraded} />
+                  )}
+                  <PatternPanel patterns={ctx.pattern_stats} config={config} />
+                  <FailureTimeline history={ctx.failure_history} />
+                  <SimilarIncidents incidents={ctx.sister_incidents} />
+                </>
               )}
-              <PatternPanel patterns={ctx.pattern_stats} config={config} />
-              <FailureTimeline history={ctx.failure_history} />
-              <SimilarIncidents incidents={ctx.sister_incidents} />
             </div>
             <aside className="flex flex-col gap-8 lg:col-span-4">
               <AssetProfileCard profile={ctx.asset_profile} />

@@ -18,4 +18,5 @@ def get_app_config() -> AppConfig:
     return AppConfig(
         downtime_cost_per_hour_inr=per_hr,
         downtime_cost_label=label,
+        model_costs=settings.model_costs,
     )

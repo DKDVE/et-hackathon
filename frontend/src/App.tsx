@@ -3,6 +3,7 @@ import { Navigate, Route, Routes } from "react-router-dom";
 import { AssetRegistry } from "@/routes/AssetRegistry";
 import { DossierView } from "@/routes/DossierView";
 import { EventBoard } from "@/routes/EventBoard";
+import { OpsView } from "@/routes/OpsView";
 import { ReportView } from "@/routes/ReportView";
 
 export default function App() {
@@ -13,6 +14,7 @@ export default function App() {
       <Route path="/events/:id" element={<DossierView />} />
       <Route path="/events/:id/report" element={<ReportView />} />
       <Route path="/assets" element={<AssetRegistry />} />
+      <Route path="/ops" element={<OpsView />} />
     </Routes>
   );
 }

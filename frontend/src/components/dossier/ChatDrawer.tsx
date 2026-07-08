@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { EvidenceChip } from "@/components/dossier/EvidenceChip";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { chatDossier, type ChatResponse } from "@/lib/api";
+import { chatDossierRaw, type ChatResponse } from "@/lib/api";
 import { cn } from "@/lib/utils";
 
 export type ChatMessage = {
@@ -61,13 +61,22 @@ export function ChatDrawer({
     setLoading(true);
     try {
       const history = next.slice(0, -1).slice(-6).map((m) => ({ role: m.role, text: m.text }));
-      const resp: ChatResponse = await chatDossier(dossierId, q, history);
+      const resp = await chatDossierRaw(dossierId, q, history);
+      if (resp.status === 429) {
+        setError("Rate limit reached — try again in a moment.");
+        return;
+      }
+      if (!resp.ok) {
+        setError("Reasoning service unavailable.");
+        return;
+      }
+      const data = (await resp.json()) as ChatResponse;
       const assistant: ChatMessage = {
         role: "assistant",
-        text: resp.answer,
-        citations: resp.citations,
-        refused: resp.refused,
-        grounding: resp.grounding ?? undefined,
+        text: data.answer,
+        citations: data.citations,
+        refused: data.refused,
+        grounding: data.grounding ?? undefined,
       };
       const updated = [...next, assistant];
       setMessages(updated);

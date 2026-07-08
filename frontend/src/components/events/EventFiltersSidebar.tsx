@@ -1,5 +1,12 @@
 import { cn } from "@/lib/utils";
 import { criticalityBadgeClass, type Criticality } from "@/lib/criticality";
+import {
+  ALL_CRITICALITIES,
+  ALL_STATUSES,
+  toggleSet,
+  type EventBoardFilters,
+  type EventStatus,
+} from "@/lib/eventFilters";
 
 const criticalityFilters: { level: Criticality; label: string }[] = [
   { level: "A", label: "Critical" },
@@ -7,57 +14,121 @@ const criticalityFilters: { level: Criticality; label: string }[] = [
   { level: "C", label: "Advisory" },
 ];
 
-const unitFilters = ["Ethylene-1", "Ethylene-2", "Utilities", "Storage"] as const;
+const statusFilters: { value: EventStatus; label: string }[] = [
+  { value: "open", label: "Open" },
+  { value: "reviewed", label: "Reviewed" },
+  { value: "closed", label: "Closed" },
+];
 
-export function EventFiltersSidebar() {
+type EventFiltersSidebarProps = {
+  units: string[];
+  filters: EventBoardFilters;
+  onChange: (filters: EventBoardFilters) => void;
+};
+
+export function EventFiltersSidebar({ units, filters, onChange }: EventFiltersSidebarProps) {
   return (
     <aside className="w-full shrink-0 space-y-8 lg:w-64">
-      <div>
-        <h3 className="mb-4 text-xs font-bold uppercase tracking-widest text-muted-foreground">
-          Criticality Level
-        </h3>
-        <div className="space-y-2">
-          {criticalityFilters.map(({ level, label }) => (
-            <label
-              key={level}
-              className="group flex cursor-pointer items-center gap-3"
-            >
-              <input
-                type="checkbox"
-                defaultChecked
-                className="rounded border-border bg-card/50 text-primary focus:ring-primary focus:ring-offset-background"
-              />
-              <div className="flex items-center gap-2">
+      <FilterGroup title="Criticality Level">
+        {criticalityFilters.map(({ level, label }) => (
+          <FilterCheckbox
+            key={level}
+            checked={filters.criticalities.has(level)}
+            onChange={() =>
+              onChange({
+                ...filters,
+                criticalities: toggleSet(filters.criticalities, level),
+              })
+            }
+            label={
+              <>
                 <span className={cn("px-1.5 py-0.5", criticalityBadgeClass(level))}>
                   {level}
                 </span>
                 <span className="text-sm font-medium text-muted-foreground transition-colors group-hover:text-foreground">
                   {label}
                 </span>
-              </div>
-            </label>
-          ))}
-        </div>
-      </div>
-      <div>
-        <h3 className="mb-4 text-xs font-bold uppercase tracking-widest text-muted-foreground">
-          Unit
-        </h3>
-        <div className="space-y-2">
-          {unitFilters.map((unit, i) => (
-            <label key={unit} className="group flex cursor-pointer items-center gap-3">
-              <input
-                type="checkbox"
-                defaultChecked={i < 2}
-                className="rounded border-border bg-card/50 text-primary focus:ring-primary focus:ring-offset-background"
-              />
+              </>
+            }
+          />
+        ))}
+      </FilterGroup>
+
+      <FilterGroup title="Status">
+        {statusFilters.map(({ value, label }) => (
+          <FilterCheckbox
+            key={value}
+            checked={filters.statuses.has(value)}
+            onChange={() =>
+              onChange({
+                ...filters,
+                statuses: toggleSet(filters.statuses, value),
+              })
+            }
+            label={
+              <span className="text-sm font-medium capitalize text-muted-foreground transition-colors group-hover:text-foreground">
+                {label}
+              </span>
+            }
+          />
+        ))}
+      </FilterGroup>
+
+      <FilterGroup title="Unit">
+        {units.map((unit) => (
+          <FilterCheckbox
+            key={unit}
+            checked={filters.units.has(unit)}
+            onChange={() =>
+              onChange({
+                ...filters,
+                units: toggleSet(filters.units, unit),
+              })
+            }
+            label={
               <span className="text-sm font-medium text-muted-foreground transition-colors group-hover:text-foreground">
                 {unit}
               </span>
-            </label>
-          ))}
-        </div>
-      </div>
+            }
+          />
+        ))}
+      </FilterGroup>
     </aside>
   );
 }
+
+function FilterGroup({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <div>
+      <h3 className="mb-4 text-xs font-bold uppercase tracking-widest text-muted-foreground">
+        {title}
+      </h3>
+      <div className="space-y-2">{children}</div>
+    </div>
+  );
+}
+
+function FilterCheckbox({
+  checked,
+  onChange,
+  label,
+}: {
+  checked: boolean;
+  onChange: () => void;
+  label: React.ReactNode;
+}) {
+  return (
+    <label className="group flex cursor-pointer items-center gap-3">
+      <input
+        type="checkbox"
+        checked={checked}
+        onChange={onChange}
+        className="rounded border-border bg-card/50 text-primary focus:ring-primary focus:ring-offset-background"
+      />
+      <div className="flex items-center gap-2">{label}</div>
+    </label>
+  );
+}
+
+// ponytail: export for tests asserting default filter dimensions
+export { ALL_CRITICALITIES, ALL_STATUSES };

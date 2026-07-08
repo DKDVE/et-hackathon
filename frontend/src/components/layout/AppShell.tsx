@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Bell, Settings } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { getHealth } from "@/lib/api";
@@ -8,6 +7,7 @@ import { getHealth } from "@/lib/api";
 const navItems = [
   { to: "/events", label: "Events" },
   { to: "/assets", label: "Assets" },
+  { to: "/ops", label: "Operations" },
 ] as const;
 
 type AppShellProps = {
@@ -77,22 +77,6 @@ export function AppShell({ children, breadcrumb }: AppShellProps) {
                 {apiOk === null ? "…" : apiOk ? "API Connected" : "API Offline"}
               </span>
             </div>
-            <div className="hidden items-center gap-2 text-muted-foreground sm:flex">
-              <button
-                type="button"
-                className="rounded p-1 transition-colors hover:text-primary"
-                aria-label="Notifications"
-              >
-                <Bell className="size-5" />
-              </button>
-              <button
-                type="button"
-                className="rounded p-1 transition-colors hover:text-primary"
-                aria-label="Settings"
-              >
-                <Settings className="size-5" />
-              </button>
-            </div>
           </div>
         </div>
       </header>
@@ -111,8 +95,7 @@ export function AppShell({ children, breadcrumb }: AppShellProps) {
           <div>Meridian Specialty Chemicals · Unit 3</div>
           <div className="flex flex-wrap justify-center gap-6">
             <span>Facility: Houston Southeast Plant</span>
-            <span>Unit: Ethylene-1</span>
-            <span>Area: Compression</span>
+            <span>Meridian Specialty Chemicals</span>
           </div>
           <div>© 2026 OCE — Industrial Decision Intelligence</div>
         </div>
