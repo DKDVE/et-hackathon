@@ -29,6 +29,7 @@ def _allowed_paths() -> set[Path]:
     return {
         (repo / "dataset/generators/render_wo.py").resolve(),
         (here.parent / "audits/normalization_audit.py").resolve(),
+        (here.parent / "test_routine_guard.py").resolve(),
         Path("/dataset/generators/render_wo.py").resolve(),
         Path("/app/tests/audits/normalization_audit.py").resolve(),
     }

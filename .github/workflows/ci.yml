@@ -50,6 +50,11 @@ jobs:
         working-directory: backend
         run: alembic upgrade head
 
+      - name: Structure seed (CI substrate — no ingest/torch)
+        run: python scripts/seed.py --phase structure
+        env:
+          DATASET_DIR: ${{ github.workspace }}/dataset
+
       - name: Ruff
         working-directory: backend
         run: ruff check .

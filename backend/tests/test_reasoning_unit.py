@@ -186,7 +186,7 @@ def test_report_section_order() -> None:
         actions=[],
     )
     keys = list(sections.model_dump().keys())
-    assert keys == ["safety_notes", "probable_causes", "actions"]
+    assert keys == ["safety_notes", "probable_causes", "actions", "executive_summary"]
 
 
 def test_strength_attachment() -> None:
