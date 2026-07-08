@@ -15,6 +15,9 @@ from sqlalchemy.orm import Session
 
 from app.db.models import Asset, FailureMode, WorkOrder
 from app.domain.models import PatternStat, SisterIncident, WorkOrderRecord
+from app.memory.effective_mode import effective_failure_mode_id
+
+_eff_mode = effective_failure_mode_id()
 
 
 def _f(value: Any) -> float | None:
@@ -32,7 +35,7 @@ def get_work_order_source(
     row = session.execute(
         select(WorkOrder, Asset.tag, Asset.name, FailureMode.code, FailureMode.name)
         .join(Asset, WorkOrder.asset_id == Asset.id)
-        .outerjoin(FailureMode, WorkOrder.failure_mode_id == FailureMode.id)
+        .outerjoin(FailureMode, FailureMode.id == _eff_mode)
         .where(WorkOrder.wo_number.in_(candidates))
     ).first()
     return (row[0], row[1], row[2], row[3], row[4]) if row else None
@@ -45,7 +48,7 @@ def get_failure_history(
     rows = session.execute(
         select(WorkOrder, Asset.tag, FailureMode.code)
         .join(Asset, WorkOrder.asset_id == Asset.id)
-        .outerjoin(FailureMode, WorkOrder.failure_mode_id == FailureMode.id)
+        .outerjoin(FailureMode, FailureMode.id == _eff_mode)
         .where(WorkOrder.asset_id == asset_id)
         .order_by(WorkOrder.opened_on.desc(), WorkOrder.wo_number.desc())
         .limit(cap)
@@ -82,7 +85,7 @@ def get_sister_incidents(
     stmt = (
         select(WorkOrder, Asset.tag, Asset.name, FailureMode.code)
         .join(Asset, WorkOrder.asset_id == Asset.id)
-        .outerjoin(FailureMode, WorkOrder.failure_mode_id == FailureMode.id)
+        .outerjoin(FailureMode, FailureMode.id == _eff_mode)
         .where(WorkOrder.asset_id.in_(sister_ids))
     )
     if mode_codes is not None:
@@ -130,8 +133,9 @@ def get_pattern_stats(
             func.array_agg(func.distinct(Asset.tag)),
         )
         .join(Asset, WorkOrder.asset_id == Asset.id)
-        .join(FailureMode, WorkOrder.failure_mode_id == FailureMode.id)
+        .join(FailureMode, FailureMode.id == _eff_mode)
         .where(WorkOrder.asset_id.in_(asset_ids))
+        .where(_eff_mode.isnot(None))
     )
     if mode_codes is not None:
         stmt = stmt.where(FailureMode.code.in_(mode_codes))

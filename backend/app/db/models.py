@@ -93,6 +93,20 @@ class EvidenceKind(StrEnum):
     chunk = "chunk"
 
 
+class HumanVerdict(StrEnum):
+    confirmed = "confirmed"
+    corrected = "corrected"
+    unclassifiable = "unclassifiable"
+
+
+human_verdict_enum = Enum(
+    HumanVerdict,
+    name="human_verdict",
+    native_enum=True,
+    create_constraint=True,
+)
+
+
 class AssetClass(Base):
     __tablename__ = "asset_classes"
 
@@ -139,7 +153,10 @@ class FailureMode(Base):
     description: Mapped[str | None] = mapped_column(Text)
     embedding: Mapped[list[float] | None] = mapped_column(Vector(EMBEDDING_DIM))
 
-    work_orders: Mapped[list["WorkOrder"]] = relationship(back_populates="failure_mode")
+    work_orders: Mapped[list["WorkOrder"]] = relationship(
+        back_populates="failure_mode",
+        foreign_keys="WorkOrder.failure_mode_id",
+    )
 
 
 class WorkOrder(Base):
@@ -154,11 +171,17 @@ class WorkOrder(Base):
     raw_description: Mapped[str] = mapped_column(Text, nullable=False)
     actions_taken: Mapped[str | None] = mapped_column(Text)
     downtime_hours: Mapped[float | None] = mapped_column(Numeric(10, 2))
+    # D-023: auto columns — ONLY the ingester (wo_normalizer) may write these.
     failure_mode_id: Mapped[int | None] = mapped_column(ForeignKey("failure_modes.id"))
     normalization_score: Mapped[float | None] = mapped_column()
+    human_failure_mode_id: Mapped[int | None] = mapped_column(ForeignKey("failure_modes.id"))
+    human_verdict: Mapped[HumanVerdict | None] = mapped_column(human_verdict_enum)
+    human_reviewed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
 
     asset: Mapped[Asset] = relationship(back_populates="work_orders")
-    failure_mode: Mapped[FailureMode | None] = relationship(back_populates="work_orders")
+    failure_mode: Mapped[FailureMode | None] = relationship(
+        back_populates="work_orders", foreign_keys=[failure_mode_id]
+    )
     evidence_links: Mapped[list["EvidenceLink"]] = relationship(back_populates="work_order")
 
 

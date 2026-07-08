@@ -87,6 +87,8 @@ def normalize_work_orders(session: Session) -> tuple[int, int]:
         idx, score = classify_vector(
             qvec, mode_matrix, threshold=threshold, margin=margin, families=families
         )
+        # D-023: failure_mode_id and normalization_score are auto columns — only this
+        # ingester may write them; human review writes human_* columns only.
         wo.normalization_score = score
         if idx is not None:
             wo.failure_mode_id = mode_ids[idx]

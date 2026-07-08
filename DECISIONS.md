@@ -194,3 +194,16 @@
 ---
 
 *Next entries will be appended as ready-to-paste blocks in chat whenever a qualifying decision is made — including during TDD, schema design, and any mid-build pivots. Superseding is allowed; deleting is not.*
+
+---
+
+## D-023 — Human-override provenance on work-order classification
+
+**Status:** Accepted
+**Decision:** Human review of normalization writes **only** `human_failure_mode_id`, `human_verdict`, and `human_reviewed_at`. Auto columns (`failure_mode_id`, `normalization_score`) are written exclusively by the ingester and never mutated by review, APIs, or UI. Effective mode for downstream queries is `human_failure_mode_id` when `human_verdict IN (confirmed, corrected)`; `unclassifiable` forces NULL regardless of auto. No re-review/undo endpoint pre-auth — irreversibility without identity is safer than mutable-without-auth.
+**Alternatives Considered:** (a) Overwrite auto columns on review (loses audit trail); (b) Re-review/undo without auth (mutable anonymous state); (c) Full taxonomy editing in Memory UI (post-auth scope).
+**Rationale:** Normalization accuracy math and the planted pattern substrate must remain byte-stable under human judgment. Separating auto vs human columns makes provenance auditable in one SQL diff. The review queue is the product's first mutation — provenance rules are constitutional.
+**Trade-offs:** Accidental review on demo WOs requires `make seed` + `make ingest` to reset; no bulk actions or threshold tuning in MVP.
+**Impact:** Migration 0005; `effective_failure_mode()` helper; Memory layer UI; normalization audit gains human-override summary line while accuracy stays on auto columns only.
+
+---

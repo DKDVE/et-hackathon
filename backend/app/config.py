@@ -95,6 +95,16 @@ class Settings(BaseSettings):
     evidence_cap_sister: int = 3
     evidence_recency_threshold_months: int = 24
 
+    # Memory layer coverage tiers (P8) — deterministic Good/Partial/Thin per asset.
+    memory_coverage_good_min_sops: int = 1
+    memory_coverage_good_min_wos: int = 5
+    memory_coverage_good_classified_ratio: float = 0.70
+    memory_coverage_partial_min_wos: int = 1
+    memory_coverage_footnote: str = (
+        "Good: OEM manual on class + ≥1 SOP + ≥5 WOs + ≥70% classified. "
+        "Partial: manual or SOP or ≥1 WO, but not Good. Thin: everything else."
+    )
+
 
 @lru_cache
 def get_settings() -> Settings:

@@ -247,3 +247,95 @@ class GuardrailsResponse(BaseModel):
 
 class RateLimitDetail(BaseModel):
     message: str = "Rate limit reached — try again in a moment."
+
+
+# --- memory layer (M12, D-012/D-023) ----------------------------------------
+
+
+class MemoryOverview(BaseModel):
+    asset_count: int
+    document_count: int
+    chunk_count: int
+    work_order_count: int
+    wo_auto_classified: int
+    wo_unclassified: int
+    wo_human_reviewed: int
+    taxonomy_size: int
+
+
+class MemoryAssetRow(BaseModel):
+    asset_id: int
+    tag: str
+    name: str
+    asset_class: str
+    manual_available: bool
+    sop_count: int
+    wo_count: int
+    last_inspection_date: date | None
+    classified_ratio: float
+    coverage_tier: Literal["Good", "Partial", "Thin"]
+
+
+class MemoryAssetsResponse(BaseModel):
+    assets: list[MemoryAssetRow]
+    coverage_footnote: str
+
+
+class MemoryDocumentRow(BaseModel):
+    document_id: int
+    title: str
+    doc_type: str
+    owner_asset_tag: str | None
+    owner_class: str | None
+    chunk_count: int
+    ocr_page_count: int
+    file_url: str
+
+
+class ModeCandidate(BaseModel):
+    mode_id: int
+    code: str
+    name: str
+    score: float
+
+
+class TaxonomyModeRow(BaseModel):
+    mode_id: int
+    code: str
+    name: str
+    auto_wo_count: int
+    human_override_count: int
+    mean_normalization_score: float | None
+
+
+class TaxonomyFamilyGroup(BaseModel):
+    family: str
+    modes: list[TaxonomyModeRow]
+
+
+class ReviewQueueRow(BaseModel):
+    wo_id: int
+    wo_number: str
+    asset_tag: str
+    raw_description: str
+    auto_failure_mode_code: str | None
+    auto_failure_mode_family: str | None
+    normalization_score: float | None
+    candidates: list[ModeCandidate]
+
+
+class ReviewVerdictRequest(BaseModel):
+    verdict: Literal["confirmed", "corrected", "unclassifiable"]
+    failure_mode_id: int | None = None
+
+
+class ReviewVerdictResponse(BaseModel):
+    wo_id: int
+    wo_number: str
+    human_verdict: str
+    human_failure_mode_id: int | None
+    human_failure_mode_code: str | None
+    human_reviewed_at: datetime
+    # D-023: auto columns echoed read-only for provenance audit
+    failure_mode_id: int | None
+    normalization_score: float | None

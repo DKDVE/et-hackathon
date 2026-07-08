@@ -14,6 +14,7 @@ from app.api.dossiers import router as dossiers_router
 from app.api.events import router as events_router
 from app.api.health import router as health_router
 from app.api.limiter import limiter
+from app.api.memory import router as memory_router
 from app.api.ops import router as ops_router
 from app.api.sources import router as sources_router
 from app.config import get_settings
@@ -75,6 +76,7 @@ def create_app() -> FastAPI:
     app.include_router(sources_router)
     app.include_router(assets_router)
     app.include_router(ops_router)
+    app.include_router(memory_router)
     return app
 
 

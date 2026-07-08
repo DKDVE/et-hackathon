@@ -26,11 +26,19 @@ EXPECTED_ENUMS = (
     "dossier_status",
     "evidence_kind",
     "reasoning_run_status",
+    "human_verdict",
 )
 
 KEY_COLUMNS: dict[str, list[str]] = {
     "assets": ["tag", "asset_class_id", "criticality"],
-    "work_orders": ["wo_number", "failure_mode_id", "normalization_score"],
+    "work_orders": [
+        "wo_number",
+        "failure_mode_id",
+        "normalization_score",
+        "human_failure_mode_id",
+        "human_verdict",
+        "human_reviewed_at",
+    ],
     "operational_events": ["source", "symptom_category", "status"],
     "chunks": ["embedding", "document_id", "page"],
     "dossiers": ["shared_context", "sections", "event_id"],

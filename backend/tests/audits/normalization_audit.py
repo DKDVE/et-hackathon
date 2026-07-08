@@ -15,7 +15,7 @@ from sqlalchemy.orm import Session
 
 from app.config import get_settings
 from app.db.engine import SessionLocal
-from app.db.models import FailureMode, WorkOrder
+from app.db.models import FailureMode, HumanVerdict, WorkOrder
 from app.llm.embeddings import get_embedder
 
 PLANTED_WOS = ("WO-2024-0117", "WO-2025-0289", "WO-2026-0034")
@@ -153,6 +153,16 @@ def run_audit(session: Session) -> tuple[bool, list[str]]:
         for wo in PLANTED_WOS
     )
 
+    # D-023: human overrides are reported separately; accuracy stays on auto columns.
+    human_rows = session.scalars(
+        select(WorkOrder).where(WorkOrder.human_reviewed_at.isnot(None))
+    ).all()
+    n_confirmed = sum(1 for w in human_rows if w.human_verdict == HumanVerdict.confirmed)
+    n_corrected = sum(1 for w in human_rows if w.human_verdict == HumanVerdict.corrected)
+    n_unclassifiable = sum(
+        1 for w in human_rows if w.human_verdict == HumanVerdict.unclassifiable
+    )
+
     lines = [
         f"overall accuracy (classified rows): {accuracy:.3f} ({len(correct)}/{len(classified)})",
         f"unclassified rate: {uncl_rate:.1%} ({len(unclassified)}/{len(rows)})",
@@ -160,6 +170,7 @@ def run_audit(session: Session) -> tuple[bool, list[str]]:
         f"{len(cross_family_errors)} cross-family (gate ≤ {MAX_CROSS_FAMILY_ERRORS})",
         f"false positives (true=unclassified → real mode): {len(false_positives)}",
         f"rows rescued by family rule (score≥thr, margin<{norm_margin}): {len(rescued)}",
+        f"human overrides: {len(human_rows)} (confirmed {n_confirmed} / corrected {n_corrected} / unclassifiable {n_unclassifiable})",
         "per-family accuracy (by true-mode family):",
     ]
     for f in sorted(fam_total):

@@ -63,7 +63,13 @@ def reset_ingest_state(session: Session) -> None:
     """Idempotent prep: wipe chunks and normalization artifacts."""
     session.execute(delete(Chunk))
     session.execute(
-        update(WorkOrder).values(failure_mode_id=None, normalization_score=None)
+        update(WorkOrder).values(
+            failure_mode_id=None,
+            normalization_score=None,
+            human_failure_mode_id=None,
+            human_verdict=None,
+            human_reviewed_at=None,
+        )
     )
     session.execute(update(FailureMode).values(embedding=None))
     session.commit()
