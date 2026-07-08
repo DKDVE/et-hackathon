@@ -1,0 +1,104 @@
+# Azure DevOps pipeline — build backend image and deploy to ACA (M15A / D-026)
+# Use when: student subscription blocks ACR Tasks and local Docker daemon is unavailable.
+# Prereq: service connection "Azure-OCE-Hackathon" (Workload Identity Federation or SP)
+#         with Contributor on rg-oce-hackathon; infra/bootstrap via deploy.sh first.
+
+trigger:
+  branches:
+    include: [main]
+  paths:
+    include:
+      - backend/**
+      - dataset/rendered/**
+      - scripts/**
+      - infra/azure/**
+
+pr: none
+
+pool:
+  vmImage: ubuntu-latest
+
+variables:
+  azureResourceGroup: rg-oce-hackathon
+  acrName: ocehackathonacr
+  backendApp: oce-backend
+  seedJob: oce-seed
+  imageRepository: oce-backend
+
+stages:
+  - stage: BuildPush
+    jobs:
+      - job: Docker
+        steps:
+          - checkout: self
+
+          - task: AzureCLI@2
+            displayName: ACR login
+            inputs:
+              azureSubscription: Azure-OCE-Hackathon
+              scriptType: bash
+              scriptLocation: inlineScript
+              inlineScript: az acr login --name $(acrName)
+
+          - task: Docker@2
+            displayName: Build and push backend image
+            inputs:
+              containerRegistry: $(acrName)
+              repository: $(imageRepository)
+              command: buildAndPush
+              Dockerfile: backend/Dockerfile.prod
+              buildContext: .
+              tags: |
+                $(Build.SourceVersion)
+                latest
+
+  - stage: Deploy
+    dependsOn: BuildPush
+    jobs:
+      - job: ACA
+        steps:
+          - checkout: self
+
+          - task: AzureCLI@2
+            displayName: Update Container App + seed job
+            inputs:
+              azureSubscription: Azure-OCE-Hackathon
+              scriptType: bash
+              scriptLocation: inlineScript
+              inlineScript: |
+                set -euo pipefail
+                IMAGE="$(acrName).azurecr.io/$(imageRepository):$(Build.SourceVersion)"
+                IDENTITY_ID="$(az identity show -g $(azureResourceGroup) -n oce-aca-identity --query id -o tsv)"
+                az containerapp update \
+                  -g $(azureResourceGroup) -n $(backendApp) \
+                  --image "$IMAGE" \
+                  --registry-server "$(acrName).azurecr.io" \
+                  --registry-identity "$IDENTITY_ID" \
+                  --set-env-vars "GIT_REF=$(Build.SourceVersion)"
+                if az containerapp job show -g $(azureResourceGroup) -n $(seedJob) &>/dev/null; then
+                  az containerapp job update -g $(azureResourceGroup) -n $(seedJob) --image "$IMAGE"
+                else
+                  echo "seed job not found — create via deploy.sh after first image push"
+                fi
+
+          - task: NodeTool@0
+            inputs:
+              versionSpec: "22.x"
+
+          - task: AzureCLI@2
+            displayName: Build frontend + deploy SWA
+            inputs:
+              azureSubscription: Azure-OCE-Hackathon
+              scriptType: bash
+              scriptLocation: inlineScript
+              inlineScript: |
+                set -euo pipefail
+                FQDN="$(az containerapp show -g $(azureResourceGroup) -n $(backendApp) \
+                  --query properties.configuration.ingress.fqdn -o tsv)"
+                cd frontend
+                export VITE_API_URL="https://${FQDN}"
+                npm ci && npm run build
+                # Set SWA_DEPLOYMENT_TOKEN as secret variable in ADO pipeline library
+                npx @azure/static-web-apps-cli deploy ./dist \
+                  --deployment-token "$(SWA_DEPLOYMENT_TOKEN)" \
+                  --env production

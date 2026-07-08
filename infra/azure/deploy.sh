@@ -22,7 +22,9 @@
 #   AZURE_IDENTITY_NAME    default: oce-aca-identity
 #   IMAGE_TAG              default: latest
 #   SKIP_PG=1              skip Postgres (reuse existing DATABASE_URL)
+#   SKIP_BUILD=1           skip image build (use PLACEHOLDER if image missing in ACR)
 #   SKIP_SWA=1             skip Static Web App (deploy via GitHub Actions only)
+#   PLACEHOLDER_IMAGE      default: mcr.microsoft.com/k8se/quickstart:latest
 
 set -euo pipefail
 
@@ -31,8 +33,10 @@ set -euo pipefail
 : "${AZURE_ACR_NAME:?AZURE_ACR_NAME required}"
 : "${AZURE_PG_SERVER:=oce-pg-hackathon}"
 : "${AZURE_PG_ADMIN_USER:=oceadmin}"
-: "${AZURE_PG_ADMIN_PASSWORD:?AZURE_PG_ADMIN_PASSWORD required unless SKIP_PG=1}"
-: "${AZURE_DEV_IP:?AZURE_DEV_IP required unless SKIP_PG=1}"
+if [[ "${SKIP_PG:-0}" != "1" ]]; then
+  : "${AZURE_PG_ADMIN_PASSWORD:?AZURE_PG_ADMIN_PASSWORD required unless SKIP_PG=1}"
+  : "${AZURE_DEV_IP:?AZURE_DEV_IP required unless SKIP_PG=1}"
+fi
 : "${OPENROUTER_API_KEY:?OPENROUTER_API_KEY required}"
 : "${ACCESS_PASSWORD:?ACCESS_PASSWORD required}"
 : "${AZURE_CA_ENV:=oce-env}"
@@ -42,12 +46,14 @@ set -euo pipefail
 : "${IMAGE_TAG:=latest}"
 : "${SKIP_PG:=0}"
 : "${SKIP_SWA:=0}"
+: "${SKIP_BUILD:=0}"
+: "${AZURE_SWA_LOCATION:=centralus}"
+: "${PLACEHOLDER_IMAGE:=mcr.microsoft.com/k8se/quickstart:latest}"
 
 log() { printf '==> %s\n' "$*"; }
 need() { command -v "$1" >/dev/null || { echo "missing: $1" >&2; exit 1; }; }
 
 need az
-need docker
 
 SUBSCRIPTION_ID="$(az account show --query id -o tsv)"
 ACR_LOGIN_SERVER="${AZURE_ACR_NAME}.azurecr.io"
@@ -135,17 +141,42 @@ ACR_ID="$(az acr show --name "${AZURE_ACR_NAME}" --resource-group "${AZURE_RESOU
 az role assignment create --assignee "${IDENTITY_PRINCIPAL}" --role AcrPull --scope "${ACR_ID}" -o none 2>/dev/null || true
 
 log "build + push ${IMAGE} (expect ~4.5 GB; layer cache helps on reruns)"
-if command -v docker >/dev/null 2>&1 && docker info >/dev/null 2>&1; then
+USE_PLACEHOLDER=0
+if [[ "${SKIP_BUILD:-0}" == "1" ]]; then
+  if az acr repository show --name "${AZURE_ACR_NAME}" --image "oce-backend:${IMAGE_TAG}" &>/dev/null; then
+    log "SKIP_BUILD=1 — image oce-backend:${IMAGE_TAG} already in ACR"
+  else
+    log "SKIP_BUILD=1 — no image in ACR yet; ACA will use placeholder until CI builds"
+    USE_PLACEHOLDER=1
+    DEPLOY_IMAGE="${PLACEHOLDER_IMAGE}"
+    DEPLOY_PORT=80
+  fi
+elif command -v docker >/dev/null 2>&1 && docker version >/dev/null 2>&1; then
   az acr login --name "${AZURE_ACR_NAME}"
   docker build -f backend/Dockerfile.prod -t "${IMAGE}" .
   docker push "${IMAGE}"
+  DEPLOY_IMAGE="${IMAGE}"
+  DEPLOY_PORT=8000
 else
-  log "local docker unavailable — using az acr build (cloud build, no local daemon)"
-  az acr build \
+  log "local docker unavailable — trying az acr build (blocked on some student subscriptions)"
+  if az acr build \
     --registry "${AZURE_ACR_NAME}" \
     --image "oce-backend:${IMAGE_TAG}" \
     --file backend/Dockerfile.prod \
-    .
+    . 2>/tmp/acr-build.err; then
+    DEPLOY_IMAGE="${IMAGE}"
+    DEPLOY_PORT=8000
+  else
+    log "acr build failed — use GitHub Actions or Azure Pipelines (see infra/azure/README.md)"
+    cat /tmp/acr-build.err >&2
+    USE_PLACEHOLDER=1
+    DEPLOY_IMAGE="${PLACEHOLDER_IMAGE}"
+    DEPLOY_PORT=80
+  fi
+fi
+if [[ "${USE_PLACEHOLDER:-0}" != "1" && -z "${DEPLOY_IMAGE:-}" ]]; then
+  DEPLOY_IMAGE="${IMAGE}"
+  DEPLOY_PORT=8000
 fi
 
 log "Container Apps environment ${AZURE_CA_ENV}"
@@ -161,6 +192,10 @@ ENV_ID="$(az containerapp env show --name "${AZURE_CA_ENV}" --resource-group "${
 : "${FRONTEND_ORIGIN:=https://placeholder.azurestaticapps.net}"
 
 log "Container App ${AZURE_BACKEND_APP} (2 vCPU / 4 GiB, min=max=1)"
+REGISTRY_ARGS=()
+if [[ "${USE_PLACEHOLDER:-0}" != "1" ]]; then
+  REGISTRY_ARGS=(--registry-server "${ACR_LOGIN_SERVER}" --registry-identity "${IDENTITY_ID}" --user-assigned "${IDENTITY_ID}")
+fi
 if az containerapp show --name "${AZURE_BACKEND_APP}" --resource-group "${AZURE_RESOURCE_GROUP}" &>/dev/null; then
   az containerapp secret set \
     --name "${AZURE_BACKEND_APP}" \
@@ -170,10 +205,14 @@ if az containerapp show --name "${AZURE_BACKEND_APP}" --resource-group "${AZURE_
       openrouter-api-key="${OPENROUTER_API_KEY}" \
       access-password="${ACCESS_PASSWORD}" \
     -o none
+  UPDATE_ARGS=(--image "${DEPLOY_IMAGE}")
+  if [[ "${USE_PLACEHOLDER:-0}" != "1" ]]; then
+    UPDATE_ARGS+=(--registry-server "${ACR_LOGIN_SERVER}" --registry-identity "${IDENTITY_ID}")
+  fi
   az containerapp update \
     --name "${AZURE_BACKEND_APP}" \
     --resource-group "${AZURE_RESOURCE_GROUP}" \
-    --image "${IMAGE}" \
+    "${UPDATE_ARGS[@]}" \
     --set-env-vars \
       "DATABASE_URL=secretref:database-url" \
       "OPENROUTER_API_KEY=secretref:openrouter-api-key" \
@@ -188,13 +227,11 @@ else
     --name "${AZURE_BACKEND_APP}" \
     --resource-group "${AZURE_RESOURCE_GROUP}" \
     --environment "${AZURE_CA_ENV}" \
-    --image "${IMAGE}" \
-    --registry-server "${ACR_LOGIN_SERVER}" \
-    --registry-identity "${IDENTITY_ID}" \
-    --user-assigned "${IDENTITY_ID}" \
+    --image "${DEPLOY_IMAGE}" \
+    "${REGISTRY_ARGS[@]}" \
     --cpu 2 --memory 4Gi \
     --min-replicas 1 --max-replicas 1 \
-    --ingress external --target-port 8000 --transport auto \
+    --ingress external --target-port "${DEPLOY_PORT}" --transport auto \
     --secrets \
       database-url="${DATABASE_URL}" \
       openrouter-api-key="${OPENROUTER_API_KEY}" \
@@ -213,12 +250,14 @@ fi
 BACKEND_FQDN="$(az containerapp show --name "${AZURE_BACKEND_APP}" --resource-group "${AZURE_RESOURCE_GROUP}" --query properties.configuration.ingress.fqdn -o tsv)"
 log "backend URL: https://${BACKEND_FQDN}"
 
-log "Container Apps Job ${AZURE_SEED_JOB} (manual trigger)"
-if az containerapp job show --name "${AZURE_SEED_JOB}" --resource-group "${AZURE_RESOURCE_GROUP}" &>/dev/null; then
+log "Container Apps Job ${AZURE_SEED_JOB} (manual trigger — skipped until real image in ACR)"
+if [[ "${USE_PLACEHOLDER:-0}" == "1" ]]; then
+  log "seed job deferred: run after GitHub Actions / Azure Pipelines pushes oce-backend image"
+elif az containerapp job show --name "${AZURE_SEED_JOB}" --resource-group "${AZURE_RESOURCE_GROUP}" &>/dev/null; then
   az containerapp job update \
     --name "${AZURE_SEED_JOB}" \
     --resource-group "${AZURE_RESOURCE_GROUP}" \
-    --image "${IMAGE}" \
+    --image "${DEPLOY_IMAGE}" \
     -o none
 else
   az containerapp job create \
@@ -230,7 +269,7 @@ else
     --replica-retry-limit 1 \
     --parallelism 1 \
     --replica-completion-count 1 \
-    --image "${IMAGE}" \
+    --image "${DEPLOY_IMAGE}" \
     --registry-server "${ACR_LOGIN_SERVER}" \
     --registry-identity "${IDENTITY_ID}" \
     --cpu 2 --memory 4Gi \
@@ -253,7 +292,7 @@ if [[ "${SKIP_SWA}" != "1" ]]; then
     az staticwebapp create \
       --name oce-frontend \
       --resource-group "${AZURE_RESOURCE_GROUP}" \
-      --location "${AZURE_LOCATION}" \
+      --location "${AZURE_SWA_LOCATION}" \
       --sku Free \
       -o none
   fi

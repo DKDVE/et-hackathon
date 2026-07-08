@@ -51,6 +51,12 @@ jobs:
       - name: Resolve backend FQDN
         id: aca
         run: |
+          if ! az containerapp show \
+            --name "${{ env.AZURE_BACKEND_APP }}" \
+            --resource-group "${{ env.AZURE_RESOURCE_GROUP }}" &>/dev/null; then
+            echo "::error::Container App ${{ env.AZURE_BACKEND_APP }} missing — run infra/azure/deploy.sh SKIP_BUILD=1 first"
+            exit 1
+          fi
           FQDN="$(az containerapp show \
             --name "${{ env.AZURE_BACKEND_APP }}" \
             --resource-group "${{ env.AZURE_RESOURCE_GROUP }}" \
@@ -71,11 +77,37 @@ jobs:
 
       - name: Update Container App
         run: |
+          IDENTITY_ID="$(az identity show \
+            -g "${{ env.AZURE_RESOURCE_GROUP }}" -n oce-aca-identity --query id -o tsv)"
           az containerapp update \
             --name "${{ env.AZURE_BACKEND_APP }}" \
             --resource-group "${{ env.AZURE_RESOURCE_GROUP }}" \
             --image "${{ env.AZURE_ACR_NAME }}.azurecr.io/oce-backend:${{ env.DEPLOY_SHA }}" \
-            --set-env-vars "GIT_REF=${{ env.DEPLOY_SHA }}"
+            --registry-server "${{ env.AZURE_ACR_NAME }}.azurecr.io" \
+            --registry-identity "${IDENTITY_ID}" \
+            --set-env-vars "GIT_REF=${{ env.DEPLOY_SHA }}" \
+            --target-port 8000
+
+      - name: Ensure seed job exists
+        run: |
+          IMAGE="${{ env.AZURE_ACR_NAME }}.azurecr.io/oce-backend:${{ env.DEPLOY_SHA }}"
+          IDENTITY_ID="$(az identity show \
+            -g "${{ env.AZURE_RESOURCE_GROUP }}" -n oce-aca-identity --query id -o tsv)"
+          if az containerapp job show -g "${{ env.AZURE_RESOURCE_GROUP }}" -n oce-seed &>/dev/null; then
+            az containerapp job update -g "${{ env.AZURE_RESOURCE_GROUP }}" -n oce-seed --image "$IMAGE"
+          else
+            az containerapp job create \
+              -g "${{ env.AZURE_RESOURCE_GROUP }}" -n oce-seed \
+              --environment oce-env \
+              --trigger-type Manual \
+              --replica-timeout 3600 --replica-retry-limit 1 \
+              --parallelism 1 --replica-completion-count 1 \
+              --image "$IMAGE" \
+              --registry-server "${{ env.AZURE_ACR_NAME }}.azurecr.io" \
+              --registry-identity "$IDENTITY_ID" \
+              --cpu 2 --memory 4Gi \
+              --command "python" "/scripts/seed.py" "--phase" "structure"
+          fi
 
       - name: Build frontend
         working-directory: frontend
