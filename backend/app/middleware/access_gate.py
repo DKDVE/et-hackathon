@@ -15,6 +15,8 @@ import base64
 import binascii
 from secrets import compare_digest
 
+from urllib.parse import parse_qs
+
 from starlette.types import ASGIApp, Receive, Scope, Send
 
 from app.config import get_settings
@@ -77,8 +79,14 @@ class AccessGateMiddleware:
         headers = {k.lower(): v for k, v in scope.get("headers", [])}
         auth = headers.get(b"authorization", b"").decode("latin-1")
         creds = _parse_basic(auth)
-        if creds is None or not compare_digest(creds[1], password):
-            await _unauthorized(send)
+        if creds is not None and compare_digest(creds[1], password):
+            await self.app(scope, receive, send)
             return
 
-        await self.app(scope, receive, send)
+        # ponytail: EventSource and window.open cannot send Authorization headers
+        qs = parse_qs(scope.get("query_string", b"").decode("latin-1"))
+        if qs.get("access", [""])[0] == password:
+            await self.app(scope, receive, send)
+            return
+
+        await _unauthorized(send)

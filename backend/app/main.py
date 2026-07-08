@@ -63,6 +63,8 @@ def create_app() -> FastAPI:
 
     app.add_middleware(SlowAPIMiddleware)
     app.add_middleware(TimingMiddleware)
+    # Inner — 401 responses bubble out through CORSMiddleware (added last).
+    app.add_middleware(AccessGateMiddleware)
     app.add_middleware(
         CORSMiddleware,
         allow_origins=[o.strip() for o in settings.frontend_origin.split(",") if o.strip()],
@@ -70,8 +72,6 @@ def create_app() -> FastAPI:
         allow_methods=["*"],
         allow_headers=["*"],
     )
-    # Outermost when added last — blocks unauthenticated hosted traffic only.
-    app.add_middleware(AccessGateMiddleware)
     app.include_router(health_router)
     app.include_router(events_router)
     app.include_router(dossiers_router)

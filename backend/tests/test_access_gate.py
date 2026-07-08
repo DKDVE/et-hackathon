@@ -57,6 +57,36 @@ def test_gate_allows_cors_preflight_without_credentials() -> None:
         get_settings.cache_clear()
 
 
+def test_gate_allows_query_access_for_sse() -> None:
+    os.environ["ACCESS_PASSWORD"] = "hosted-secret"
+    get_settings.cache_clear()
+    client = TestClient(create_app())
+    try:
+        r = client.get("/api/config?access=hosted-secret")
+        assert r.status_code == 200
+    finally:
+        os.environ.pop("ACCESS_PASSWORD", None)
+        get_settings.cache_clear()
+
+
+def test_gate_401_includes_cors_for_blocked_origin() -> None:
+    os.environ["ACCESS_PASSWORD"] = "hosted-secret"
+    os.environ["FRONTEND_ORIGIN"] = "https://dkdve.github.io"
+    get_settings.cache_clear()
+    client = TestClient(create_app())
+    try:
+        r = client.get(
+            "/api/config",
+            headers={"Origin": "https://dkdve.github.io"},
+        )
+        assert r.status_code == 401
+        assert r.headers.get("access-control-allow-origin") == "https://dkdve.github.io"
+    finally:
+        os.environ.pop("ACCESS_PASSWORD", None)
+        os.environ.pop("FRONTEND_ORIGIN", None)
+        get_settings.cache_clear()
+
+
 def test_gate_allows_with_basic_credentials() -> None:
     os.environ["ACCESS_PASSWORD"] = "hosted-secret"
     get_settings.cache_clear()

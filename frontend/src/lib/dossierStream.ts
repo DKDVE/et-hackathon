@@ -1,6 +1,7 @@
 import { useEffect, useReducer } from "react";
 
 import { API_URL, getDossier, type DegradedInfo, type DossierResponse } from "./api";
+import { withAccessQuery } from "./auth";
 
 /**
  * The FULL SSE event vocabulary (TDD §7). The frontend implements all six now
@@ -96,7 +97,7 @@ export function subscribeDossier(
   onError: () => void,
   EventSourceImpl: EventSourceCtor = globalThis.EventSource,
 ): () => void {
-  const es = new EventSourceImpl(`${API_URL}/api/dossiers/${dossierId}/stream`);
+  const es = new EventSourceImpl(withAccessQuery(`${API_URL}/api/dossiers/${dossierId}/stream`));
   for (const name of SSE_EVENTS) {
     es.addEventListener(name, (ev) => {
       const message = ev as MessageEvent;

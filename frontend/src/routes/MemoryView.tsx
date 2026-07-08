@@ -14,6 +14,7 @@ import {
   getMemoryReviewQueue,
   getMemoryTaxonomy,
   submitReviewVerdict,
+  fileUrl,
   type MemoryAssetRow,
   type MemoryDocumentRow,
   type MemoryOverview,
@@ -402,8 +403,7 @@ export function MemoryView() {
   };
 
   const openPdf = (url: string) => {
-    const docId = url.split("/").pop();
-    if (docId) window.open(`${import.meta.env.VITE_API_URL ?? "http://localhost:8000"}${url}`, "_blank");
+    window.open(fileUrl(url), "_blank");
   };
 
   const queueCount = queue.length;

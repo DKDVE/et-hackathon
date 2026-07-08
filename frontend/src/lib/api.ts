@@ -1,4 +1,5 @@
 import type { components } from "./api-types";
+import { authHeaders, clearAccessPassword, withAccessQuery } from "./auth";
 
 export const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:8000";
 
@@ -53,11 +54,16 @@ export class ApiError extends Error {
 export async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> {
   const response = await fetch(`${API_URL}${path}`, {
     ...init,
+    credentials: "include",
     headers: {
       "Content-Type": "application/json",
+      ...authHeaders(),
       ...init?.headers,
     },
   });
+  if (response.status === 401) {
+    clearAccessPassword();
+  }
   if (!response.ok) {
     throw new ApiError(`API error: ${response.statusText}`, response.status);
   }
@@ -156,7 +162,8 @@ export const chatDossierRaw = (
 ) =>
   fetch(`${API_URL}/api/dossiers/${dossierId}/chat`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+    headers: { "Content-Type": "application/json", ...authHeaders() },
     body: JSON.stringify({ question, history }),
   });
 
@@ -270,4 +277,4 @@ export const submitReviewVerdict = (
   });
 
 /** Absolute URL for a rendered PDF served by the backend (react-pdf source). */
-export const fileUrl = (relativeUrl: string) => `${API_URL}${relativeUrl}`;
+export const fileUrl = (relativeUrl: string) => withAccessQuery(`${API_URL}${relativeUrl}`);

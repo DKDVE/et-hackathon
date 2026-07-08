@@ -1,5 +1,6 @@
 import { Navigate, Route, Routes } from "react-router-dom";
 
+import { AccessGate } from "@/components/AccessGate";
 import { AssetRegistry } from "@/routes/AssetRegistry";
 import { DossierView } from "@/routes/DossierView";
 import { EventBoard } from "@/routes/EventBoard";
@@ -9,7 +10,8 @@ import { ReportView } from "@/routes/ReportView";
 
 export default function App() {
   return (
-    <Routes>
+    <AccessGate>
+      <Routes>
       <Route path="/" element={<Navigate to="/events" replace />} />
       <Route path="/events" element={<EventBoard />} />
       <Route path="/events/:id" element={<DossierView />} />
@@ -17,6 +19,7 @@ export default function App() {
       <Route path="/assets" element={<AssetRegistry />} />
       <Route path="/memory" element={<MemoryView />} />
       <Route path="/ops" element={<OpsView />} />
-    </Routes>
+      </Routes>
+    </AccessGate>
   );
 }
