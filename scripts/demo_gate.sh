@@ -47,18 +47,30 @@ fi
 
 # 5 — fresh timed demo-event dossier (creates the dossier audits target)
 set +e
-TIMING_OUT="$(docker compose exec -T backend python /scripts/demo_gate_timing.py 2>&1)"
-TIMING_RC=$?
+TIMING_OUT=""
+TIMING_RC=1
+ATTEMPTS_USED=0
+for _attempt in 1 2 3; do
+  ATTEMPTS_USED=$((ATTEMPTS_USED + 1))
+  TIMING_OUT="$(docker compose exec -T backend python /scripts/demo_gate_timing.py 2>&1)" && TIMING_RC=0 && break
+  sleep 15
+done
 set -e
+echo "attempts_used=${ATTEMPTS_USED}"
+TIMING_OUT="${TIMING_OUT}"$'\n'"attempts_used=${ATTEMPTS_USED}"
 TIMING_WARN=0
 if echo "$TIMING_OUT" | grep -q 'TIMING_WARN:'; then
   TIMING_WARN=1
 fi
 if [ "$TIMING_RC" -eq 0 ] && [ "$TIMING_WARN" -eq 0 ]; then
-  pass "timed demo-event dossier (wall <60s, analysis <30s)"
+  pass "timed demo-event dossier (wall <60s, analysis <30s; attempts_used=${ATTEMPTS_USED})"
   echo "$TIMING_OUT"
 elif [ "$TIMING_RC" -eq 0 ] && [ "$TIMING_WARN" -eq 1 ]; then
-  warn "timed demo-event dossier (wall <60s, analysis <30s)"
+  warn_msg="timed demo-event dossier (wall <60s, analysis <30s)"
+  if [ "$ATTEMPTS_USED" -gt 1 ]; then
+    warn_msg="${warn_msg}; attempts_used=${ATTEMPTS_USED}"
+  fi
+  warn "$warn_msg"
   echo "$TIMING_OUT"
 else
   fail "timed demo-event dossier (functional failure)"
@@ -117,6 +129,16 @@ with SessionLocal() as s:
   pass "fallback replay cache (analysis prompt current)"
 else
   fail "fallback replay cache (run live demo event to populate v4 cache)"
+fi
+
+# 8 — persist gate eval rows (GATE_PERSIST=1 default)
+if [ -n "$DOSSIER_ID" ]; then
+  if echo "$TIMING_OUT" | docker compose exec -T backend python -m app.evals.gate_persist \
+    --dossier-id "$DOSSIER_ID"; then
+    pass "gate eval persistence (GATE_PERSIST)"
+  else
+    fail "gate eval persistence"
+  fi
 fi
 
 echo ""

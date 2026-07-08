@@ -38,7 +38,8 @@ class Settings(BaseSettings):
         "chat": "anthropic/claude-haiku-4.5",
     }
     llm_max_tokens: dict[str, int] = {
-        "analysis": 900,
+        # typical completion ~860; 900 caused ~25% truncation-repair (M9.1); 1100 = headroom
+        "analysis": 1100,
         "recommendation": 1400,
         "validation": 900,
         "chat": 600,
@@ -46,6 +47,12 @@ class Settings(BaseSettings):
 
     # D-021 — downtime cost for pattern impact display (₹/hr).
     downtime_cost_per_hour_inr: int = 450_000
+
+    # D-022 — per-model token rates for Trace tab cost estimate (USD per 1M tokens).
+    model_costs: dict[str, dict[str, float]] = {
+        "anthropic/claude-sonnet-4.6": {"prompt": 3.0, "completion": 15.0},
+        "anthropic/claude-haiku-4.5": {"prompt": 0.8, "completion": 4.0},
+    }
 
     # Ingestion / embeddings (M3, D-014)
     embedding_model: str = "BAAI/bge-large-en-v1.5"
