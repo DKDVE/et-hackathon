@@ -124,6 +124,17 @@ With stack healthy and v4 fallback cache present (regenerated at T−30m):
    chat degrades quietly
 5. Restore valid key, `DEMO_FALLBACK=0`, `docker compose up -d --force-recreate backend`
 
+## Memory layer (M12)
+
+- [ ] **Do not action Review Queue items on hero-class WOs during rehearsals.** The three
+      planted seal-failure WOs (`WO-2024-0117`, `WO-2025-0289`, `WO-2026-0034`) must keep
+      auto-only classification for the FR-12 pattern reveal. If reviewed accidentally,
+      re-run `make seed` + `make ingest` — this wipes human columns (`human_verdict`,
+      `human_failure_mode_id`, `human_reviewed_at`) along with re-normalizing auto columns,
+      then regenerate the fallback cache at T−30m.
+- [ ] Browse **Memory** → all five tabs (Overview, Assets, Documents, Taxonomy, Review Queue).
+- [ ] **Coverage tier footnote** visible on Assets tab.
+
 ## Automated proof
 
 ```bash

@@ -18,6 +18,11 @@ from tests.audits.prose_id_audit import audit_prose_ids
 
 
 def git_ref() -> str:
+    import os
+
+    env_ref = os.environ.get("GIT_REF", "").strip()
+    if env_ref:
+        return env_ref
     try:
         out = subprocess.check_output(
             ["git", "rev-parse", "--short", "HEAD"],

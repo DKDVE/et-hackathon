@@ -18,6 +18,8 @@ services:
   backend:
     build: ./backend
     env_file: .env
+    environment:
+      GIT_REF: ${GIT_REF:-unknown}
     ports:
       - "8000:8000"
     depends_on:
@@ -52,6 +54,8 @@ services:
   seed:
     build: ./backend
     env_file: .env
+    environment:
+      GIT_REF: ${GIT_REF:-unknown}
     depends_on:
       db:
         condition: service_healthy

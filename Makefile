@@ -1,7 +1,7 @@
 .PHONY: up down dataset seed ingest test test-all test-llm golden verify-seed audit-ground types lint typecheck audit-norm audit-prose demo-gate evals images-save images-load
 
 up:
-	docker compose up -d
+	GIT_REF=$$(git rev-parse --short HEAD 2>/dev/null || echo unknown) docker compose up -d
 
 down:
 	docker compose down
