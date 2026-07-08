@@ -1,6 +1,6 @@
 # Operational Context Engine (OCE)
 
-[![CI](https://github.com/REPLACE_ORG/REPLACE_REPO/actions/workflows/ci.yml/badge.svg)](https://github.com/REPLACE_ORG/REPLACE_REPO/actions/workflows/ci.yml)
+[![CI](https://github.com/DKDVE/et-hackathon/actions/workflows/ci.yml/badge.svg)](https://github.com/DKDVE/et-hackathon/actions/workflows/ci.yml)
 
 Demo-ready operational context dossier for industrial reliability events. One
 `docker compose` stack: Postgres + FastAPI backend + Vite/React frontend.
