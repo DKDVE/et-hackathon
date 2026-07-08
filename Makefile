@@ -1,4 +1,4 @@
-.PHONY: up down dataset seed ingest test test-all test-llm golden verify-seed audit-ground types lint typecheck audit-norm audit-prose demo-gate images-save images-load
+.PHONY: up down dataset seed ingest test test-all test-llm golden verify-seed audit-ground types lint typecheck audit-norm audit-prose demo-gate evals images-save images-load
 
 up:
 	docker compose up -d
@@ -55,6 +55,12 @@ audit-prose:
 
 demo-gate:
 	@bash scripts/demo_gate.sh
+
+evals:
+	docker compose exec -T backend sh -c '\
+	  DOSSIER=$$(python -c "from sqlalchemy import select; from app.db.engine import SessionLocal; from app.db.models import Dossier; \
+	  s=SessionLocal(); d=s.scalar(select(Dossier).where(Dossier.sections.isnot(None)).order_by(Dossier.id.desc())); print(d.id if d else \"\")"); \
+	  if [ -n "$$DOSSIER" ]; then python -m app.evals.runner --dossier-id "$$DOSSIER"; else python -m app.evals.runner; fi'
 
 # Cold-machine contingency: save/load pre-built images for USB-stick transfer (NFR-6).
 # Prerequisite: images already built (`make up` once). After load: cp .env.example .env,
