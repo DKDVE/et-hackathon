@@ -1,0 +1,96 @@
+# CD — Azure Container Apps + Static Web App (M15A / D-026)
+# Runs after CI passes on main. OIDC login — no Azure client secrets in GitHub.
+# Only GitHub secret: AZURE_STATIC_WEB_APPS_API_TOKEN (SWA deployment token).
+
+name: Deploy
+
+on:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-azure
+  cancel-in-progress: false
+
+env:
+  AZURE_RESOURCE_GROUP: rg-oce-hackathon
+  AZURE_ACR_NAME: ocehackathonacr
+  AZURE_BACKEND_APP: oce-backend
+  AZURE_SWA_NAME: oce-frontend
+
+jobs:
+  deploy:
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.workflow_run.conclusion == 'success' &&
+       github.event.workflow_run.head_branch == 'main')
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    env:
+      DEPLOY_SHA: ${{ github.event_name == 'workflow_dispatch' && github.sha || github.event.workflow_run.head_sha }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ env.DEPLOY_SHA }}
+
+      - name: Azure login (OIDC)
+        uses: azure/login@v2
+        with:
+          client-id: ${{ vars.AZURE_CLIENT_ID }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}
+          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+
+      - name: ACR login
+        run: az acr login --name "${{ env.AZURE_ACR_NAME }}"
+
+      - name: Resolve backend FQDN
+        id: aca
+        run: |
+          FQDN="$(az containerapp show \
+            --name "${{ env.AZURE_BACKEND_APP }}" \
+            --resource-group "${{ env.AZURE_RESOURCE_GROUP }}" \
+            --query properties.configuration.ingress.fqdn -o tsv)"
+          echo "fqdn=${FQDN}" >> "$GITHUB_OUTPUT"
+
+      - name: Build and push backend image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: backend/Dockerfile.prod
+          push: true
+          tags: |
+            ${{ env.AZURE_ACR_NAME }}.azurecr.io/oce-backend:${{ env.DEPLOY_SHA }}
+            ${{ env.AZURE_ACR_NAME }}.azurecr.io/oce-backend:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Update Container App
+        run: |
+          az containerapp update \
+            --name "${{ env.AZURE_BACKEND_APP }}" \
+            --resource-group "${{ env.AZURE_RESOURCE_GROUP }}" \
+            --image "${{ env.AZURE_ACR_NAME }}.azurecr.io/oce-backend:${{ env.DEPLOY_SHA }}" \
+            --set-env-vars "GIT_REF=${{ env.DEPLOY_SHA }}"
+
+      - name: Build frontend
+        working-directory: frontend
+        env:
+          VITE_API_URL: https://${{ steps.aca.outputs.fqdn }}
+        run: |
+          npm ci
+          npm run build
+
+      - name: Deploy Static Web App
+        uses: Azure/static-web-apps-deploy@v1
+        with:
+          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          action: upload
+          app_location: frontend/dist
+          output_location: ""
+          skip_app_build: true

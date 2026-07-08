@@ -107,3 +107,23 @@ scripts/     seed.py, simulate_event.py, demo_gate.sh
 ```
 
 Architecture: `ArchitecturePrinciples.md`, `TDD.md`, `PRD.md`.
+
+## Deployment (Azure)
+
+Optional hosted demo track (M15A / D-026). **Does not affect local demo.**
+
+| Layer | Resource |
+|-------|----------|
+| API | Azure Container App `oce-backend` (2 vCPU / 4 GiB, always on) |
+| DB | Azure Database for PostgreSQL Flexible + `pgvector` |
+| Frontend | Azure Static Web App (Free) |
+| CD | GitHub Actions → ACR → ACA (OIDC, no client secrets) |
+
+Bootstrap, OIDC setup, seed procedure, SSE verification, teardown, and cost table:
+[`infra/azure/README.md`](infra/azure/README.md).
+
+Secrets (by name only): `DATABASE_URL`, `OPENROUTER_API_KEY`, `ACCESS_PASSWORD`,
+`AZURE_STATIC_WEB_APPS_API_TOKEN` (GitHub). `ACCESS_PASSWORD` goes on the closing
+slide — not in the repo.
+
+Render track superseded — see [`docs/deploy-alternatives/render/`](docs/deploy-alternatives/render/).

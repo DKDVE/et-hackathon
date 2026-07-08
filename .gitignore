@@ -1,4 +1,6 @@
 .env
+.env.*
+!.env.example
 .venv/
 __pycache__/
 *.pyc
@@ -9,3 +11,4 @@ dist/
 node_modules/
 frontend/dist/
 docker-images.tar
+.cursor/
