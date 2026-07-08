@@ -9,20 +9,29 @@ from __future__ import annotations
 
 import logging
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Request
 from sse_starlette.sse import EventSourceResponse
 
 from app import obs
 from app.api.deps import DbDep
-from app.api.schemas import ChatRequest, ChatResponse, DossierResponse, EvidenceBreakdown
+from app.api.limiter import limiter
+from app.api.schemas import (
+    ChatRequest,
+    ChatResponse,
+    DossierResponse,
+    EvidenceBreakdown,
+    ReasoningRunRow,
+    ReasoningRunsResponse,
+)
 from app.api.service import build_dossier_response, dossier_sse
+from app.api.trace_cost import COST_FOOTNOTE, estimate_cost_usd
 from app.config import get_settings
 from app.context.assembler import build_shared_context
 from app.db.engine import SessionLocal
 from app.db.models import DossierStatus
 from app.domain.models import SharedContext
 from app.llm.client import LLMClient, NodeFailure
-from app.memory.repositories import dossiers, events
+from app.memory.repositories import dossiers, events, reasoning_runs
 from app.reasoning.nodes.chat import run_chat
 
 logger = logging.getLogger("oce.dossier")
@@ -64,6 +73,40 @@ def get_dossier(dossier_id: int, db: DbDep) -> DossierResponse:
     if dossier is None:
         raise HTTPException(404, f"dossier {dossier_id} not found")
     return build_dossier_response(dossier)
+
+
+@router.get("/dossiers/{dossier_id}/runs", response_model=ReasoningRunsResponse)
+def get_dossier_runs(dossier_id: int, db: DbDep) -> ReasoningRunsResponse:
+    """Reasoning trace rows for a dossier (D-016), read-only."""
+    dossier = dossiers.get_by_id(db, dossier_id)
+    if dossier is None:
+        raise HTTPException(404, f"dossier {dossier_id} not found")
+
+    rows, replayed = reasoning_runs.list_for_dossier_view(db, dossier)
+    settings = get_settings()
+    runs = [
+        ReasoningRunRow(
+            id=r.id,
+            node=r.node,
+            model=r.model,
+            prompt_version=r.prompt_version,
+            started_at=r.started_at,
+            latency_ms=r.latency_ms,
+            prompt_tokens=r.prompt_tokens,
+            completion_tokens=r.completion_tokens,
+            status=str(r.status),
+        )
+        for r in rows
+    ]
+    return ReasoningRunsResponse(
+        runs=runs,
+        replayed_from_cache=replayed,
+        total_latency_ms=sum(r.latency_ms for r in rows),
+        total_prompt_tokens=sum(r.prompt_tokens for r in rows),
+        total_completion_tokens=sum(r.completion_tokens for r in rows),
+        estimated_cost_usd=estimate_cost_usd(rows, settings.model_costs),
+        cost_footnote=COST_FOOTNOTE,
+    )
 
 
 @router.get("/dossiers/{dossier_id}/stream")
@@ -116,7 +159,13 @@ def get_evidence(
 
 
 @router.post("/dossiers/{dossier_id}/chat", response_model=ChatResponse)
-def chat_dossier(dossier_id: int, body: ChatRequest, db: DbDep) -> ChatResponse:
+@limiter.limit("10/minute")
+def chat_dossier(
+    request: Request,
+    dossier_id: int,
+    body: ChatRequest,
+    db: DbDep,
+) -> ChatResponse:
     """Contextual Q&A scoped to frozen dossier context only (FR-9, P1/P4)."""
     if not get_settings().reasoning_enabled:
         raise HTTPException(503, "reasoning layer not enabled")

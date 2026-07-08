@@ -156,3 +156,94 @@ class ChatResponse(BaseModel):
 class AppConfig(BaseModel):
     downtime_cost_per_hour_inr: int
     downtime_cost_label: str
+    model_costs: dict[str, dict[str, float]]
+
+
+# --- reasoning trace (D-016) -------------------------------------------------
+
+
+class ReasoningRunRow(BaseModel):
+    id: int
+    node: str
+    model: str
+    prompt_version: str
+    started_at: datetime
+    latency_ms: int
+    prompt_tokens: int
+    completion_tokens: int
+    status: str
+
+
+class ReasoningRunsResponse(BaseModel):
+    runs: list[ReasoningRunRow]
+    replayed_from_cache: bool = False
+    total_latency_ms: int
+    total_prompt_tokens: int
+    total_completion_tokens: int
+    estimated_cost_usd: float
+    cost_footnote: str
+
+
+# --- ops (M11) ---------------------------------------------------------------
+
+
+class OpsRunRow(BaseModel):
+    id: int
+    dossier_id: int
+    event_id: int
+    node: str
+    model: str
+    prompt_version: str
+    started_at: datetime
+    latency_ms: int
+    prompt_tokens: int
+    completion_tokens: int
+    status: str
+
+
+class OpsRunsResponse(BaseModel):
+    runs: list[OpsRunRow]
+    limit: int
+    offset: int
+
+
+class OpsCostsResponse(BaseModel):
+    total_estimated_cost_usd: float
+    today_estimated_cost_usd: float
+    by_model: dict[str, dict[str, float | int]]
+    by_day: dict[str, dict[str, float | int]]
+    cost_footnote: str
+
+
+class EvalRunRow(BaseModel):
+    id: int
+    suite: str
+    started_at: datetime
+    finished_at: datetime
+    git_ref: str
+    prompt_versions: dict[str, Any]
+    status: str
+    metrics: dict[str, Any]
+    detail: dict[str, Any] | None = None
+
+
+class EvalRunsResponse(BaseModel):
+    history: list[EvalRunRow]
+    latest_by_suite: dict[str, EvalRunRow | None]
+
+
+class GuardrailDossierRow(BaseModel):
+    dossier_id: int
+    event_id: int
+    completed_at: datetime | None
+    stats: dict[str, int]
+
+
+class GuardrailsResponse(BaseModel):
+    fleet_totals: dict[str, int]
+    not_recorded_count: int
+    dossiers: list[GuardrailDossierRow]
+
+
+class RateLimitDetail(BaseModel):
+    message: str = "Rate limit reached — try again in a moment."
