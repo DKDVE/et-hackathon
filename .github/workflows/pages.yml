@@ -1,0 +1,79 @@
+# GitHub Pages — hosted UI (student Azure sub has no Static Web App).
+# Enable: repo Settings → Pages → Build and deployment → GitHub Actions.
+
+name: Pages
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "frontend/**"
+      - ".github/workflows/pages.yml"
+  workflow_dispatch:
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+env:
+  VITE_API_URL: https://oce-backend.happywave-8830fe78.centralindia.azurecontainerapps.io
+  GITHUB_PAGES: "1"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Build frontend
+        working-directory: frontend
+        run: |
+          npm ci
+          npm run build
+          cp dist/index.html dist/404.html
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: frontend/dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
+
+  cors:
+    needs: deploy
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - uses: azure/login@v2
+        with:
+          client-id: ${{ vars.AZURE_CLIENT_ID }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}
+          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Allow GitHub Pages origin on backend
+        run: |
+          ORIGIN="https://${GITHUB_REPOSITORY_OWNER,,}.github.io"
+          az containerapp update \
+            -g rg-oce-hackathon -n oce-backend \
+            --set-env-vars "FRONTEND_ORIGIN=${ORIGIN},http://localhost:5173" \
+            -o none

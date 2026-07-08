@@ -3,7 +3,11 @@ import tailwindcss from "@tailwindcss/vite"
 import react from "@vitejs/plugin-react"
 import { defineConfig } from "vite"
 
+// ponytail: GH Pages project site only; local/docker builds keep base "/"
+const base = process.env.GITHUB_PAGES === "1" ? "/et-hackathon/" : "/"
+
 export default defineConfig({
+  base,
   plugins: [react(), tailwindcss()],
   resolve: {
     alias: {

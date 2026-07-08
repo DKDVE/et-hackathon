@@ -72,7 +72,7 @@ az containerapp job start -g "$RG" -n oce-seed
 
 # Phase 2 — ingest (chunk, embed, normalize)
 az containerapp job update -g "$RG" -n oce-seed \
-  --command "python" "/scripts/seed.py" "--phase" "ingest"
+  --set-env-vars SEED_PHASE=ingest
 az containerapp job start -g "$RG" -n oce-seed
 ```
 

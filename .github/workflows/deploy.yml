@@ -105,7 +105,9 @@ jobs:
           IDENTITY_ID="$(az identity show \
             -g "${{ env.AZURE_RESOURCE_GROUP }}" -n oce-aca-identity --query id -o tsv)"
           if az containerapp job show -g "${{ env.AZURE_RESOURCE_GROUP }}" -n oce-seed &>/dev/null; then
-            az containerapp job update -g "${{ env.AZURE_RESOURCE_GROUP }}" -n oce-seed --image "$IMAGE"
+            az containerapp job update -g "${{ env.AZURE_RESOURCE_GROUP }}" -n oce-seed \
+              --image "$IMAGE" \
+              --set-env-vars "SEED_PHASE=structure" "DATASET_DIR=/dataset"
           else
             az containerapp job create \
               -g "${{ env.AZURE_RESOURCE_GROUP }}" -n oce-seed \
@@ -118,7 +120,7 @@ jobs:
               --registry-identity "$IDENTITY_ID" \
               --cpu 2 --memory 4Gi \
               --command "python" "/scripts/seed.py" \
-              --args "--phase" "structure"
+              --set-env-vars "SEED_PHASE=structure" "DATASET_DIR=/dataset"
           fi
 
       - name: Build frontend
@@ -130,6 +132,7 @@ jobs:
           npm run build
 
       - name: Deploy Static Web App
+        if: false
         continue-on-error: true
         uses: Azure/static-web-apps-deploy@v1
         with:

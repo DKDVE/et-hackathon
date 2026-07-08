@@ -354,7 +354,11 @@ def run_structure_phase() -> tuple[bool, list[str]]:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Meridian dataset seeder")
-    parser.add_argument("--phase", choices=["structure", "ingest"], default="structure")
+    parser.add_argument(
+        "--phase",
+        choices=["structure", "ingest"],
+        default=os.environ.get("SEED_PHASE", "structure"),
+    )
     args = parser.parse_args()
 
     if args.phase == "ingest":

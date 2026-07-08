@@ -15,6 +15,8 @@ Workflow: [`.github/workflows/ci.yml`](../.github/workflows/ci.yml)
 
 CD: [`.github/workflows/deploy.yml`](../.github/workflows/deploy.yml) — runs after green CI on `main`.
 
+**Frontend (GitHub Pages):** [`.github/workflows/pages.yml`](../.github/workflows/pages.yml) — builds `frontend/dist` and deploys to **https://dkdve.github.io/et-hackathon/** (API stays on Azure ACA). One-time: repo **Settings → Pages → Source: GitHub Actions**. Backend `FRONTEND_ORIGIN` must include `https://dkdve.github.io` (the Pages workflow updates ACA after deploy; comma-separated origins need a backend image with the `main.py` CORS split — run Deploy workflow once after merging).
+
 ## Demo-path safety
 
 Changes are additive or config-gated (`ACCESS_PASSWORD`, prod Docker targets, `compose.prod.yaml`, `infra/azure/`). Default `docker compose up` / `make demo-gate` path is unchanged.
