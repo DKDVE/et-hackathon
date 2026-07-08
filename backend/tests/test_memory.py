@@ -50,6 +50,7 @@ def test_memory_documents_and_taxonomy(client: TestClient) -> None:
     assert "modes" in tax[0]
 
 
+@pytest.mark.slow  # needs ingest normalization scores — run locally after make ingest
 def test_planted_wos_not_in_review_queue(client: TestClient) -> None:
     """Hero planted WOs score 0.642–0.817 — above low-margin band."""
     queue = client.get("/api/memory/review-queue").json()
@@ -58,6 +59,7 @@ def test_planted_wos_not_in_review_queue(client: TestClient) -> None:
         assert wo not in queued_numbers, f"{wo} should not appear in review queue"
 
 
+@pytest.mark.slow  # needs ingest normalization scores
 def test_review_queue_band_logic(client: TestClient) -> None:
     settings = get_settings()
     thr = settings.norm_threshold
@@ -89,6 +91,7 @@ def test_review_queue_band_logic(client: TestClient) -> None:
     assert low_id in queue_ids
 
 
+@pytest.mark.slow  # needs ingest normalization scores
 def test_review_provenance_and_409(client: TestClient) -> None:
     with SessionLocal() as session:
         wo = session.scalar(
