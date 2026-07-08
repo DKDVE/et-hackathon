@@ -135,9 +135,18 @@ ACR_ID="$(az acr show --name "${AZURE_ACR_NAME}" --resource-group "${AZURE_RESOU
 az role assignment create --assignee "${IDENTITY_PRINCIPAL}" --role AcrPull --scope "${ACR_ID}" -o none 2>/dev/null || true
 
 log "build + push ${IMAGE} (expect ~4.5 GB; layer cache helps on reruns)"
-az acr login --name "${AZURE_ACR_NAME}"
-docker build -f backend/Dockerfile.prod -t "${IMAGE}" .
-docker push "${IMAGE}"
+if command -v docker >/dev/null 2>&1 && docker info >/dev/null 2>&1; then
+  az acr login --name "${AZURE_ACR_NAME}"
+  docker build -f backend/Dockerfile.prod -t "${IMAGE}" .
+  docker push "${IMAGE}"
+else
+  log "local docker unavailable — using az acr build (cloud build, no local daemon)"
+  az acr build \
+    --registry "${AZURE_ACR_NAME}" \
+    --image "oce-backend:${IMAGE_TAG}" \
+    --file backend/Dockerfile.prod \
+    .
+fi
 
 log "Container Apps environment ${AZURE_CA_ENV}"
 if ! az containerapp env show --name "${AZURE_CA_ENV}" --resource-group "${AZURE_RESOURCE_GROUP}" &>/dev/null; then
