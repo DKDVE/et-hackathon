@@ -207,7 +207,18 @@ if az containerapp show --name "${AZURE_BACKEND_APP}" --resource-group "${AZURE_
     -o none
   UPDATE_ARGS=(--image "${DEPLOY_IMAGE}")
   if [[ "${USE_PLACEHOLDER:-0}" != "1" ]]; then
-    UPDATE_ARGS+=(--registry-server "${ACR_LOGIN_SERVER}" --registry-identity "${IDENTITY_ID}")
+    az containerapp registry set \
+      --name "${AZURE_BACKEND_APP}" \
+      --resource-group "${AZURE_RESOURCE_GROUP}" \
+      --server "${ACR_LOGIN_SERVER}" \
+      --identity "${IDENTITY_ID}" \
+      -o none
+    az containerapp ingress update \
+      --name "${AZURE_BACKEND_APP}" \
+      --resource-group "${AZURE_RESOURCE_GROUP}" \
+      --target-port "${DEPLOY_PORT}" \
+      --transport auto \
+      -o none
   fi
   az containerapp update \
     --name "${AZURE_BACKEND_APP}" \

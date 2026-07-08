@@ -82,14 +82,21 @@ jobs:
         run: |
           IDENTITY_ID="$(az identity show \
             -g "${{ env.AZURE_RESOURCE_GROUP }}" -n oce-aca-identity --query id -o tsv)"
+          az containerapp registry set \
+            --name "${{ env.AZURE_BACKEND_APP }}" \
+            --resource-group "${{ env.AZURE_RESOURCE_GROUP }}" \
+            --server "${{ env.AZURE_ACR_NAME }}.azurecr.io" \
+            --identity "${IDENTITY_ID}"
+          az containerapp ingress update \
+            --name "${{ env.AZURE_BACKEND_APP }}" \
+            --resource-group "${{ env.AZURE_RESOURCE_GROUP }}" \
+            --target-port 8000 \
+            --transport auto
           az containerapp update \
             --name "${{ env.AZURE_BACKEND_APP }}" \
             --resource-group "${{ env.AZURE_RESOURCE_GROUP }}" \
             --image "${{ env.AZURE_ACR_NAME }}.azurecr.io/oce-backend:${{ env.DEPLOY_SHA }}" \
-            --registry-server "${{ env.AZURE_ACR_NAME }}.azurecr.io" \
-            --registry-identity "${IDENTITY_ID}" \
-            --set-env-vars "GIT_REF=${{ env.DEPLOY_SHA }}" \
-            --target-port 8000
+            --set-env-vars "GIT_REF=${{ env.DEPLOY_SHA }}"
 
       - name: Ensure seed job exists
         run: |
