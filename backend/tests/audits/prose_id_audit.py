@@ -24,6 +24,10 @@ _PROSE_PATHS: list[tuple[str, ...]] = [
 
 def _check_sections(sections: dict[str, Any]) -> list[str]:
     violations: list[str] = []
+    summary = sections.get("executive_summary")
+    if isinstance(summary, str):
+        for match in _ID_RE.finditer(summary):
+            violations.append(f"executive_summary: {match.group()}")
     for path in _PROSE_PATHS:
         key, field = path[0], path[1]
         for i, item in enumerate(sections.get(key, [])):

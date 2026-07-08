@@ -11,15 +11,21 @@ from fastapi import APIRouter, HTTPException
 from fastapi.responses import FileResponse, Response
 
 from app.api.deps import DbDep
-from app.api.schemas import ChunkSource, WorkOrderSource
+from app.api.schemas import ChunkSource, PidDrawingSource, WorkOrderSource
 from app.memory.ingestion.document_ingestor import resolve_dataset_path
-from app.memory.repositories import chunks, work_orders
+from app.memory.repositories import chunks, documents, work_orders
 
 router = APIRouter(prefix="/api/sources", tags=["sources"])
 
 
 def _file_url(document_id: int) -> str:
     return f"/api/sources/file/{document_id}"
+
+
+@router.get("/pid/asset/{asset_id}", response_model=list[PidDrawingSource])
+def get_pid_for_asset(asset_id: int, db: DbDep) -> list[PidDrawingSource]:
+    rows = documents.get_pid_drawings_for_asset(db, asset_id)
+    return [PidDrawingSource(**r) for r in rows]
 
 
 @router.get("/wo/{wo_number}", response_model=WorkOrderSource)
@@ -77,6 +83,10 @@ def get_file(document_id: int, db: DbDep) -> Response:
     except FileNotFoundError as exc:
         raise HTTPException(404, f"file for document {document_id} not found") from exc
     media = "application/pdf" if path.suffix.lower() == ".pdf" else "application/octet-stream"
+    if path.suffix.lower() in {".png", ".jpg", ".jpeg", ".webp", ".gif"}:
+        media = f"image/{path.suffix.lower().lstrip('.')}"
+        if media == "image/jpg":
+            media = "image/jpeg"
     return FileResponse(
         path,
         media_type=media,

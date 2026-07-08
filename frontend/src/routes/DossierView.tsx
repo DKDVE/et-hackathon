@@ -6,6 +6,7 @@ import { AppShell } from "@/components/layout/AppShell";
 import { DossierBreadcrumb } from "@/components/layout/DossierBreadcrumb";
 import { ChatDrawer } from "@/components/dossier/ChatDrawer";
 import { DossierHero } from "@/components/dossier/DossierHero";
+import { ExecutiveSummaryBlock } from "@/components/dossier/ExecutiveSummaryBlock";
 import { AssetProfileCard } from "@/components/dossier/AssetProfileCard";
 import { ExtractCards } from "@/components/dossier/ExtractCards";
 import { FailureTimeline } from "@/components/dossier/FailureTimeline";
@@ -19,6 +20,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import {
   createDossier,
+  ensureExecutiveSummary,
   getAppConfig,
   getDossierRuns,
   type AppConfig,
@@ -40,6 +42,7 @@ export function DossierView() {
   const [chatOpen, setChatOpen] = useState(false);
   const [tab, setTab] = useState<DossierTab>("dossier");
   const [trace, setTrace] = useState<ReasoningRunsResponse | null>(null);
+  const [executiveSummary, setExecutiveSummary] = useState<string | null>(null);
 
   useEffect(() => {
     getAppConfig().then(setConfig).catch(() => {
@@ -77,6 +80,31 @@ export function DossierView() {
   useEffect(() => {
     if (dossierId == null || !isComplete) return;
     let cancelled = false;
+    const sections = dossier?.sections as Record<string, unknown> | null | undefined;
+    const existing =
+      typeof sections?.executive_summary === "string" ? sections.executive_summary : null;
+    if (existing) {
+      setExecutiveSummary(existing);
+      return;
+    }
+    ensureExecutiveSummary(dossierId)
+      .then((d) => {
+        if (cancelled) return;
+        const s = d.sections as Record<string, unknown> | null;
+        const text = typeof s?.executive_summary === "string" ? s.executive_summary : null;
+        setExecutiveSummary(text);
+      })
+      .catch(() => {
+        /* ponytail: header omits summary on failure */
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [dossierId, isComplete, dossier?.sections]);
+
+  useEffect(() => {
+    if (dossierId == null || !isComplete) return;
+    let cancelled = false;
     getDossierRuns(dossierId)
       .then((t) => !cancelled && setTrace(t))
       .catch(() => {
@@ -91,6 +119,12 @@ export function DossierView() {
     <SourceProvider>
       <AppShell breadcrumb={<DossierBreadcrumb eventId={eventId} />}>
         <DossierHero context={ctx} degraded={degraded} />
+
+        {isComplete && executiveSummary && (
+          <div className="mb-6">
+            <ExecutiveSummaryBlock summary={executiveSummary} />
+          </div>
+        )}
 
         {error && (
           <div className="rounded border border-destructive/30 bg-destructive/10 p-4 text-sm text-destructive">

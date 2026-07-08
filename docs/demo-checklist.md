@@ -1,8 +1,10 @@
-# Demo Checklist — M9 (demo-final)
+# Demo Checklist — M14 freeze (`demo-final-v2`)
 
 Rehearsal script for the Operational Context Engine demo. Everything below
 assumes `REASONING_ENABLED=true` and a valid `OPENROUTER_API_KEY` unless you are
 explicitly testing the fallback path (P9/NFR-7).
+
+**Plan B bookmark (final board state, M14):** http://localhost:5173/events/25
 
 ## Pre-demo timeline
 
@@ -30,9 +32,11 @@ python scripts/simulate_event.py --background   # 3 historical events, non-hero 
 ```
 
 **One live reasoning run on FINAL board state** (hero P-3401 event after
-`simulate_event.py` without flags). Confirm the fallback cache key is written
-(`reasoning_fallback_cache` row with current `analysis-v4` prompt). **Bookmark
-that dossier URL as plan B** if the provider is slow on stage.
+`simulate_event.py` without flags). Open the dossier in the browser (SSE stream
+required — POST alone does not run reasoning). Confirm the fallback cache key is
+written (`reasoning_fallback_cache` row with current `analysis-v4` prompt).
+**Bookmark that dossier URL as plan B** — currently
+http://localhost:5173/events/25 (regenerate each rehearsal).
 
 Stage browser tabs:
 
@@ -66,12 +70,20 @@ make dataset && make up && make seed && make ingest
 First `make up` downloads ~3GB (PyTorch + BGE embedder baked into backend image);
 allow **15–25 minutes** on a typical conference Wi‑Fi. If the network is hostile,
 use the USB-stick path: on a warm machine run `make images-save`, copy
-`docker-images.tar` to USB, on the cold machine `make images-load` then
-`make dataset && make up && make seed && make ingest` (skips image rebuild).
+`docker-images.tar` (~1.5 GB) to USB, on the cold machine `make images-load`
+(~2 min) then `make dataset && make up && make seed && make ingest` (skips image
+rebuild; allow **~12–15 min** total after load).
 
 Stack services **≥2 min before demo**; confirm embedder-ready log before firing
 the simulator. Frontend installs its own `node_modules` inside the container on
 first boot — no host `npm ci` required.
+
+**Migrations:** backend runs `alembic upgrade head` on start (0001–0006 including
+routine-guard disposition). No manual migration step.
+
+**Nav surfaces:** confirm http://localhost:5173/ops (Runs, Evals, Guardrails) and
+http://localhost:5173/memory (five tabs) load before Act 2 — both are deterministic
+and survive provider outage.
 
 **`.env` rule:** env changes require `docker compose up -d --force-recreate backend`
 — **restart is NOT enough** (reload does not re-read env_file).
@@ -119,13 +131,20 @@ With stack healthy and v4 fallback cache present (regenerated at T−30m):
 
 1. Set invalid `OPENROUTER_API_KEY` + `DEMO_FALLBACK=1` in `.env`
 2. `docker compose up -d --force-recreate backend`
-3. `python scripts/simulate_event.py` → open dossier in UI
+3. `python scripts/simulate_event.py` → open dossier in UI (SSE stream)
 4. Confirm: deterministic sections live; full reasoning replay with cached badges;
-   chat degrades quietly
+   chat degrades quietly; **Report** view without summary still shows Executive
+   facts block; `/ops` and `/memory` fully functional
 5. Restore valid key, `DEMO_FALLBACK=0`, `docker compose up -d --force-recreate backend`
+6. Re-open a dossier — confirm live reasoning (no cached badges) recovers
 
-## Memory layer (M12)
+## Memory layer (M12 / M13)
 
+- [ ] **Post-guard figures (M13, D-024):** after `make ingest`, expect **55 routine
+      closures**, review queue **32** (genuinely ambiguous failure rows in the
+      0.51–0.57 score band), failure-row unclassified rate **7.2%** (32/445).
+      Accuracy rises to **96.6%** with **0** routine false positives. Re-run
+      `make audit-norm` before demo if substrate changes.
 - [ ] **Do not action Review Queue items on hero-class WOs during rehearsals.** The three
       planted seal-failure WOs (`WO-2024-0117`, `WO-2025-0289`, `WO-2026-0034`) must keep
       auto-only classification for the FR-12 pattern reveal. If reviewed accidentally,
@@ -134,6 +153,10 @@ With stack healthy and v4 fallback cache present (regenerated at T−30m):
       then regenerate the fallback cache at T−30m.
 - [ ] Browse **Memory** → all five tabs (Overview, Assets, Documents, Taxonomy, Review Queue).
 - [ ] **Coverage tier footnote** visible on Assets tab.
+
+## Founder script
+
+See `docs/DEMO-SCRIPT.md` (governance beat) and `docs/FIGURES-CARD.md` (stage numbers).
 
 ## Automated proof
 

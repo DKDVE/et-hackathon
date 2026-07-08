@@ -80,6 +80,9 @@ export const createDossier = (eventId: number | string) =>
 export const getDossier = (dossierId: number | string) =>
   apiFetch<DossierResponse>(`/api/dossiers/${dossierId}`);
 
+export const ensureExecutiveSummary = (dossierId: number | string) =>
+  apiFetch<DossierResponse>(`/api/dossiers/${dossierId}/summary`, { method: "POST" });
+
 export const getDossierRuns = (dossierId: number | string) =>
   apiFetch<ReasoningRunsResponse>(`/api/dossiers/${dossierId}/runs`);
 
@@ -173,6 +176,15 @@ export const getChunkSource = (chunkId: number | string) =>
 export const getWorkOrderSource = (woNumber: string) =>
   apiFetch<WorkOrderSource>(`/api/sources/wo/${woNumber}`);
 
+export type PidDrawingSource = {
+  document_id: number;
+  title: string;
+  file_url: string;
+};
+
+export const getPidDrawings = (assetId: number | string) =>
+  apiFetch<PidDrawingSource[]>(`/api/sources/pid/asset/${assetId}`);
+
 export const listAssets = () => apiFetch<AssetSummary[]>("/api/assets");
 
 export type MemoryOverview = {
@@ -180,9 +192,11 @@ export type MemoryOverview = {
   document_count: number;
   chunk_count: number;
   work_order_count: number;
-  wo_auto_classified: number;
+  wo_failure_classified: number;
+  wo_routine_closures: number;
   wo_unclassified: number;
   wo_human_reviewed: number;
+  wo_auto_classified: number;
   taxonomy_size: number;
 };
 

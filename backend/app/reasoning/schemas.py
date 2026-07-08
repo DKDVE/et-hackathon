@@ -109,6 +109,7 @@ class DossierSections(BaseModel):
     safety_notes: list[ValidatedSafetyNote] = Field(default_factory=list)
     probable_causes: list[ValidatedCause] = Field(default_factory=list)
     actions: list[ValidatedAction] = Field(default_factory=list)
+    executive_summary: str | None = None
 
 
 class ChatOutput(BaseModel):

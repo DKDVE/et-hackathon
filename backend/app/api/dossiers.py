@@ -109,6 +109,41 @@ def get_dossier_runs(dossier_id: int, db: DbDep) -> ReasoningRunsResponse:
     )
 
 
+@router.post("/dossiers/{dossier_id}/summary", response_model=DossierResponse)
+def ensure_executive_summary(dossier_id: int, db: DbDep) -> DossierResponse:
+    """Lazy-generate executive summary on first report open (M13). Immutable once written."""
+    from app.config import get_settings
+    from app.reasoning.nodes.summary import run_summary
+
+    dossier = dossiers.get_by_id(db, dossier_id)
+    if dossier is None:
+        raise HTTPException(404, f"dossier {dossier_id} not found")
+    if dossier.sections is None:
+        return build_dossier_response(dossier)
+    if dossier.sections.get("executive_summary"):
+        return build_dossier_response(dossier)
+    if not get_settings().reasoning_enabled:
+        return build_dossier_response(dossier)
+    ai_keys = ("safety_notes", "probable_causes", "actions")
+    if not any(dossier.sections.get(k) for k in ai_keys):
+        return build_dossier_response(dossier)
+
+    client = LLMClient()
+    text = run_summary(
+        dossier_id=dossier_id,
+        session=db,
+        client=client,
+        sections=dossier.sections,
+    )
+    if text:
+        updated = dict(dossier.sections)
+        updated["executive_summary"] = text
+        dossier.sections = updated
+        db.commit()
+        db.refresh(dossier)
+    return build_dossier_response(dossier)
+
+
 @router.get("/dossiers/{dossier_id}/stream")
 async def stream_dossier(dossier_id: int) -> EventSourceResponse:
     with SessionLocal() as session:

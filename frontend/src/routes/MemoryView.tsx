@@ -1,6 +1,7 @@
 import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
 
 import { SourceProvider } from "@/components/source/SourceViewer";
+import { PidReferenceBlock } from "@/components/dossier/PidReferenceBlock";
 import { AppShell } from "@/components/layout/AppShell";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { Badge } from "@/components/ui/badge";
@@ -78,10 +79,18 @@ function OverviewTab({ data }: { data: MemoryOverview | null }) {
         <h3 className="text-sm font-bold uppercase tracking-widest text-muted-foreground">
           Work order classification
         </h3>
-        <div className="mt-4 grid gap-4 sm:grid-cols-3">
+        <p className="mt-2 text-xs text-muted-foreground">
+          {data.wo_failure_classified} failure records · {data.wo_routine_closures} routine
+          closures · {data.wo_unclassified} unclassified · {data.wo_human_reviewed} human-reviewed
+        </p>
+        <div className="mt-4 grid gap-4 sm:grid-cols-4">
           <div>
-            <div className="text-2xl font-bold tabular-nums">{data.wo_auto_classified}</div>
-            <div className="text-xs text-muted-foreground">Auto-classified</div>
+            <div className="text-2xl font-bold tabular-nums">{data.wo_failure_classified}</div>
+            <div className="text-xs text-muted-foreground">Failure classified</div>
+          </div>
+          <div>
+            <div className="text-2xl font-bold tabular-nums">{data.wo_routine_closures}</div>
+            <div className="text-xs text-muted-foreground">Routine closures</div>
           </div>
           <div>
             <div className="text-2xl font-bold tabular-nums">{data.wo_unclassified}</div>
@@ -148,6 +157,9 @@ function AssetsTab({
                     <td colSpan={7} className="p-4 text-xs text-muted-foreground">
                       <strong>{a.name}</strong> · Last WO closed:{" "}
                       {a.last_inspection_date ?? "—"}
+                      <div className="mt-3 max-w-xs">
+                        <PidReferenceBlock assetId={a.asset_id} />
+                      </div>
                     </td>
                   </tr>
                 )}

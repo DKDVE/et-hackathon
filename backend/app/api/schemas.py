@@ -104,6 +104,12 @@ class ChunkSource(BaseModel):
     file_url: str
 
 
+class PidDrawingSource(BaseModel):
+    document_id: int
+    title: str
+    file_url: str
+
+
 # --- assets -----------------------------------------------------------------
 
 
@@ -257,9 +263,11 @@ class MemoryOverview(BaseModel):
     document_count: int
     chunk_count: int
     work_order_count: int
-    wo_auto_classified: int
+    wo_failure_classified: int
+    wo_routine_closures: int
     wo_unclassified: int
     wo_human_reviewed: int
+    wo_auto_classified: int
     taxonomy_size: int
 
 

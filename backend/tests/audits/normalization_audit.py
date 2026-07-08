@@ -21,7 +21,10 @@ from app.llm.embeddings import get_embedder
 PLANTED_WOS = ("WO-2024-0117", "WO-2025-0289", "WO-2026-0034")
 PLANTED_MODE = "mechanical_seal_leakage"
 MIN_ACCURACY = 0.90
-# D-024: rate is on failure-disposition rows only (routine closures excluded).
+# D-024: unclassified band is on failure-disposition rows only (routine closures
+# excluded). Pre-guard denominator was all 500 WOs (~8–18%); post-guard the
+# designed-ambiguous corpus is ~60 truth-unclassified rows — 55 caught by the
+# routine guard, ~32 land as failure-row unclassified (~7.2% of 445 failures).
 UNCLASSIFIED_LO = 0.05
 UNCLASSIFIED_HI = 0.18
 # D-017: cross-family confusion is the failure the margin guard exists to prevent.

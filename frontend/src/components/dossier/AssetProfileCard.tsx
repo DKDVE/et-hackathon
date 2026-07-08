@@ -1,4 +1,5 @@
 import type { AssetProfile } from "@/lib/api";
+import { PidReferenceBlock } from "@/components/dossier/PidReferenceBlock";
 import { Card, CardContent } from "@/components/ui/card";
 
 export function AssetProfileCard({ profile }: { profile: AssetProfile }) {
@@ -37,6 +38,9 @@ export function AssetProfileCard({ profile }: { profile: AssetProfile }) {
           <span className="rounded bg-primary/10 px-2 py-0.5 text-xs font-bold text-primary">
             {profile.criticality}
           </span>
+        </div>
+        <div className="pt-4">
+          <PidReferenceBlock assetId={profile.asset_id} />
         </div>
       </CardContent>
     </Card>

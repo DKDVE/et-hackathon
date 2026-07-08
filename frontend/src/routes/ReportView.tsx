@@ -6,6 +6,7 @@ import { PatternPanel } from "@/components/dossier/PatternPanel";
 import { SourceProvider } from "@/components/source/SourceViewer";
 import {
   createDossier,
+  ensureExecutiveSummary,
   getAppConfig,
   type AppConfig,
   type DossierResponse,
@@ -68,9 +69,19 @@ export function ReportView() {
     if (id == null) return;
     let cancelled = false;
     Promise.all([createDossier(id), getAppConfig()])
-      .then(([d, c]) => {
+      .then(async ([d, c]) => {
+        if (cancelled) return;
+        let dossier = d;
+        const secs = d.sections as Record<string, unknown> | null;
+        if (d.sections && !secs?.executive_summary) {
+          try {
+            dossier = await ensureExecutiveSummary(d.dossier_id);
+          } catch {
+            /* graceful absence — facts block still renders */
+          }
+        }
         if (!cancelled) {
-          setDossier(d);
+          setDossier(dossier);
           setConfig(c);
         }
       })
@@ -101,6 +112,8 @@ export function ReportView() {
   const cited = collectCitedIds(ctx, sections);
   const event = ctx.event;
   const asset = ctx.asset_profile;
+  const executiveSummary =
+    typeof sections.executive_summary === "string" ? sections.executive_summary : null;
 
   return (
     <SourceProvider>
@@ -135,6 +148,15 @@ export function ReportView() {
         </header>
 
         <main className="mx-auto max-w-4xl space-y-8 px-8 py-8 print:px-0">
+          {executiveSummary && (
+            <section>
+              <h2 className="mb-2 text-sm font-bold uppercase tracking-widest text-slate-500">
+                AI summary of validated findings
+              </h2>
+              <p className="text-sm leading-relaxed text-slate-800">{executiveSummary}</p>
+            </section>
+          )}
+
           <section>
             <h2 className="mb-3 text-sm font-bold uppercase tracking-widest text-slate-500">
               Executive facts

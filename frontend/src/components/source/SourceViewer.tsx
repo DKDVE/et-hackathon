@@ -25,7 +25,10 @@ pdfjs.GlobalWorkerOptions.workerSrc = new URL(
   import.meta.url,
 ).toString();
 
-type SourceContextValue = { open: (citationId: string) => void };
+type SourceContextValue = {
+  open: (citationId: string) => void;
+  openReference: (documentId: number, title: string) => void;
+};
 const SourceContext = createContext<SourceContextValue | null>(null);
 
 export function useSourceViewer(): SourceContextValue {
@@ -36,11 +39,23 @@ export function useSourceViewer(): SourceContextValue {
 
 export function SourceProvider({ children }: { children: ReactNode }) {
   const [citation, setCitation] = useState<string | null>(null);
+  const [reference, setReference] = useState<{ documentId: number; title: string } | null>(null);
   const open = useCallback((citationId: string) => setCitation(citationId), []);
+  const openReference = useCallback(
+    (documentId: number, title: string) => setReference({ documentId, title }),
+    [],
+  );
   return (
-    <SourceContext.Provider value={{ open }}>
+    <SourceContext.Provider value={{ open, openReference }}>
       {children}
       {citation && <SourceModal citation={citation} onClose={() => setCitation(null)} />}
+      {reference && (
+        <ReferenceImageModal
+          documentId={reference.documentId}
+          title={reference.title}
+          onClose={() => setReference(null)}
+        />
+      )}
     </SourceContext.Provider>
   );
 }
@@ -206,6 +221,56 @@ function WorkOrderView({ woNumber }: { woNumber: string }) {
           <p className="text-sm leading-relaxed text-muted-foreground">{wo.actions_taken}</p>
         </div>
       )}
+    </div>
+  );
+}
+
+function ReferenceImageModal({
+  documentId,
+  title,
+  onClose,
+}: {
+  documentId: number;
+  title: string;
+  onClose: () => void;
+}) {
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [onClose]);
+
+  const url = fileUrl(`/api/sources/file/${documentId}`);
+
+  return (
+    <div
+      className="fixed inset-0 z-[60] flex items-center justify-center bg-background/80 p-4 backdrop-blur-sm"
+      onClick={onClose}
+    >
+      <div
+        className="flex max-h-[90vh] w-full max-w-4xl flex-col overflow-hidden rounded-xl border border-border bg-card shadow-2xl"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="flex items-center justify-between border-b border-border px-5 py-3">
+          <div className="text-sm font-bold uppercase tracking-widest text-primary">
+            Reference drawing · {title}
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            className="rounded p-1 text-muted-foreground transition-colors hover:text-foreground"
+            aria-label="Close"
+          >
+            <X className="size-5" />
+          </button>
+        </div>
+        <div className="flex justify-center overflow-auto bg-neutral-900/40 p-4">
+          <img src={url} alt={title} className="max-h-[75vh] max-w-full object-contain" />
+        </div>
+        <p className="border-t border-border px-5 py-2 text-center text-xs text-muted-foreground">
+          Reference drawing
+        </p>
+      </div>
     </div>
   );
 }
