@@ -2,14 +2,19 @@ import logging
 import threading
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
+from slowapi.errors import RateLimitExceeded
+from slowapi.middleware import SlowAPIMiddleware
 
 from app.api.assets import router as assets_router
 from app.api.config import router as config_router
 from app.api.dossiers import router as dossiers_router
 from app.api.events import router as events_router
 from app.api.health import router as health_router
+from app.api.limiter import limiter
+from app.api.ops import router as ops_router
 from app.api.sources import router as sources_router
 from app.config import get_settings
 from app.llm.embeddings import prewarm_embedder
@@ -45,6 +50,16 @@ def create_app() -> FastAPI:
     configure_logging()
     settings = get_settings()
     app = FastAPI(title="Operational Context Engine", version="0.1.0", lifespan=_lifespan)
+    app.state.limiter = limiter
+
+    @app.exception_handler(RateLimitExceeded)
+    async def _chat_rate_limit(_request: Request, _exc: RateLimitExceeded) -> JSONResponse:
+        return JSONResponse(
+            status_code=429,
+            content={"message": "Rate limit reached — try again in a moment."},
+        )
+
+    app.add_middleware(SlowAPIMiddleware)
     app.add_middleware(TimingMiddleware)
     app.add_middleware(
         CORSMiddleware,
@@ -59,6 +74,7 @@ def create_app() -> FastAPI:
     app.include_router(config_router)
     app.include_router(sources_router)
     app.include_router(assets_router)
+    app.include_router(ops_router)
     return app
 
 

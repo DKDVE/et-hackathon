@@ -14,6 +14,7 @@ dependencies = [
     "pydantic-settings>=2",
     "sse-starlette>=2.1",
     "httpx>=0.28",
+    "slowapi>=0.1.9",
     # seed.py loads the design yaml via dataset/generators/catalogue.py, so
     # pyyaml is a runtime (not just dataset-tooling) dependency.
     "pyyaml>=6",
@@ -57,7 +58,7 @@ strict = true
 plugins = ["pydantic.mypy"]
 
 [[tool.mypy.overrides]]
-module = ["pgvector.*", "sentence_transformers.*", "pypdfium2.*", "pytesseract.*", "yaml"]
+module = ["pgvector.*", "sentence_transformers.*", "pypdfium2.*", "pytesseract.*", "yaml", "slowapi.*"]
 ignore_missing_imports = true
 
 [tool.pytest.ini_options]

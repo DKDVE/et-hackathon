@@ -8,7 +8,7 @@ route streams the rendered artifact from the read-only dataset mount.
 from __future__ import annotations
 
 from fastapi import APIRouter, HTTPException
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, Response
 
 from app.api.deps import DbDep
 from app.api.schemas import ChunkSource, WorkOrderSource
@@ -63,8 +63,12 @@ def get_chunk(chunk_id: int, db: DbDep) -> ChunkSource:
 
 
 @router.get("/file/{document_id}")
-def get_file(document_id: int, db: DbDep) -> FileResponse:
-    """Stream a rendered PDF from the read-only dataset mount (react-pdf source)."""
+def get_file(document_id: int, db: DbDep) -> Response:
+    """Stream a rendered PDF from the read-only dataset mount (react-pdf source).
+
+  ponytail: Cache-Control assumes artifacts only change via re-seed (P10); safe
+  to treat rendered PDFs as immutable for 24h at demo scale.
+    """
     document = chunks.get_document(db, document_id)
     if document is None:
         raise HTTPException(404, f"document {document_id} not found")
@@ -73,4 +77,9 @@ def get_file(document_id: int, db: DbDep) -> FileResponse:
     except FileNotFoundError as exc:
         raise HTTPException(404, f"file for document {document_id} not found") from exc
     media = "application/pdf" if path.suffix.lower() == ".pdf" else "application/octet-stream"
-    return FileResponse(path, media_type=media, filename=path.name)
+    return FileResponse(
+        path,
+        media_type=media,
+        filename=path.name,
+        headers={"Cache-Control": "public, max-age=86400, immutable"},
+    )
