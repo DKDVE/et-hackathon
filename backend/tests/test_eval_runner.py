@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 from datetime import UTC, datetime
-from unittest.mock import patch
 
 import pytest
 from sqlalchemy import delete
@@ -53,11 +52,19 @@ def test_timing_warn_status() -> None:
 def test_run_all_suites_stubbed(monkeypatch: pytest.MonkeyPatch) -> None:
     from app.evals import runner
 
-    monkeypatch.setattr(runner, "run_golden", lambda: (EvalStatus.PASS, {"passed": 3, "failed": 0}, None))
+    monkeypatch.setattr(
+        runner,
+        "run_golden",
+        lambda: (EvalStatus.PASS, {"passed": 3, "failed": 0}, None),
+    )
     monkeypatch.setattr(
         runner,
         "run_normalization",
-        lambda: (EvalStatus.PASS, {"accuracy": 0.95, "unclassified_rate": 0.1, "cross_family_errors": 0}, None),
+        lambda: (
+            EvalStatus.PASS,
+            {"accuracy": 0.95, "unclassified_rate": 0.1, "cross_family_errors": 0},
+            None,
+        ),
     )
     ids = runner.run_all_suites(dossier_id=None)
     assert len(ids) == 2

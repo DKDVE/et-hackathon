@@ -56,7 +56,8 @@ def test_runs_empty_for_deterministic_dossier(client: TestClient) -> None:
         assert body["runs"] == []
         assert body["total_latency_ms"] == 0
         assert body["estimated_cost_usd"] == 0.0
-        assert "footnote" in body["cost_footnote"].lower() or "token" in body["cost_footnote"].lower()
+        footnote = body["cost_footnote"].lower()
+        assert "footnote" in footnote or "token" in footnote
     finally:
         _teardown(dossier_id, event_id)
 

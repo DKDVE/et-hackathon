@@ -64,7 +64,10 @@ def test_summary_immutable_once_written(client: TestClient) -> None:
         dossier.sections = sections
         session.commit()
 
-    with patch("app.reasoning.nodes.summary.run_summary", side_effect=AssertionError("should not call")):
+    with patch(
+        "app.reasoning.nodes.summary.run_summary",
+        side_effect=AssertionError("should not call"),
+    ):
         resp = client.post(f"/api/dossiers/{dossier_id}/summary")
     assert resp.status_code == 200
     assert resp.json()["sections"]["executive_summary"] == "Existing immutable summary."

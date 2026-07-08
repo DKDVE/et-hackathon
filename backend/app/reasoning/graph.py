@@ -16,10 +16,6 @@ from app.llm.client import LLMClient, NodeFailure
 from app.llm.fallback_cache import load_sequence, replay_with_pacing, store_sequence
 from app.reasoning.nodes import analysis, recommendation, validation_stage1, validation_stage2
 from app.reasoning.nodes.report import run_report
-from app.reasoning.nodes.validation_stage1 import (
-    provisional_analysis_payload,
-    provisional_recommendation_payload,
-)
 from app.reasoning.nodes.validation_stage2 import validated_payload
 from app.reasoning.state import DossierState
 
@@ -126,7 +122,8 @@ async def reasoning_sse_events(
                     async for item in _replay_cached(session, dossier_id, shared_context, cached):
                         yield item
                     return
-            reason = "llm_failure" if "transport" in str(exc).lower() or "api" in str(exc).lower() else "node_failure"
+            err = str(exc).lower()
+            reason = "llm_failure" if "transport" in err or "api" in err else "node_failure"
             yield "degraded", {"reason": reason, "deterministic_available": True}
         except Exception:
             logger.exception("reasoning unexpected failure")

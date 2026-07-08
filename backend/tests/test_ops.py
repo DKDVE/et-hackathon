@@ -10,7 +10,13 @@ from sqlalchemy import delete
 
 from app.config import get_settings
 from app.db.engine import SessionLocal
-from app.db.models import Dossier, EvalRun, EvalStatus, EvalSuite, EvidenceLink, OperationalEvent, ReasoningRun
+from app.db.models import (
+    Dossier,
+    EvalRun,
+    EvidenceLink,
+    OperationalEvent,
+    ReasoningRun,
+)
 from app.main import create_app
 
 DEMO_EVENT = {

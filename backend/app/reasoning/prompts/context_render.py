@@ -41,11 +41,15 @@ def render_shared_context(ctx: SharedContext) -> str:
 
     lines.append("\n=== FAILURE HISTORY (newest first) ===")
     for wo in ctx.failure_history:
-        lines.append(_fmt_wo_line(wo.wo_number, wo.asset_tag, wo.raw_description, wo.downtime_hours))
+        lines.append(
+            _fmt_wo_line(wo.wo_number, wo.asset_tag, wo.raw_description, wo.downtime_hours)
+        )
 
     lines.append("\n=== SISTER INCIDENTS ===")
     for si in ctx.sister_incidents:
-        lines.append(_fmt_wo_line(si.wo_number, si.asset_tag, si.raw_description, si.downtime_hours))
+        lines.append(
+            _fmt_wo_line(si.wo_number, si.asset_tag, si.raw_description, si.downtime_hours)
+        )
 
     lines.append("\n=== PATTERN STATS (consider together) ===")
     for p in ctx.pattern_stats:

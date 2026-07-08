@@ -8,11 +8,20 @@ from pathlib import Path
 
 import pytest
 
-from app.domain.models import AssetProfile, EventInfo, SharedContext, SisterIncident, WorkOrderRecord
+from app.domain.models import (
+    AssetProfile,
+    EventInfo,
+    SharedContext,
+    SisterIncident,
+    WorkOrderRecord,
+)
 from app.reasoning.graph import reasoning_sse_events
-from app.reasoning.nodes.report import attach_strength, compute_guardrail_stats, persist_validated
+from app.reasoning.nodes.report import attach_strength, compute_guardrail_stats
 from app.reasoning.nodes.validation_stage1 import run_validation_stage1
-from app.reasoning.prompts.context_render import render_recommendation_context, render_shared_context
+from app.reasoning.prompts.context_render import (
+    render_recommendation_context,
+    render_shared_context,
+)
 from app.reasoning.schemas import (
     AnalysisOutput,
     ProbableCause,

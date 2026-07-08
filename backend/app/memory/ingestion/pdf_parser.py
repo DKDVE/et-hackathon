@@ -54,7 +54,12 @@ def parse_pdf(path: Path) -> list[PageText]:
         page_no = i + 1
         text = (page.extract_text() or "").strip()
         if len(text) < min_chars:
-            logger.info("OCR fallback: %s page %d (%d chars from pypdf)", path.name, page_no, len(text))
+            logger.info(
+                "OCR fallback: %s page %d (%d chars from pypdf)",
+                path.name,
+                page_no,
+                len(text),
+            )
             text = _ocr_page(path, i).strip()
             _ocr_pages.append((str(path), page_no))
         pages.append(PageText(page_number=page_no, text=text))

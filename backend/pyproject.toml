@@ -52,6 +52,12 @@ line-length = 100
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B"]
 
+[tool.ruff.lint.per-file-ignores]
+# Prompt bodies and alembic revisions are intentionally long single lines.
+"app/reasoning/prompts/*.py" = ["E501"]
+"app/db/migrations/**/*.py" = ["E501"]
+"tests/audits/*.py" = ["E501"]
+
 [tool.mypy]
 python_version = "3.12"
 strict = true

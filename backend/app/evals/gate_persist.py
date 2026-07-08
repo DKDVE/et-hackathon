@@ -9,7 +9,7 @@ import sys
 from datetime import UTC, datetime
 
 from app.db.engine import SessionLocal
-from app.db.models import EvalStatus, EvalSuite
+from app.db.models import EvalSuite
 from app.evals.persist import persist_eval_run
 from app.evals.runner import (
     git_ref,

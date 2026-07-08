@@ -50,7 +50,12 @@ def resolve_dataset_path(file_path: str) -> Path:
     if p.is_file():
         return p
     if file_path.startswith("dataset/"):
-        for root in (os.environ.get("DATASET_DIR"), "/dataset", Path(__file__).resolve().parents[4] / "dataset"):
+        dataset_roots = (
+            os.environ.get("DATASET_DIR"),
+            "/dataset",
+            Path(__file__).resolve().parents[4] / "dataset",
+        )
+        for root in dataset_roots:
             if not root:
                 continue
             candidate = Path(root) / file_path.removeprefix("dataset/")

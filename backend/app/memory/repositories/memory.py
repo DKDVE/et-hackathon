@@ -83,7 +83,6 @@ def get_overview(session: Session) -> dict:
 
 
 def get_assets(session: Session) -> list[dict]:
-    s = get_settings()
     eff = effective_failure_mode_id()
     rows = session.execute(
         select(
@@ -178,7 +177,9 @@ def get_documents(session: Session) -> list[dict]:
 
 
 def get_taxonomy(session: Session) -> list[dict]:
-    modes = session.scalars(select(FailureMode).order_by(FailureMode.family, FailureMode.code)).all()
+    modes = session.scalars(
+        select(FailureMode).order_by(FailureMode.family, FailureMode.code)
+    ).all()
     auto_counts = dict(
         session.execute(
             select(WorkOrder.failure_mode_id, func.count())
