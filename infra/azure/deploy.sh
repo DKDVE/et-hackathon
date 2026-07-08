@@ -93,16 +93,16 @@ if [[ "${SKIP_PG}" != "1" ]]; then
 
   az postgres flexible-server firewall-rule create \
     --resource-group "${AZURE_RESOURCE_GROUP}" \
-    --name "${AZURE_PG_SERVER}" \
-    --rule-name AllowAzureServices \
+    --server-name "${AZURE_PG_SERVER}" \
+    --name AllowAzureServices \
     --start-ip-address 0.0.0.0 \
     --end-ip-address 0.0.0.0 \
     -o none 2>/dev/null || true
 
   az postgres flexible-server firewall-rule create \
     --resource-group "${AZURE_RESOURCE_GROUP}" \
-    --name "${AZURE_PG_SERVER}" \
-    --rule-name AllowDevIP \
+    --server-name "${AZURE_PG_SERVER}" \
+    --name AllowDevIP \
     --start-ip-address "${AZURE_DEV_IP}" \
     --end-ip-address "${AZURE_DEV_IP}" \
     -o none 2>/dev/null || true
@@ -110,11 +110,11 @@ if [[ "${SKIP_PG}" != "1" ]]; then
   if ! az postgres flexible-server db show \
       --resource-group "${AZURE_RESOURCE_GROUP}" \
       --server-name "${AZURE_PG_SERVER}" \
-      --database-name oce &>/dev/null; then
+      --name oce &>/dev/null; then
     az postgres flexible-server db create \
       --resource-group "${AZURE_RESOURCE_GROUP}" \
       --server-name "${AZURE_PG_SERVER}" \
-      --database-name oce \
+      --name oce \
       -o none
   fi
 
