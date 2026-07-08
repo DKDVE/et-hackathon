@@ -9,7 +9,8 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.config import get_settings
-from app.db.models import FailureMode, WorkOrder
+from app.db.models import FailureMode, WoDisposition, WorkOrder
+from app.domain.routine_guard import match_routine_closure
 from app.llm.embeddings import get_embedder
 
 logger = logging.getLogger(__name__)
@@ -76,14 +77,26 @@ def normalize_work_orders(session: Session) -> tuple[int, int]:
     families = [m.family for m in modes]
 
     work_orders = session.scalars(select(WorkOrder).order_by(WorkOrder.id)).all()
+    to_embed: list[WorkOrder] = []
+    routine_count = 0
+    for wo in work_orders:
+        if match_routine_closure(wo.raw_description):
+            wo.disposition = WoDisposition.routine
+            wo.failure_mode_id = None
+            wo.normalization_score = None
+            routine_count += 1
+        else:
+            wo.disposition = WoDisposition.failure
+            to_embed.append(wo)
+
     embedder = get_embedder()
     query_vectors = np.asarray(
-        embedder.embed_batch([wo.raw_description for wo in work_orders]),
+        embedder.embed_batch([wo.raw_description for wo in to_embed]),
         dtype=np.float64,
     )
 
     classified = 0
-    for wo, qvec in zip(work_orders, query_vectors, strict=True):
+    for wo, qvec in zip(to_embed, query_vectors, strict=True):
         idx, score = classify_vector(
             qvec, mode_matrix, threshold=threshold, margin=margin, families=families
         )
@@ -97,6 +110,12 @@ def normalize_work_orders(session: Session) -> tuple[int, int]:
             wo.failure_mode_id = None
 
     session.commit()
-    unclassified = len(work_orders) - classified
-    logger.info("Normalized %d WOs (%d classified, %d unclassified)", len(work_orders), classified, unclassified)
+    unclassified = len(to_embed) - classified
+    logger.info(
+        "Normalized %d WOs (%d routine, %d classified, %d unclassified)",
+        len(work_orders),
+        routine_count,
+        classified,
+        unclassified,
+    )
     return classified, unclassified

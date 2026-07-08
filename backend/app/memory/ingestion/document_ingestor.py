@@ -10,7 +10,7 @@ from pathlib import Path
 from sqlalchemy import delete, select, update
 from sqlalchemy.orm import Session
 
-from app.db.models import Chunk, DocType, Document, FailureMode, WorkOrder
+from app.db.models import Chunk, DocType, Document, FailureMode, WoDisposition, WorkOrder
 from app.llm.embeddings import get_embedder
 from app.memory.ingestion.chunker import TextChunk, chunk_document
 from app.memory.ingestion.csv_parser import CsvChunk, parse_csv
@@ -66,6 +66,7 @@ def reset_ingest_state(session: Session) -> None:
         update(WorkOrder).values(
             failure_mode_id=None,
             normalization_score=None,
+            disposition=WoDisposition.failure,
             human_failure_mode_id=None,
             human_verdict=None,
             human_reviewed_at=None,

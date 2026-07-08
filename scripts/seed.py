@@ -52,6 +52,7 @@ from app.db.models import (  # noqa: E402
     DocType,
     Document,
     FailureMode,
+    WoDisposition,
     WorkOrder,
 )
 from app.memory.ingestion.document_ingestor import ingest_all, ocr_page_count  # noqa: E402
@@ -266,10 +267,21 @@ def run_ingest_phase() -> tuple[bool, list[str]]:
 
 def verify_ingest(session: Session, stats) -> tuple[bool, list[str]]:
     total_wo = session.scalar(select(func.count()).select_from(WorkOrder))
-    uncl = session.scalar(
-        select(func.count()).select_from(WorkOrder).where(WorkOrder.failure_mode_id.is_(None))
-    )
-    uncl_pct = 100.0 * uncl / total_wo if total_wo else 0.0
+    routine = session.scalar(
+        select(func.count())
+        .select_from(WorkOrder)
+        .where(WorkOrder.disposition == WoDisposition.routine)
+    ) or 0
+    failure_uncl = session.scalar(
+        select(func.count())
+        .select_from(WorkOrder)
+        .where(
+            WorkOrder.disposition == WoDisposition.failure,
+            WorkOrder.failure_mode_id.is_(None),
+        )
+    ) or 0
+    failure_total = total_wo - routine if total_wo else 0
+    uncl_pct = 100.0 * failure_uncl / failure_total if failure_total else 0.0
 
     n_fm_embedded = session.scalar(
         select(func.count()).select_from(FailureMode).where(FailureMode.embedding.isnot(None))
@@ -285,15 +297,16 @@ def verify_ingest(session: Session, stats) -> tuple[bool, list[str]]:
         f"docs with 0 chunks: {stats.zero_chunk_docs} {'✓' if zero_ok else 'FAIL'} | "
         f"clause-mode: {stats.clause_mode_docs} docs, fallback-mode: {stats.fallback_mode_docs} docs",
         f"failure_modes embedded: {n_fm_embedded}/25",
-        f"WOs normalized: {stats.wos_classified + stats.wos_unclassified}/500 | "
-        f"unclassified: {uncl} ({uncl_pct:.1f}%)",
+        f"WOs: {stats.wos_classified} classified + {stats.wos_unclassified} failure-unclassified "
+        f"+ {routine} routine = {stats.wos_classified + stats.wos_unclassified + routine}/500 | "
+        f"failure-unclassified rate: {failure_uncl}/{failure_total} ({uncl_pct:.1f}%)",
         pattern_line,
     ]
     ok = (
         stats.chunks_total > 0
         and zero_ok
         and n_fm_embedded == 25
-        and stats.wos_classified + stats.wos_unclassified == 500
+        and stats.wos_classified + stats.wos_unclassified + routine == 500
         and pattern_ok
     )
     return ok, lines

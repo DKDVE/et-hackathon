@@ -19,6 +19,7 @@ from app.api.ops import router as ops_router
 from app.api.sources import router as sources_router
 from app.config import get_settings
 from app.llm.embeddings import prewarm_embedder
+from app.middleware.access_gate import AccessGateMiddleware
 from app.obs import TimingMiddleware, configure_logging
 
 logger = logging.getLogger("oce")
@@ -69,6 +70,8 @@ def create_app() -> FastAPI:
         allow_methods=["*"],
         allow_headers=["*"],
     )
+    # Outermost when added last — blocks unauthenticated hosted traffic only.
+    app.add_middleware(AccessGateMiddleware)
     app.include_router(health_router)
     app.include_router(events_router)
     app.include_router(dossiers_router)

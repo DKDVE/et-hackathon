@@ -13,11 +13,12 @@ from typing import Any
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
-from app.db.models import Asset, FailureMode, WorkOrder
+from app.db.models import Asset, FailureMode, WoDisposition, WorkOrder
 from app.domain.models import PatternStat, SisterIncident, WorkOrderRecord
 from app.memory.effective_mode import effective_failure_mode_id
 
 _eff_mode = effective_failure_mode_id()
+_failure_only = WorkOrder.disposition == WoDisposition.failure
 
 
 def _f(value: Any) -> float | None:
@@ -50,6 +51,7 @@ def get_failure_history(
         .join(Asset, WorkOrder.asset_id == Asset.id)
         .outerjoin(FailureMode, FailureMode.id == _eff_mode)
         .where(WorkOrder.asset_id == asset_id)
+        .where(_failure_only)
         .order_by(WorkOrder.opened_on.desc(), WorkOrder.wo_number.desc())
         .limit(cap)
     ).all()
@@ -87,6 +89,7 @@ def get_sister_incidents(
         .join(Asset, WorkOrder.asset_id == Asset.id)
         .outerjoin(FailureMode, FailureMode.id == _eff_mode)
         .where(WorkOrder.asset_id.in_(sister_ids))
+        .where(_failure_only)
     )
     if mode_codes is not None:
         stmt = stmt.where(FailureMode.code.in_(mode_codes))
@@ -135,6 +138,7 @@ def get_pattern_stats(
         .join(Asset, WorkOrder.asset_id == Asset.id)
         .join(FailureMode, FailureMode.id == _eff_mode)
         .where(WorkOrder.asset_id.in_(asset_ids))
+        .where(_failure_only)
         .where(_eff_mode.isnot(None))
     )
     if mode_codes is not None:

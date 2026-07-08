@@ -207,3 +207,14 @@
 **Impact:** Migration 0005; `effective_failure_mode()` helper; Memory layer UI; normalization audit gains human-override summary line while accuracy stays on auto columns only.
 
 ---
+
+## D-024 — Routine-closure guard: deterministic pre-embedding disposition
+
+**Status:** Accepted
+**Decision:** Before embedding similarity, apply a curated regex pattern list (~10–15 high-precision patterns from M12 band readout) to work-order descriptions. Match → `disposition=routine`, `failure_mode_id=NULL`, `normalization_score=NULL`. Failure-history, sister-incident, pattern-stat queries, and the review queue exclude `routine` rows. Audit gates guard false positives (routine ∧ true=real mode) ≤ 1 absolute.
+**Alternatives Considered:** (a) LLM classification of routineness at ingestion (rejected — unauditable, violates P2); (b) Lowering norm threshold to absorb routine noise (rejected — one variable, D-017); (c) Human-only review-queue pruning (insufficient — 13 FPs were polluting accuracy).
+**Rationale:** M12 showed 13 designed-routine rows misclassified as real modes (lubrication_degradation / impeller_damage) while sitting in the low-margin review band. A conservative deterministic guard removes them from the failure substrate without touching threshold/margin tuning. Conservatism is explicit: missed routine = queue noise; false routine on real failure = data loss (hard-gated).
+**Trade-offs:** Pattern list requires human ratification like family mapping; recall over designed-routine rows is informational only. Unclassified-rate band is computed on failure-disposition rows only post-guard.
+**Impact:** Migration 0006; `routine_closure_patterns.yaml`; `wo_normalizer.py` pre-pass; repository exclusions; normalization audit guard section; Memory overview split counts.
+
+---

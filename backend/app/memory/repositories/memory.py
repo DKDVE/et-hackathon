@@ -14,6 +14,7 @@ from app.db.models import (
     Document,
     FailureMode,
     HumanVerdict,
+    WoDisposition,
     WorkOrder,
 )
 from app.memory.candidates import top_mode_candidates
@@ -42,8 +43,26 @@ def _coverage_tier(
 
 def get_overview(session: Session) -> dict:
     wo_total = session.scalar(select(func.count()).select_from(WorkOrder)) or 0
+    routine = session.scalar(
+        select(func.count())
+        .select_from(WorkOrder)
+        .where(WorkOrder.disposition == WoDisposition.routine)
+    ) or 0
     auto_classified = session.scalar(
-        select(func.count()).select_from(WorkOrder).where(WorkOrder.failure_mode_id.isnot(None))
+        select(func.count())
+        .select_from(WorkOrder)
+        .where(
+            WorkOrder.disposition == WoDisposition.failure,
+            WorkOrder.failure_mode_id.isnot(None),
+        )
+    ) or 0
+    wo_unclassified = session.scalar(
+        select(func.count())
+        .select_from(WorkOrder)
+        .where(
+            WorkOrder.disposition == WoDisposition.failure,
+            WorkOrder.failure_mode_id.is_(None),
+        )
     ) or 0
     human_reviewed = session.scalar(
         select(func.count()).select_from(WorkOrder).where(WorkOrder.human_reviewed_at.isnot(None))
@@ -53,9 +72,12 @@ def get_overview(session: Session) -> dict:
         "document_count": session.scalar(select(func.count()).select_from(Document)) or 0,
         "chunk_count": session.scalar(select(func.count()).select_from(Chunk)) or 0,
         "work_order_count": wo_total,
-        "wo_auto_classified": auto_classified,
-        "wo_unclassified": wo_total - auto_classified,
+        "wo_failure_classified": auto_classified,
+        "wo_routine_closures": routine,
+        "wo_unclassified": wo_unclassified,
         "wo_human_reviewed": human_reviewed,
+        # legacy keys — same semantics, kept for API compat
+        "wo_auto_classified": auto_classified,
         "taxonomy_size": session.scalar(select(func.count()).select_from(FailureMode)) or 0,
     }
 
@@ -73,6 +95,7 @@ def get_assets(session: Session) -> list[dict]:
         )
         .join(AssetClass, Asset.asset_class_id == AssetClass.id)
         .outerjoin(WorkOrder, WorkOrder.asset_id == Asset.id)
+        .where(WorkOrder.disposition == WoDisposition.failure)
         .group_by(Asset.id, AssetClass.class_name)
         .order_by(Asset.tag)
     ).all()
@@ -210,6 +233,7 @@ def get_review_queue(session: Session) -> list[dict]:
         select(WorkOrder, Asset.tag, FailureMode.code, FailureMode.family)
         .join(Asset, WorkOrder.asset_id == Asset.id)
         .outerjoin(FailureMode, WorkOrder.failure_mode_id == FailureMode.id)
+        .where(WorkOrder.disposition == WoDisposition.failure)
         .where(WorkOrder.human_reviewed_at.is_(None))
         .where(
             (WorkOrder.failure_mode_id.is_(None))

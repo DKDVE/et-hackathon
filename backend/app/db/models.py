@@ -93,6 +93,11 @@ class EvidenceKind(StrEnum):
     chunk = "chunk"
 
 
+class WoDisposition(StrEnum):
+  failure = "failure"
+  routine = "routine"
+
+
 class HumanVerdict(StrEnum):
     confirmed = "confirmed"
     corrected = "corrected"
@@ -102,6 +107,13 @@ class HumanVerdict(StrEnum):
 human_verdict_enum = Enum(
     HumanVerdict,
     name="human_verdict",
+    native_enum=True,
+    create_constraint=True,
+)
+
+wo_disposition_enum = Enum(
+    WoDisposition,
+    name="wo_disposition",
     native_enum=True,
     create_constraint=True,
 )
@@ -171,6 +183,10 @@ class WorkOrder(Base):
     raw_description: Mapped[str] = mapped_column(Text, nullable=False)
     actions_taken: Mapped[str | None] = mapped_column(Text)
     downtime_hours: Mapped[float | None] = mapped_column(Numeric(10, 2))
+    # D-024: routine closure vs failure record — guard sets routine before embedding.
+    disposition: Mapped[WoDisposition] = mapped_column(
+        wo_disposition_enum, nullable=False, server_default="failure"
+    )
     # D-023: auto columns — ONLY the ingester (wo_normalizer) may write these.
     failure_mode_id: Mapped[int | None] = mapped_column(ForeignKey("failure_modes.id"))
     normalization_score: Mapped[float | None] = mapped_column()

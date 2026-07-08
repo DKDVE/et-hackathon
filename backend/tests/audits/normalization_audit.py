@@ -15,16 +15,19 @@ from sqlalchemy.orm import Session
 
 from app.config import get_settings
 from app.db.engine import SessionLocal
-from app.db.models import FailureMode, HumanVerdict, WorkOrder
+from app.db.models import FailureMode, HumanVerdict, WoDisposition, WorkOrder
 from app.llm.embeddings import get_embedder
 
 PLANTED_WOS = ("WO-2024-0117", "WO-2025-0289", "WO-2026-0034")
 PLANTED_MODE = "mechanical_seal_leakage"
 MIN_ACCURACY = 0.90
-UNCLASSIFIED_LO = 0.08
+# D-024: rate is on failure-disposition rows only (routine closures excluded).
+UNCLASSIFIED_LO = 0.05
 UNCLASSIFIED_HI = 0.18
 # D-017: cross-family confusion is the failure the margin guard exists to prevent.
 MAX_CROSS_FAMILY_ERRORS = 2
+# D-024: a real failure wrongly flagged routine is data loss — hard gate.
+MAX_GUARD_FALSE_POSITIVES = 1
 
 
 def _truth_file() -> Path:
@@ -97,26 +100,41 @@ def run_audit(session: Session) -> tuple[bool, list[str]]:
         return families.get(code) if code else None
 
     rows: list[AuditRow] = []
+    routine_guard_hits: list[AuditRow] = []
     for wo in session.scalars(select(WorkOrder)).all():
         pred = codes.get(wo.failure_mode_id) if wo.failure_mode_id else None
         m, runner = margins.get(wo.wo_number, (None, None))
-        rows.append(
-            AuditRow(
-                wo_number=wo.wo_number,
-                true_mode=truth[wo.wo_number],
-                predicted_code=pred,
-                score=wo.normalization_score,
-                margin=m,
-                runner_code=runner,
-            )
+        row = AuditRow(
+            wo_number=wo.wo_number,
+            true_mode=truth[wo.wo_number],
+            predicted_code=pred,
+            score=wo.normalization_score,
+            margin=m,
+            runner_code=runner,
         )
+        rows.append(row)
+        if wo.disposition == WoDisposition.routine:
+            routine_guard_hits.append(row)
 
-    classified = [r for r in rows if r.predicted_code is not None]
-    unclassified = [r for r in rows if r.predicted_code is None]
+    # D-024: routine rows are excluded from normalization accuracy — they never embed.
+    disposition_by_wo = {wo.wo_number: wo.disposition for wo in session.scalars(select(WorkOrder)).all()}
+    failure_rows = [r for r in rows if disposition_by_wo[r.wo_number] != WoDisposition.routine]
+
+    classified = [r for r in failure_rows if r.predicted_code is not None]
+    unclassified = [r for r in failure_rows if r.predicted_code is None]
     correct = [r for r in classified if r.predicted_code == r.true_mode]
     errors = [r for r in classified if r.predicted_code != r.true_mode]
     accuracy = len(correct) / len(classified) if classified else 0.0
-    uncl_rate = len(unclassified) / len(rows)
+    uncl_rate = len(unclassified) / len(failure_rows) if failure_rows else 0.0
+
+    guard_false_positives = [r for r in routine_guard_hits if r.true_mode != "unclassified"]
+    designed_routine = [r for r in rows if r.true_mode == "unclassified"]
+    guard_recall = (
+        sum(1 for r in designed_routine if disposition_by_wo[r.wo_number] == WoDisposition.routine)
+        / len(designed_routine)
+        if designed_routine
+        else 0.0
+    )
 
     # D-017 error split. Three distinct failure kinds among misclassifications:
     #   * false_positives — a routine WO (true == "unclassified") assigned a real
@@ -164,8 +182,11 @@ def run_audit(session: Session) -> tuple[bool, list[str]]:
     )
 
     lines = [
-        f"overall accuracy (classified rows): {accuracy:.3f} ({len(correct)}/{len(classified)})",
-        f"unclassified rate: {uncl_rate:.1%} ({len(unclassified)}/{len(rows)})",
+        f"overall accuracy (classified failure rows): {accuracy:.3f} ({len(correct)}/{len(classified)})",
+        f"unclassified rate (failure rows only): {uncl_rate:.1%} ({len(unclassified)}/{len(failure_rows)})",
+        f"routine closures (guard): {len(routine_guard_hits)}",
+        f"guard false positives (routine ∧ true=real mode): {len(guard_false_positives)} (gate ≤ {MAX_GUARD_FALSE_POSITIVES})",
+        f"guard recall over designed-routine rows: {guard_recall:.1%} (informational)",
         f"error split (real→real): {len(within_family_errors)} within-family, "
         f"{len(cross_family_errors)} cross-family (gate ≤ {MAX_CROSS_FAMILY_ERRORS})",
         f"false positives (true=unclassified → real mode): {len(false_positives)}",
@@ -184,6 +205,13 @@ def run_audit(session: Session) -> tuple[bool, list[str]]:
                 f"  {r.wo_number}: {r.true_mode}[{fam(r.true_mode)}] -> "
                 f"{r.predicted_code}[{fam(r.predicted_code)}] score={r.score:.3f}"
             )
+    else:
+        lines.append("  (none)")
+
+    lines.append("guard false-positive rows (if any):")
+    if guard_false_positives:
+        for r in guard_false_positives:
+            lines.append(f"  {r.wo_number}: true={r.true_mode}")
     else:
         lines.append("  (none)")
 
@@ -213,6 +241,7 @@ def run_audit(session: Session) -> tuple[bool, list[str]]:
         and accuracy >= MIN_ACCURACY
         and UNCLASSIFIED_LO <= uncl_rate <= UNCLASSIFIED_HI
         and len(cross_family_errors) <= MAX_CROSS_FAMILY_ERRORS
+        and len(guard_false_positives) <= MAX_GUARD_FALSE_POSITIVES
     )
 
     if not planted_ok:
@@ -232,6 +261,11 @@ def run_audit(session: Session) -> tuple[bool, list[str]]:
     if len(cross_family_errors) > MAX_CROSS_FAMILY_ERRORS:
         lines.append(
             f"FAIL: cross-family errors {len(cross_family_errors)} > {MAX_CROSS_FAMILY_ERRORS}"
+        )
+
+    if len(guard_false_positives) > MAX_GUARD_FALSE_POSITIVES:
+        lines.append(
+            f"FAIL: guard false positives {len(guard_false_positives)} > {MAX_GUARD_FALSE_POSITIVES}"
         )
 
     if not (UNCLASSIFIED_LO <= uncl_rate <= UNCLASSIFIED_HI):

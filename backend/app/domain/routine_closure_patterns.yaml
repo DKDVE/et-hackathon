@@ -1,0 +1,68 @@
+# =============================================================================
+# ROUTINE-CLOSURE GUARD (D-024) — deterministic pre-embedding patterns.
+# =============================================================================
+# Applied BEFORE embedding similarity in wo_normalizer. A match → disposition
+# routine, failure_mode_id NULL, normalization_score NULL (never force-fit).
+#
+# Built from M12 band readout: the 13 false-positive rows (true=unclassified
+# assigned lubrication_degradation / impeller_damage) plus the designed routine
+# phrase bank in meridian.yaml routine_phrases.
+#
+# CONSERVATIVE: when in doubt, let it normalize. A missed routine WO is queue
+# noise; a real failure flagged routine is data loss.
+#
+# Human ratification: prune any pattern that fires on non-routine rows in audit.
+# =============================================================================
+
+patterns:
+  - id: routine_pm_done
+    regex: "routine\\s+pm\\s+done"
+    note: "routine pm done, greased, checked, all ok"
+
+  - id: scheduled_pm_no_abnormality
+    regex: "scheduled\\s+pm:.*general\\s+check.*no\\s+abnormality"
+    note: "Scheduled PM: lubrication, general check. No abnormality found."
+
+  - id: no_abnormality_found
+    regex: "no\\s+abnormality\\s+found"
+    note: "closure phrase on PM / inspection WOs"
+
+  - id: nothing_abnormal
+    regex: "nothing\\s+abnormal"
+    note: "gen'l inspection, nothing abnormal, cont' running"
+
+  - id: running_normal_no_issue
+    regex: "running\\s+normal\\s+no\\s+issue"
+    note: "checked pump running normal no issue closed wo"
+
+  - id: topped_up_oil_running_fine
+    regex: "topped\\s+up\\s+oil.*running\\s+fine"
+    note: "topped up oil, wiped down, running fine"
+
+  - id: preventive_maintenance_satisfactory
+    regex: "preventive\\s+maintenance.*satisfactory\\s+condition"
+    note: "Preventive maintenance … equipment found in satisfactory condition"
+
+  - id: tightened_fittings_ok
+    regex: "tightened\\s+fittings,\\s+ok"
+    note: "cleaned area, tightened fittings, ok"
+
+  - id: housekeeping_no_defect
+    regex: "housekeeping.*no\\s+defect"
+    note: "painting + housekeeping around unit, no defect"
+
+  - id: nothing_wrong_equipment_ok
+    regex: "nothing\\s+wrong.*equipment\\s+ok"
+    note: "attended complaint found nothing wrong equipment ok"
+
+  - id: quarterly_check_readings_normal
+    regex: "quarterly\\s+check:.*readings\\s+normal"
+    note: "Quarterly check: readings normal. Action: none."
+
+  - id: wiped_down_running_fine
+    regex: "wiped\\s+down,\\s+running\\s+fine"
+    note: "topped up oil variant — oil phrase optional"
+
+  - id: closed_after_inspection_ok
+    regex: "^checked\\s+pump\\s+running\\s+normal"
+    note: "anchored start — avoids matching mid-sentence 'running normal' on failures"

@@ -27,7 +27,10 @@ def test_memory_overview(client: TestClient) -> None:
     data = resp.json()
     assert data["work_order_count"] == 500
     assert data["taxonomy_size"] == 25
-    assert data["wo_auto_classified"] + data["wo_unclassified"] == data["work_order_count"]
+    assert (
+        data["wo_failure_classified"] + data["wo_routine_closures"] + data["wo_unclassified"]
+        == data["work_order_count"]
+    )
 
 
 def test_memory_assets_coverage_footnote(client: TestClient) -> None:

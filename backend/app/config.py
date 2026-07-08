@@ -1,7 +1,9 @@
 """All tunable configuration — single source for env-derived settings."""
 
 from functools import lru_cache
+from typing import Any
 
+from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 # ponytail: migration 0001 hardcodes this dim; change here + new migration to resize vectors
@@ -12,6 +14,8 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=(".env", "../.env"), extra="ignore")
 
     database_url: str = "postgresql+psycopg://oce:oce@localhost:5432/oce"
+    # M15 hosted gate (D-025). Unset → middleware inert; local demo unchanged.
+    access_password: str = ""
     openrouter_api_key: str = ""
     embedding_dim: int = EMBEDDING_DIM
     demo_fallback: bool = False
@@ -34,6 +38,8 @@ class Settings(BaseSettings):
         "recommendation": "anthropic/claude-haiku-4.5",
         # Per-claim verdict JSON; Haiku sufficient with claim-scoped input (M6.1).
         "validation": "anthropic/claude-haiku-4.5",
+        # Executive summary on report open (M13 / D-019 stretch).
+        "summary": "anthropic/claude-haiku-4.5",
         # Contextual Q&A (FR-9, M8).
         "chat": "anthropic/claude-haiku-4.5",
     }
@@ -42,6 +48,7 @@ class Settings(BaseSettings):
         "analysis": 1100,
         "recommendation": 1400,
         "validation": 900,
+        "summary": 400,
         "chat": 600,
     }
 
@@ -104,6 +111,14 @@ class Settings(BaseSettings):
         "Good: OEM manual on class + ≥1 SOP + ≥5 WOs + ≥70% classified. "
         "Partial: manual or SOP or ≥1 WO, but not Good. Thin: everything else."
     )
+
+    @field_validator("database_url", mode="before")
+    @classmethod
+    def _normalize_database_url(cls, value: Any) -> Any:
+        # Render managed Postgres supplies postgresql:// — coerce for psycopg driver.
+        if isinstance(value, str) and value.startswith("postgresql://"):
+            return "postgresql+psycopg://" + value.removeprefix("postgresql://")
+        return value
 
 
 @lru_cache
