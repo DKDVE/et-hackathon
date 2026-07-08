@@ -70,7 +70,7 @@ class AccessGateMiddleware:
             return
 
         path = scope.get("path", "")
-        if path == "/health":
+        if path == "/health" or scope.get("method") == "OPTIONS":
             await self.app(scope, receive, send)
             return
 
