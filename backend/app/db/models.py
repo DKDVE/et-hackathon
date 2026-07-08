@@ -74,6 +74,20 @@ class ReasoningRunStatus(StrEnum):
     failed = "failed"
 
 
+class EvalSuite(StrEnum):
+    golden = "golden"
+    groundedness = "groundedness"
+    normalization = "normalization"
+    prose_id = "prose_id"
+    timing = "timing"
+
+
+class EvalStatus(StrEnum):
+    PASS = "pass"
+    WARN = "warn"
+    FAIL = "fail"
+
+
 class EvidenceKind(StrEnum):
     work_order = "work_order"
     chunk = "chunk"
@@ -230,6 +244,7 @@ class Dossier(Base):
         DateTime(timezone=True), server_default=func.now(), nullable=False
     )
     completed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    guardrail_stats: Mapped[dict[str, Any] | None] = mapped_column(JSONB)
 
     event: Mapped[OperationalEvent] = relationship(back_populates="dossier")
     evidence_links: Mapped[list["EvidenceLink"]] = relationship(back_populates="dossier")
@@ -260,6 +275,38 @@ class ReasoningRun(Base):
     output_digest: Mapped[str] = mapped_column(Text, nullable=False)
 
     dossier: Mapped[Dossier] = relationship(back_populates="reasoning_runs")
+
+
+class EvalRun(Base):
+    __tablename__ = "eval_runs"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    suite: Mapped[EvalSuite] = mapped_column(
+        Enum(
+            EvalSuite,
+            name="eval_suite",
+            native_enum=True,
+            create_constraint=True,
+            values_callable=lambda e: [m.value for m in e],
+        ),
+        nullable=False,
+    )
+    started_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    finished_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    git_ref: Mapped[str] = mapped_column(Text, nullable=False)
+    prompt_versions: Mapped[dict[str, Any]] = mapped_column(JSONB, nullable=False)
+    status: Mapped[EvalStatus] = mapped_column(
+        Enum(
+            EvalStatus,
+            name="eval_status",
+            native_enum=True,
+            create_constraint=True,
+            values_callable=lambda e: [m.value for m in e],
+        ),
+        nullable=False,
+    )
+    metrics: Mapped[dict[str, Any]] = mapped_column(JSONB, nullable=False)
+    detail: Mapped[dict[str, Any] | None] = mapped_column(JSONB)
 
 
 class ReasoningFallbackCache(Base):

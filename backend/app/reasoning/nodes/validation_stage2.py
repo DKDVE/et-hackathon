@@ -77,6 +77,7 @@ def _apply_verdicts(
 ) -> ValidatedDossier:
     verdicts = {v.claim_ref: v for v in output.claims}
     pool = state.shared_context.evidence_pool
+    stage2_removed = 0
 
     causes: list[ValidatedCause] = []
     for c in state.provisional_causes:
@@ -93,6 +94,7 @@ def _apply_verdicts(
         else:
             ids = []
             grounding = "hypothesis"
+        stage2_removed += max(0, len(c.evidence_ids) - len(ids))
         causes.append(
             ValidatedCause(
                 statement=c.statement,
@@ -108,6 +110,7 @@ def _apply_verdicts(
     for n in state.provisional_notes:
         v = verdicts.get(n.claim_ref)
         ids = _final_ids(n.evidence_ids, v, pool)
+        stage2_removed += max(0, len(n.evidence_ids) - len(ids))
         grounding = "evidenced" if ids else "hypothesis"
         notes.append(
             ValidatedSafetyNote(
@@ -122,6 +125,7 @@ def _apply_verdicts(
     for a in state.provisional_actions:
         v = verdicts.get(a.claim_ref)
         ids = _final_ids(a.evidence_ids, v, pool)
+        stage2_removed += max(0, len(a.evidence_ids) - len(ids))
         grounding = "evidenced" if ids else "hypothesis"
         actions.append(
             ValidatedAction(
@@ -134,6 +138,7 @@ def _apply_verdicts(
             )
         )
 
+    state.stripped_id_counts["stage2"] = stage2_removed
     return ValidatedDossier(probable_causes=causes, safety_notes=notes, actions=actions)
 
 

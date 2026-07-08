@@ -7,6 +7,7 @@ from datetime import UTC, datetime
 from sqlalchemy.orm import Session
 
 from app.config import get_settings
+from app.db.models import Dossier
 from app.domain.models import SharedContext
 from app.llm.client import LLMClient, NodeFailure
 from app.memory.repositories import reasoning_runs
@@ -80,9 +81,16 @@ def run_chat(
         raise
 
     pool = set(shared_context.evidence_pool)
-    citations, grounding = post_check_citations(
-        list(output.citations), pool, refused=output.refused
-    )
+    raw_citations = list(output.citations)
+    citations, grounding = post_check_citations(raw_citations, pool, refused=output.refused)
+    stripped = len(raw_citations) - len(citations)
+    if stripped:
+        dossier = session.get(Dossier, dossier_id)
+        if dossier is not None:
+            stats = dict(dossier.guardrail_stats or {})
+            stats["chat_citations_stripped"] = stats.get("chat_citations_stripped", 0) + stripped
+            dossier.guardrail_stats = stats
+            session.commit()
     result: dict = {
         "answer": output.answer.strip(),
         "citations": citations,

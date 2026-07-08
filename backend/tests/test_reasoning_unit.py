@@ -10,7 +10,7 @@ import pytest
 
 from app.domain.models import AssetProfile, EventInfo, SharedContext, SisterIncident, WorkOrderRecord
 from app.reasoning.graph import reasoning_sse_events
-from app.reasoning.nodes.report import attach_strength
+from app.reasoning.nodes.report import attach_strength, compute_guardrail_stats, persist_validated
 from app.reasoning.nodes.validation_stage1 import run_validation_stage1
 from app.reasoning.prompts.context_render import render_recommendation_context, render_shared_context
 from app.reasoning.schemas import (
@@ -120,6 +120,44 @@ def test_safety_hypothesis_deleted_in_sections() -> None:
     safe = [n for n in validated.safety_notes if n.grounding == "evidenced"]
     assert len(safe) == 1
     assert safe[0].text == "LOTO per SOP"
+
+
+def test_guardrail_stats_from_state() -> None:
+    from app.reasoning.state import DossierState
+
+    pool = {"WO-2024-0117"}
+    ctx = _minimal_ctx(pool)
+    state = DossierState(
+        dossier_id=1,
+        shared_context=ctx,
+        stripped_id_counts={"stage1": 2, "stage2": 1},
+        validated=ValidatedDossier(
+            probable_causes=[
+                ValidatedCause(
+                    statement="A",
+                    mechanism_explanation="m",
+                    evidence_ids=[],
+                    grounding="hypothesis",
+                    claim_ref="cause:0",
+                )
+            ],
+            safety_notes=[
+                ValidatedSafetyNote(
+                    text="bad",
+                    evidence_ids=[],
+                    grounding="hypothesis",
+                    claim_ref="safety:0",
+                )
+            ],
+            actions=[],
+        ),
+    )
+    stats = compute_guardrail_stats(state)
+    assert stats["stage1_stripped_citations"] == 2
+    assert stats["stage2_unsupported_removed"] == 1
+    assert stats["hypothesis_claims"] == 1
+    assert stats["safety_notes_deleted"] == 1
+    assert stats["chat_citations_stripped"] == 0
 
 
 def test_report_section_order() -> None:
