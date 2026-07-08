@@ -7,6 +7,7 @@ import { getHealth } from "@/lib/api";
 const navItems = [
   { to: "/events", label: "Events" },
   { to: "/assets", label: "Assets" },
+  { to: "/memory", label: "Memory" },
   { to: "/ops", label: "Operations" },
 ] as const;
 

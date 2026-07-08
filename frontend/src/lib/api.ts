@@ -175,5 +175,85 @@ export const getWorkOrderSource = (woNumber: string) =>
 
 export const listAssets = () => apiFetch<AssetSummary[]>("/api/assets");
 
+export type MemoryOverview = {
+  asset_count: number;
+  document_count: number;
+  chunk_count: number;
+  work_order_count: number;
+  wo_auto_classified: number;
+  wo_unclassified: number;
+  wo_human_reviewed: number;
+  taxonomy_size: number;
+};
+
+export type MemoryAssetRow = {
+  asset_id: number;
+  tag: string;
+  name: string;
+  asset_class: string;
+  manual_available: boolean;
+  sop_count: number;
+  wo_count: number;
+  last_inspection_date: string | null;
+  classified_ratio: number;
+  coverage_tier: "Good" | "Partial" | "Thin";
+};
+
+export type MemoryDocumentRow = {
+  document_id: number;
+  title: string;
+  doc_type: string;
+  owner_asset_tag: string | null;
+  owner_class: string | null;
+  chunk_count: number;
+  ocr_page_count: number;
+  file_url: string;
+};
+
+export type TaxonomyModeRow = {
+  mode_id: number;
+  code: string;
+  name: string;
+  auto_wo_count: number;
+  human_override_count: number;
+  mean_normalization_score: number | null;
+};
+
+export type TaxonomyFamilyGroup = {
+  family: string;
+  modes: TaxonomyModeRow[];
+};
+
+export type ReviewQueueRow = {
+  wo_id: number;
+  wo_number: string;
+  asset_tag: string;
+  raw_description: string;
+  auto_failure_mode_code: string | null;
+  auto_failure_mode_family: string | null;
+  normalization_score: number | null;
+  candidates: { mode_id: number; code: string; name: string; score: number }[];
+};
+
+export const getMemoryOverview = () => apiFetch<MemoryOverview>("/api/memory/overview");
+
+export const getMemoryAssets = () =>
+  apiFetch<{ assets: MemoryAssetRow[]; coverage_footnote: string }>("/api/memory/assets");
+
+export const getMemoryDocuments = () => apiFetch<MemoryDocumentRow[]>("/api/memory/documents");
+
+export const getMemoryTaxonomy = () => apiFetch<TaxonomyFamilyGroup[]>("/api/memory/taxonomy");
+
+export const getMemoryReviewQueue = () => apiFetch<ReviewQueueRow[]>("/api/memory/review-queue");
+
+export const submitReviewVerdict = (
+  woId: number,
+  body: { verdict: string; failure_mode_id?: number | null },
+) =>
+  apiFetch(`/api/memory/review/${woId}`, {
+    method: "POST",
+    body: JSON.stringify(body),
+  });
+
 /** Absolute URL for a rendered PDF served by the backend (react-pdf source). */
 export const fileUrl = (relativeUrl: string) => `${API_URL}${relativeUrl}`;

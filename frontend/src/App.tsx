@@ -3,6 +3,7 @@ import { Navigate, Route, Routes } from "react-router-dom";
 import { AssetRegistry } from "@/routes/AssetRegistry";
 import { DossierView } from "@/routes/DossierView";
 import { EventBoard } from "@/routes/EventBoard";
+import { MemoryView } from "@/routes/MemoryView";
 import { OpsView } from "@/routes/OpsView";
 import { ReportView } from "@/routes/ReportView";
 
@@ -14,6 +15,7 @@ export default function App() {
       <Route path="/events/:id" element={<DossierView />} />
       <Route path="/events/:id/report" element={<ReportView />} />
       <Route path="/assets" element={<AssetRegistry />} />
+      <Route path="/memory" element={<MemoryView />} />
       <Route path="/ops" element={<OpsView />} />
     </Routes>
   );
