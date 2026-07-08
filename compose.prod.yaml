@@ -1,0 +1,50 @@
+# Local prod-bundle smoke (additive). Default `docker compose up` stays on dev targets.
+# Usage:
+#   docker compose -f compose.prod.yaml up --build
+# Then open http://localhost:8080 (frontend) — API at http://localhost:8000
+
+services:
+  db:
+    image: pgvector/pgvector:pg16
+    environment:
+      POSTGRES_USER: oce
+      POSTGRES_PASSWORD: oce
+      POSTGRES_DB: oce
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata_prod:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U oce -d oce"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile.prod
+    env_file: .env
+    environment:
+      GIT_REF: ${GIT_REF:-unknown}
+      FRONTEND_ORIGIN: http://localhost:8080
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      target: prod
+      args:
+        VITE_API_URL: http://localhost:8000
+    ports:
+      - "8080:80"
+    depends_on:
+      - backend
+
+volumes:
+  pgdata_prod:
