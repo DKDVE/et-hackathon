@@ -293,7 +293,8 @@ else
       "OPENROUTER_API_KEY=secretref:openrouter-api-key" \
       "ACCESS_PASSWORD=secretref:access-password" \
       "DATASET_DIR=/dataset" \
-    --command "python" "/scripts/seed.py" "--phase" "structure" \
+    --command "python" "/scripts/seed.py" \
+    --args "--phase" "structure" \
     -o none
 fi
 
@@ -318,7 +319,7 @@ Bootstrap complete.
 
 Next steps:
   1. Seed structure:  az containerapp job start -g ${AZURE_RESOURCE_GROUP} -n ${AZURE_SEED_JOB}
-  2. Seed ingest:     az containerapp job update -g ${AZURE_RESOURCE_GROUP} -n ${AZURE_SEED_JOB} --command "python" "/scripts/seed.py" "--phase" "ingest" && az containerapp job start -g ${AZURE_RESOURCE_GROUP} -n ${AZURE_SEED_JOB}
+  2. Seed ingest:     az containerapp job update -g ${AZURE_RESOURCE_GROUP} -n ${AZURE_SEED_JOB} --command "python" "/scripts/seed.py" --args "--phase" "ingest" && az containerapp job start -g ${AZURE_RESOURCE_GROUP} -n ${AZURE_SEED_JOB}
      Fallback if ingest OOMs: add dev IP to PG firewall, run ingest locally against DATABASE_URL.
   3. Smoke:           python3 scripts/simulate_event.py --api-url "https://${BACKEND_FQDN}"
   4. Wire GitHub OIDC + SWA deployment token (see infra/azure/README.md).

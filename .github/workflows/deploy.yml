@@ -99,6 +99,7 @@ jobs:
             --set-env-vars "GIT_REF=${{ env.DEPLOY_SHA }}"
 
       - name: Ensure seed job exists
+        continue-on-error: true
         run: |
           IMAGE="${{ env.AZURE_ACR_NAME }}.azurecr.io/oce-backend:${{ env.DEPLOY_SHA }}"
           IDENTITY_ID="$(az identity show \
@@ -116,7 +117,8 @@ jobs:
               --registry-server "${{ env.AZURE_ACR_NAME }}.azurecr.io" \
               --registry-identity "$IDENTITY_ID" \
               --cpu 2 --memory 4Gi \
-              --command "python" "/scripts/seed.py" "--phase" "structure"
+              --command "python" "/scripts/seed.py" \
+              --args "--phase" "structure"
           fi
 
       - name: Build frontend

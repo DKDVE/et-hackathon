@@ -14,6 +14,7 @@ WORKDIR /app
 ENV PIP_RETRIES=5 PIP_TIMEOUT=120
 
 COPY backend/pyproject.toml ./
+COPY backend/alembic.ini ./
 COPY backend/app ./app
 
 RUN pip install --no-cache-dir --retries 5 --timeout 120 \
