@@ -1,5 +1,7 @@
 # Operational Context Engine (OCE)
 
+[![CI](https://github.com/REPLACE_ORG/REPLACE_REPO/actions/workflows/ci.yml/badge.svg)](https://github.com/REPLACE_ORG/REPLACE_REPO/actions/workflows/ci.yml)
+
 Demo-ready operational context dossier for industrial reliability events. One
 `docker compose` stack: Postgres + FastAPI backend + Vite/React frontend.
 
@@ -61,6 +63,13 @@ deterministic sections render instantly, then AI reasoning stream in.
 | `REASONING_ENABLED` | `false` | Gate the reasoning layer (P5) |
 | `DEMO_FALLBACK` | `0` | Replay cached SSE on LLM failure (P9) |
 | `VITE_API_URL` | `http://localhost:8000` | Frontend → backend |
+| `ACCESS_PASSWORD` | *(unset)* | Hosted-only HTTP Basic gate (M15); inert when empty |
+
+## Deployment (optional — M15)
+
+Hosted Render instance + GitHub Actions CI. Does **not** replace the local demo path (D-025 / P9).
+
+See [`docs/deployment.md`](docs/deployment.md) for blueprint, secrets, seed procedure, and cost notes.
 
 ## Verification
 
@@ -72,6 +81,19 @@ make demo-gate      # night-before gate: tests + audits + timed demo run
 make images-save    # tarball backend+frontend+db images for USB-stick cold start
 make images-load    # load tarball on cold machine (then dataset/seed/ingest only)
 ```
+
+### Cold-start (USB path, M14 measured)
+
+| Step | Time |
+|------|------|
+| `make images-load` | ~2 min |
+| `make dataset` | ~1 min |
+| `make up` (images cached) | ~2 min + 1–2 min embedder |
+| `make seed` | ~4 min |
+| `make ingest` (guard active) | ~4 min |
+| **Total post-USB** | **~12–15 min** |
+
+First-build path (no USB): allow **15–25 min** for `make up` alone on conference Wi‑Fi.
 
 See `docs/demo-checklist.md` for the full rehearsal script.
 

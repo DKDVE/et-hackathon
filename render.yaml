@@ -1,0 +1,70 @@
+# Render blueprint (M15 / D-025). Local demo path unchanged — this file is additive.
+# Apply from dashboard: New > Blueprint > connect repo > sync.
+#
+# pgvector: migration 0001 runs CREATE EXTENSION vector on first alembic upgrade.
+# Render Postgres supports pgvector; if extension creation fails on a new DB, run
+# CREATE EXTENSION vector; once via Render Shell (superuser) then redeploy.
+#
+# Cold first deploy: backend image ~4.5GB (CPU torch + BGE cache). Allow 15–25 min.
+
+databases:
+  - name: oce-db
+    databaseName: oce
+    user: oce
+    plan: basic-256mb
+    postgresMajorVersion: "16"
+
+services:
+  - type: web
+    name: oce-backend
+    runtime: docker
+    plan: pro # 4 GB RAM — torch + BGE ingest headroom
+    region: oregon
+    dockerfilePath: ./backend/Dockerfile.prod
+    dockerContext: .
+    dockerCommand: ""
+    healthCheckPath: /health
+    autoDeployTrigger: checksPass
+    buildFilter:
+      paths:
+        - backend/**
+        - dataset/rendered/**
+        - dataset/design/**
+        - dataset/generators/**
+        - scripts/**
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: oce-db
+          property: connectionString
+      - key: OPENROUTER_API_KEY
+        sync: false
+      - key: ACCESS_PASSWORD
+        sync: false
+      - key: DEMO_FALLBACK
+        value: "0"
+      - key: REASONING_ENABLED
+        value: "true"
+      - key: FRONTEND_ORIGIN
+        fromService:
+          name: oce-frontend
+          type: web
+          envVarKey: RENDER_EXTERNAL_URL
+      - key: GIT_REF
+        value: render-deploy
+
+  - type: web
+    name: oce-frontend
+    runtime: static
+    buildCommand: cd frontend && npm ci && npm run build
+    staticPublishPath: frontend/dist
+    autoDeployTrigger: checksPass
+    buildFilter:
+      paths:
+        - frontend/**
+    envVars:
+      - key: VITE_API_URL
+        fromService:
+          name: oce-backend
+          type: web
+          envVarKey: RENDER_EXTERNAL_URL
