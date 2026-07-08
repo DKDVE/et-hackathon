@@ -84,7 +84,27 @@ export DATABASE_URL='postgresql+psycopg://…'   # from portal — never commit
 cd backend && uv run python ../scripts/seed.py --phase ingest
 ```
 
-## GitHub Actions OIDC (no client secrets)
+## Static Web App (Free) — region caveat
+
+SWA is **not** available in `centralindia`. Default create location is `centralus`
+(`AZURE_SWA_LOCATION`). **Azure for Students** subscriptions may block SWA entirely
+(region policy). Workarounds:
+
+1. **GitHub Actions / Azure Pipelines** — build `frontend/dist` locally in CI and serve via a second Container App (add `oce-frontend` ACA) or use the API docs URL for smoke.
+2. **Local UI against hosted API** — set `VITE_API_URL` to the ACA backend FQDN; CORS: set `FRONTEND_ORIGIN=http://localhost:5173` on the backend until SWA exists.
+3. **Azure DevOps** — `infra/azure/azure-pipelines.yml` (Microsoft-hosted agents have Docker; bypasses blocked ACR Tasks).
+
+## Image build — student subscription caveat
+
+`az acr build` (ACR Tasks) returns `TasksOperationsNotAllowed` on some student
+subscriptions. **Do not rely on cloud build in `deploy.sh`.** Instead:
+
+1. **GitHub Actions** — `.github/workflows/deploy.yml` (`workflow_dispatch` or post-CI); OIDC vars: `AZURE_CLIENT_ID`, `AZURE_TENANT_ID`, `AZURE_SUBSCRIPTION_ID`.
+2. **Azure Pipelines** — `infra/azure/azure-pipelines.yml`; service connection `Azure-OCE-Hackathon`.
+3. **Local Docker** — start Docker Desktop, then `./infra/azure/deploy.sh` (full build path).
+
+Bootstrap infra without image: `SKIP_BUILD=1 SKIP_PG=1 ./infra/azure/deploy.sh` (ACA placeholder until CI pushes).
+
 
 One-time setup (replace placeholders):
 
