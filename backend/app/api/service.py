@@ -93,6 +93,33 @@ async def dossier_sse(dossier_id: int) -> AsyncIterator[dict[str, str]]:
     context_frame = response.model_copy(update={"degraded": None})
     yield _event("context_ready", context_frame)
 
+    # ponytail: complete dossiers replay persisted sections — never re-call OpenRouter
+    # on page refresh (hosted Azure gets 403 from OpenRouter datacenter IPs).
+    if dossier.sections is not None and str(dossier.status) == "complete":
+        sections = dossier.sections
+        yield _event(
+            "analysis",
+            {"probable_causes": sections.get("probable_causes", []), "provisional": False},
+        )
+        yield _event(
+            "recommendation",
+            {
+                "safety_notes": sections.get("safety_notes", []),
+                "actions": sections.get("actions", []),
+                "provisional": False,
+            },
+        )
+        yield _event(
+            "validated",
+            {
+                "probable_causes": sections.get("probable_causes", []),
+                "safety_notes": sections.get("safety_notes", []),
+                "actions": sections.get("actions", []),
+            },
+        )
+        yield _event("report_complete", build_dossier_response(dossier))
+        return
+
     if not get_settings().reasoning_enabled:
         yield _event(
             "degraded",

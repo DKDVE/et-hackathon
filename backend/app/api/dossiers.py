@@ -128,6 +128,23 @@ def ensure_executive_summary(dossier_id: int, db: DbDep) -> DossierResponse:
     if not any(dossier.sections.get(k) for k in ai_keys):
         return build_dossier_response(dossier)
 
+    # ponytail: skip repeat LLM calls after a prior summary failure (hosted OpenRouter 403).
+    from sqlalchemy import select
+
+    from app.db.models import ReasoningRun, ReasoningRunStatus
+
+    prior_fail = db.scalar(
+        select(ReasoningRun.id)
+        .where(
+            ReasoningRun.dossier_id == dossier_id,
+            ReasoningRun.node == "summary",
+            ReasoningRun.status == ReasoningRunStatus.failed,
+        )
+        .limit(1)
+    )
+    if prior_fail is not None:
+        return build_dossier_response(dossier)
+
     client = LLMClient()
     text = run_summary(
         dossier_id=dossier_id,
