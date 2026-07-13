@@ -21,14 +21,34 @@ permissions:
   id-token: write
 
 env:
-  VITE_API_URL: https://oce-backend.happywave-8830fe78.centralindia.azurecontainerapps.io
+  AZURE_RESOURCE_GROUP: rg-oce-hackathon
+  AZURE_BACKEND_APP: oce-backend
   GITHUB_PAGES: "1"
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
     steps:
       - uses: actions/checkout@v4
+
+      - name: Azure login (OIDC)
+        uses: azure/login@v2
+        with:
+          client-id: ${{ vars.AZURE_CLIENT_ID }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}
+          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Resolve backend API URL
+        id: api
+        run: |
+          FQDN="$(az containerapp show \
+            --name "${{ env.AZURE_BACKEND_APP }}" \
+            --resource-group "${{ env.AZURE_RESOURCE_GROUP }}" \
+            --query properties.configuration.ingress.fqdn -o tsv)"
+          echo "url=https://${FQDN}" >> "$GITHUB_OUTPUT"
 
       - uses: actions/setup-node@v4
         with:
@@ -38,6 +58,8 @@ jobs:
 
       - name: Build frontend
         working-directory: frontend
+        env:
+          VITE_API_URL: ${{ steps.api.outputs.url }}
         run: |
           npm ci
           npm run build

@@ -40,6 +40,7 @@ fi
 : "${OPENROUTER_API_KEY:?OPENROUTER_API_KEY required}"
 : "${ACCESS_PASSWORD:?ACCESS_PASSWORD required}"
 : "${AZURE_CA_ENV:=oce-env}"
+: "${AZURE_CA_LOCATION:=$AZURE_LOCATION}"
 : "${AZURE_BACKEND_APP:=oce-backend}"
 : "${AZURE_SEED_JOB:=oce-seed}"
 : "${AZURE_IDENTITY_NAME:=oce-aca-identity}"
@@ -179,17 +180,17 @@ if [[ "${USE_PLACEHOLDER:-0}" != "1" && -z "${DEPLOY_IMAGE:-}" ]]; then
   DEPLOY_PORT=8000
 fi
 
-log "Container Apps environment ${AZURE_CA_ENV}"
+log "Container Apps environment ${AZURE_CA_ENV} (${AZURE_CA_LOCATION})"
 if ! az containerapp env show --name "${AZURE_CA_ENV}" --resource-group "${AZURE_RESOURCE_GROUP}" &>/dev/null; then
   az containerapp env create \
     --name "${AZURE_CA_ENV}" \
     --resource-group "${AZURE_RESOURCE_GROUP}" \
-    --location "${AZURE_LOCATION}" \
+    --location "${AZURE_CA_LOCATION}" \
     -o none
 fi
 ENV_ID="$(az containerapp env show --name "${AZURE_CA_ENV}" --resource-group "${AZURE_RESOURCE_GROUP}" --query id -o tsv)"
 
-: "${FRONTEND_ORIGIN:=https://placeholder.azurestaticapps.net}"
+: "${FRONTEND_ORIGIN:=https://dkdve.github.io,http://localhost:5173}"
 
 log "Container App ${AZURE_BACKEND_APP} (2 vCPU / 4 GiB, min=max=1)"
 REGISTRY_ARGS=()

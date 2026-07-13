@@ -184,6 +184,31 @@ az group delete --name rg-oce-hackathon --yes --no-wait
 
 Also delete the GitHub federated app registration if retiring the track entirely.
 
+## Switching Azure subscription
+
+When moving off an exhausted subscription (frontend stays on **GitHub Pages**):
+
+1. **Teardown old** (on the old account): `az group delete -n rg-oce-hackathon --yes --no-wait`
+2. **Login new account**: `az login` → `export AZURE_SUBSCRIPTION_ID='<new-id>'`
+3. **Bootstrap** (reuses secrets from your password manager / prior deploy notes):
+
+   ```bash
+   export AZURE_ACR_NAME=ocehackathonacr
+   export AZURE_PG_ADMIN_PASSWORD='…'
+   export AZURE_DEV_IP="$(curl -4 -s ifconfig.me)"
+   export OPENROUTER_API_KEY='…'
+   export ACCESS_PASSWORD='…'
+   ./infra/azure/migrate-subscription.sh
+   ```
+
+   This runs `deploy.sh` (infra only, `SKIP_BUILD=1`) and `setup-github-oidc.sh` (updates GitHub `AZURE_*` vars).
+
+4. **Deploy image**: `gh workflow run deploy.yml` (first push ~20 min).
+5. **Seed**: structure job, then ingest (see [Seed procedure](#seed-procedure)).
+6. **Refresh Pages**: `gh workflow run pages.yml` — resolves `VITE_API_URL` from the new ACA FQDN automatically.
+
+Globally unique names (`ocehackathonacr`, `oce-pg-hackathon`) may take a few minutes to release after the old resource group deletes.
+
 ## Cost estimate (hackathon month)
 
 | Resource | SKU | ~USD/mo |
