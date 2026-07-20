@@ -180,8 +180,6 @@ docs/          Storyline, architecture, compliance, benchmarks
 
 ## Deployment (optional)
 
-Hosted deployment does **not** replace the local demo path. Both tracks are documented separately.
-
 ### Azure (recommended)
 
 | Layer | Resource |
@@ -197,8 +195,4 @@ Full bootstrap, OIDC setup, seed procedure, and cost table: [`infra/azure/README
 
 Superseded by Azure. Preserved for reference: [`docs/deploy-alternatives/render/`](docs/deploy-alternatives/render/).
 
----
 
-## License
-
-Hackathon submission - see repository for usage terms.
