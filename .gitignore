@@ -1,14 +1,50 @@
+# --- secrets (never commit) ---
 .env
 .env.*
 !.env.example
+
+# --- Python ---
 .venv/
 __pycache__/
 *.pyc
 .pytest_cache/
 .mypy_cache/
 .ruff_cache/
-dist/
+.coverage
+htmlcov/
+coverage/
+
+# --- Node / frontend build ---
 node_modules/
 frontend/dist/
+frontend/dist-ssr/
+*.local
+
+# --- Docker cold-start artifact ---
 docker-images.tar
+
+# --- IDE / editor / OS ---
 .cursor/
+.vscode/
+.idea/
+.DS_Store
+*.swp
+*.swo
+*Zone.Identifier
+*:Zone.Identifier
+
+# --- scratch / backups / logs ---
+*.bak
+*.original.md
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# --- ML model caches (local dev only) ---
+.cache/huggingface/
+.cache/torch/
+
+# --- dist (generic) ---
+dist/

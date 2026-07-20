@@ -5,6 +5,29 @@
 Demo-ready operational context dossier for industrial reliability events. One
 `docker compose` stack: Postgres + FastAPI backend + Vite/React frontend.
 
+## For Reviewers — the 5-minute tour
+
+1. **Story** — [`docs/MVP-STORYLINE.md`](docs/MVP-STORYLINE.md) (the whole narrative arc)
+2. **Deck** — [`docs/OCE-pitch-deck.pptx`](docs/OCE-pitch-deck.pptx)
+3. **Architecture** — [`docs/architecture/`](docs/architecture/) (reference poster + C4 drawio set)
+4. **Decisions** — [`DECISIONS.md`](DECISIONS.md) (27 logged decisions incl. our reversals)
+5. **Compliance** — [`docs/ET-COMPLIANCE-REPORT.md`](docs/ET-COMPLIANCE-REPORT.md)
+6. **Run it** — fresh laptop path (honest timing):
+
+   ```bash
+   git clone https://github.com/DKDVE/et-hackathon.git && cd et-hackathon
+   cp .env.example .env   # set OPENROUTER_API_KEY for live reasoning
+   make dataset && make up && make seed && make ingest
+   python3 scripts/simulate_event.py   # ~30–60s to dossier on warm stack
+   ```
+
+   Cold first build: allow **15–25 min** for `make up` (embedder image). After
+   ingest, `make demo-gate` is the night-before verdict.
+
+7. **Numbers** — every claim is sourced in [`docs/FIGURES-CARD.md`](docs/FIGURES-CARD.md)
+
+Also useful: [`docs/demo-checklist.md`](docs/demo-checklist.md), [`docs/DEMO-SCRIPT.md`](docs/DEMO-SCRIPT.md), [`docs/expert-benchmark.md`](docs/expert-benchmark.md).
+
 ## Prerequisites
 
 - **Docker** and **Docker Compose** v2
