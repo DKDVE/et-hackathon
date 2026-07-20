@@ -190,9 +190,3 @@ docs/          Storyline, architecture, compliance, benchmarks
 | CD | GitHub Actions → ACR → ACA (OIDC, no client secrets) |
 
 Full bootstrap, OIDC setup, seed procedure, and cost table: [`infra/azure/README.md`](infra/azure/README.md).
-
-### Render (legacy)
-
-Superseded by Azure. Preserved for reference: [`docs/deploy-alternatives/render/`](docs/deploy-alternatives/render/).
-
-
