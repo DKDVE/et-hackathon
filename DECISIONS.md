@@ -161,6 +161,17 @@
 
 ---
 
+## D-014 — Local embedding model (bge-large-en-v1.5); no network at ingest runtime
+
+**Status:** Accepted
+**Decision:** All vector embeddings — failure-mode taxonomy, work-order descriptions at ingest, and query-time retrieval — use a single in-process `sentence-transformers` model (`BAAI/bge-large-en-v1.5`, 1024-dim, L2-normalized). `llm/embeddings.py` is the sole import site for `sentence-transformers`. The model is baked into the backend image and pre-warmed on startup; ingest and audit never call an external embedding API.
+**Alternatives Considered:** (a) OpenRouter / hosted embedding APIs (network dependency on stage, cost, latency); (b) smaller/faster models (weaker cosine separation on industrial WO text — M3 calibration showed bge-large necessary for the 0.55 threshold band); (c) dual models for query vs document (ops complexity, no demo gain).
+**Rationale:** P7 posture: the demo must survive wifi loss. Local embeddings make ingest reproducible, auditable, and independent of API keys. One model keeps normalization and retrieval on the same geometry.
+**Trade-offs:** ~1–2 min warm-up on cold start; image size (~3 GB pull). Production scale would revisit batching service / managed embeddings — not before P&ID topology demands it.
+**Impact:** `config.embedding_model`, `Dockerfile` model cache, `make ingest` / `make audit-norm` load time; TDD §ingestion; demo checklist warm-up line.
+
+---
+
 ## D-015 — Hybrid-lite retrieval: deterministic lexical channel unioned with vector top-k
 
 **Status:** Accepted
@@ -193,7 +204,58 @@
 
 ---
 
-*Next entries will be appended as ready-to-paste blocks in chat whenever a qualifying decision is made — including during TDD, schema design, and any mid-build pivots. Superseding is allowed; deleting is not.*
+## D-018 — Dual pattern rows: acute and chronic displayed peer-level, downtime-sorted
+
+**Status:** Accepted
+**Decision:** FR-12 pattern statistics return **all** qualifying failure-mode rows for the sister fleet (not only the headline planted pattern). The Pattern Panel renders every row at peer visual weight, sorted by cumulative downtime descending. Verbatim field phrasings are shown as the vocabulary-normalization exhibit. The analysis prompt is instructed to read chronic and acute rows together for causal linkage.
+**Alternatives Considered:** (a) Show only the top pattern (hides the 18× flush-line chronic story); (b) Separate "acute" and "chronic" UI sections (implies hierarchy the data doesn't enforce); (c) LLM-generated pattern narrative (unauditable, violates P2).
+**Rationale:** The demo's Act 3 beat is *two* discoveries — the planted seal trio **and** the chronic flush-line cause the plant wrote down eighteen times. Sorting by downtime surfaces the chronic row first honestly; the planted acute row remains visible with exact test-gated figures.
+**Trade-offs:** Panel can feel dense on small screens; both rows must stay numerically exact (golden tests). ₹ impact display depends on D-021.
+**Impact:** `get_pattern_stats`, `PatternPanel.tsx`, `test_demo_event_context.py`, analysis prompt §pattern_stats, demo script FR-12 narration.
+
+---
+
+## D-019 — Deterministic report step; optional executive-summary stretch
+
+**Status:** Accepted
+**Decision:** After the three LLM reasoning nodes and two-stage validation, a **deterministic** report step assembles the dossier: strip stage-1 invalid citations, apply stage-2 support verdicts, delete unsupported safety notes, attach Evidence Strength tiers, persist sections + `evidence_links` + `guardrail_stats`. No LLM in this step. Report view (FR-10) renders persisted sections only — zero new model calls. M13 stretch: a lazy Haiku executive summary on first report open, post-checked like other nodes, immutable once written.
+**Alternatives Considered:** (a) LLM-written final dossier JSON (nondeterministic, hard to audit); (b) Client-side report assembly from SSE fragments (drift between stream and DB); (c) PDF export pipeline (scope — browser print is sufficient).
+**Rationale:** Separating "reason" from "publish" makes guardrail stats truthful and the incident report shareable without re-invoking the model. Deterministic assembly is the enforcement point for FR-6 / NFR-2.
+**Trade-offs:** Report cannot "fix" reasoning mistakes — only label hypotheses and delete unsafe claims. Summary stretch adds one optional Haiku call (config-gated).
+**Impact:** `reasoning/nodes/report.py`, `ReportView.tsx`, migration 0004 `guardrail_stats`, `test_e2e_deterministic.py`, demo-gate groundedness/prose audits.
+
+---
+
+## D-020 — Linear reasoning orchestrator (plain Python), not a dynamic agent graph
+
+**Status:** Accepted (founder-ratified)
+**Decision:** The reasoning pipeline is a fixed linear sequence — analysis → recommendation → validation (stage 1 code, stage 2 model) → report (code) — implemented as plain Python in `reasoning/graph.py`, not a LangGraph `StateGraph` or multi-agent planner. Nodes do not branch, loop, or call tools. D-006's four industrial responsibilities are preserved; the implementation is deliberately boring.
+**Alternatives Considered:** (a) LangGraph StateGraph with conditional edges (demo latency variance, harder to replay/cache); (b) Single mega-prompt (no adversarial validation gate); (c) Agentic tool-use loops (violates D-005 retrieval-once).
+**Rationale:** Hackathon reliability: every dossier follows the same path, cacheable as an ordered SSE sequence. Judges asking "is this agentic?" get an honest answer — disciplined linear orchestration, not an ensemble.
+**Trade-offs:** Cannot recover from a bad retrieval pass; no parallel node fan-out. Framed as discipline, not missing ambition.
+**Impact:** `reasoning/graph.py`, SSE event contract, fallback cache replay, Trace tab row order, demo talk-track vs "multi-agent" teams.
+
+---
+
+## D-021 — Configured ₹ downtime cost for pattern impact display
+
+**Status:** Accepted
+**Decision:** Cross-asset pattern rows display estimated downtime cost exposure as `hours × DOWNTIME_COST_PER_HOUR_INR`, default **₹4.5L/hr** (`450_000`), exposed via `GET /api/config` and footnoted in UI. The multiplier is configuration, not LLM output or market data.
+**Alternatives Considered:** (a) Hide cost (weakens business-impact story); (b) LLM-estimated impact (unauditable); (c) Per-asset configurable rates (scope — one fleet assumption is defensible on stage).
+**Rationale:** Converts the SQL pattern reveal into executive language judges expect, while keeping the number explainable in one sentence if challenged.
+**Trade-offs:** Not validated against real plant economics; must be labeled "configured assumption" in deck/script.
+**Impact:** `config.downtime_cost_per_hour_inr`, `PatternPanel.tsx`, `impact.ts`, `FIGURES-CARD.md`, demo script.
+
+---
+
+## D-022 — Post-MVP wave plan and governance surfaces (M10–M14)
+
+**Status:** Accepted
+**Decision:** After core dossier shipping (M9), extend the product in four gated waves through July 22: **M10** board honesty + reasoning trace tab; **M11** AI Operations panel + eval persistence + guardrail stats; **M12** Memory Layer + review queue; **M13** routine-closure guard (D-024 substrate change); **M14** freeze + re-hardening. Each wave merge-gates on `make demo-gate` GREEN; timeline extension is explicit, not scope creep by accident.
+**Alternatives Considered:** (a) Big-bang polish pass (unmergeable risk); (b) Skip ops/memory surfaces (loses the self-debugging governance story); (c) Continue feature work past freeze without gate (rejected at M14).
+**Rationale:** The 93.7→96.6% arc and review-queue discovery require product surfaces, not slides. Waves keep the local demo path sacred while compounding judge-facing proof.
+**Trade-offs:** More migrations and UI after "MVP" — mitigated by wave gates and `demo-final-v2` tag discipline.
+**Impact:** Milestones M10–M14 prompts, `eval_runs` table, `/ops` + `/memory` routes, `demo-checklist.md`, D-016 tracing consumption, D-024 guard.
 
 ---
 
@@ -216,5 +278,27 @@
 **Rationale:** M12 showed 13 designed-routine rows misclassified as real modes (lubrication_degradation / impeller_damage) while sitting in the low-margin review band. A conservative deterministic guard removes them from the failure substrate without touching threshold/margin tuning. Conservatism is explicit: missed routine = queue noise; false routine on real failure = data loss (hard-gated).
 **Trade-offs:** Pattern list requires human ratification like family mapping; recall over designed-routine rows is informational only. Unclassified-rate band is computed on failure-disposition rows only post-guard.
 **Impact:** Migration 0006; `routine_closure_patterns.yaml`; `wo_normalizer.py` pre-pass; repository exclusions; normalization audit guard section; Memory overview split counts.
+
+---
+
+## D-025 — Local-first demo path; optional hosted instance with access gate
+
+**Status:** Accepted
+**Decision:** The canonical hackathon demo is `docker compose up` + `make seed` + `make ingest` on a fresh laptop (P9). An optional hosted track (initially Render Blueprint M15) adds HTTP Basic access gating via `ACCESS_PASSWORD` middleware — inert when unset, so local demo is byte-identically unaffected. Hosted artifacts live outside `docker-compose.yml`; cuttable without ceremony.
+**Alternatives Considered:** (a) Hosted-only demo (fails NFR-6 cold-clone path); (b) Public unauthenticated instance (unacceptable for a write-capable review queue); (c) Full Entra SSO (H2 — out of MVP scope).
+**Rationale:** Judges get reproducible local proof; sponsors get a shareable URL when credentials are supplied out-of-band. The gate is a seam for future RBAC, not a stand-in for it.
+**Trade-offs:** Two deployment stories to maintain; hosted DB seed is manual. Local path remains the primary acceptance bar.
+**Impact:** `middleware/access_gate.py`, `docs/deploy-alternatives/render/`, `Dockerfile.prod` (dataset baked for hosted only), README hosted section.
+
+---
+
+## D-026 — Azure deployment track supersedes Render (M15A)
+
+**Status:** Accepted
+**Decision:** The optional hosted demo migrates from Render to **Azure Container Apps + Azure Database for PostgreSQL (pgvector) + Azure Static Web Apps**, deployed via GitHub Actions OIDC (`infra/azure/`). Render artifacts are archived under `docs/deploy-alternatives/render/`. D-025's local-first rule is unchanged — `docker compose`, `make demo-gate`, and `docker-compose.yml` are not modified by the Azure track. Cut-line: if Azure blocks for more than one cumulative day, stop and report; local demo is sufficient for submission.
+**Alternatives Considered:** (a) Stay on Render (subscription/org constraints); (b) Dual-host Render + Azure (ops burden); (c) Azure-only with no local path (rejected — violates P9).
+**Rationale:** Enterprise narrative alignment for ET jury; OIDC CD is the long-lived path. Local demo remains the freeze truth.
+**Trade-offs:** Azure bootstrap is human-gated (subscription, OIDC federation, secrets in portal only). Hosted demo is optional for judging.
+**Impact:** `infra/azure/*`, `.github/workflows/deploy.yml`, `docs/deployment.md`, superseded Render README.
 
 ---

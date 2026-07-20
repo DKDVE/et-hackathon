@@ -1,4 +1,4 @@
-# Demo Checklist — M14 freeze (`demo-final-v2`)
+# Demo Checklist — M14 freeze (`demo-final-v3`)
 
 Rehearsal script for the Operational Context Engine demo. Everything below
 assumes `REASONING_ENABLED=true` and a valid `OPENROUTER_API_KEY` unless you are
@@ -141,8 +141,8 @@ With stack healthy and v4 fallback cache present (regenerated at T−30m):
 ## Memory layer (M12 / M13)
 
 - [ ] **Post-guard figures (M13, D-024):** after `make ingest`, expect **55 routine
-      closures**, review queue **32** (genuinely ambiguous failure rows in the
-      0.51–0.57 score band), failure-row unclassified rate **7.2%** (32/445).
+      closures**, review queue **32** (genuinely ambiguous failure-unclassified rows in the
+      **0.57–0.65** score band), failure-row unclassified rate **7.2%** (32/445).
       Accuracy rises to **96.6%** with **0** routine false positives. Re-run
       `make audit-norm` before demo if substrate changes.
 - [ ] **Do not action Review Queue items on hero-class WOs during rehearsals.** The three

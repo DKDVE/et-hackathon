@@ -30,6 +30,7 @@ One page. Every number said on stage.
 |--------|-------|
 | Normalization accuracy | **96.6%** (was **93.7%** pre-guard) |
 | Review queue | **32** |
+| Review queue score band (failure-unclassified rows) | **0.57–0.65** |
 | Routine closures (guard) | **55** |
 | Failure-row unclassified rate | **7.2%** (32/445) |
 
@@ -47,7 +48,7 @@ One page. Every number said on stage.
 
 | Metric | Value |
 |--------|-------|
-| T→analysis (demo-gate, M14) | **37.8s** (WARN band: expect **38–48s** on slow provider days) |
+| T→analysis (demo-gate, M14) | **41.2s** (WARN band: expect **38–48s** on slow provider days; latest gate `attempts_used=1`) |
 | Cold clone — first `make up` (no USB) | **15–25 min** (Wi‑Fi; ~3GB image pull) |
 | Cold clone — USB `images-load` path | **~3–5 min** stack + **~1 min** dataset + **~4 min** seed + **~4 min** ingest |
 | Embedder warm-up after `make up` | **1–2 min** |
@@ -64,6 +65,14 @@ groundedness, and prose_id only; golden runs via `make evals` (~30s, embedding l
 After T−30m live run on final board state:
 
 **http://localhost:5173/events/25** (regenerate each rehearsal; see `docs/demo-checklist.md`)
+
+## Knowledge-graph linkage (live DB, post-ingest)
+
+| Metric | Value |
+|--------|-------|
+| Assets with ≥1 linked document | **100%** (40/40) |
+| Failure-row WOs normalized | **92.8%** (413/445) |
+| Sister-relation coverage | **100%** (40/40 assets have ≥1 sister via class or duty) |
 
 ## Demo screenshots (M14)
 

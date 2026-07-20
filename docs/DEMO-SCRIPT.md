@@ -33,6 +33,8 @@ Failure-row unclassified: 32 (7.2% of 445 failure records)
 **Back-pocket Q&A:** *"After the guard, the review queue is 32 rows — all
 genuinely ambiguous failure phrasing. Zero routine PM noise."*
 
+**Back-pocket Q&A:** *"What about compliance?"* → *"Deliberate depth-over-coverage: we executed the maintenance-intelligence workflow completely. Compliance intelligence reads the same Operational Memory — it's the H2 epic, and the substrate it needs already exists."*
+
 ## Pattern panel (FR-12)
 
 Narrate both rows (downtime-sorted):
